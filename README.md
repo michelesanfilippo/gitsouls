@@ -8,7 +8,7 @@
 
 
 <h2 align="left">🔥 Summon your Soul</h2>
-Your GitSouls summoned at URL. 
+Your GitSouls summoned at URL.</br>
 Drop it in your profile README, your portfolio, blog, community.
 
 ```[![My GitSouls card](https://gitsouls.com/YOUR_USERNAME.png)](https://gitsouls.com/YOUR_USERNAME)```
