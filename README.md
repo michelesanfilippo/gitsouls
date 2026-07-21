@@ -36,10 +36,10 @@ Drop it in your profile README, your portfolio, blog, community.
 ⚔️ Boss Ranking System - based on overall stats
 
 ![Hollow](https://img.shields.io/badge/Hollow-<=20-gray)
-![Undead](https://img.shields.io/badge/Undead->20_&&_<=40-darkgreen)
-![Knight](https://img.shields.io/badge/Knight->40_&&_<=60-steelblue)
-![AbyssWalker](https://img.shields.io/badge/Abyss_Walker->60_&&_<=75-purple)
-![Lord](https://img.shields.io/badge/Lord->76_&&_<=90-gold)
+![Undead](https://img.shields.io/badge/Undead-<=40-darkgreen)
+![Knight](https://img.shields.io/badge/Knight-<=60-steelblue)
+![AbyssWalker](https://img.shields.io/badge/Abyss_Walker-<=75-purple)
+![Lord](https://img.shields.io/badge/Lord-<=90-gold)
 ![SoulOfCinder](https://img.shields.io/badge/Soul_Of_Cinder-%3E90-DC2626)
 
 
