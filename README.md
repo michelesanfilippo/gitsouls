@@ -20,8 +20,7 @@ Drop it in your profile README, your portfolio, blog, community.
 
 
 ---
-
-⚙️ How stats work
+<h2 align="left">⚙️ How stats work</h2>
 
 |  | Stat | Taken from |
 |---|---|---|
