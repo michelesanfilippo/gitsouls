@@ -33,7 +33,7 @@ Drop it in your profile README, your portfolio, blog, community.
 
 ```Formula: (VIT+END+INT+DEX+FAI+SOP)/6```
 
-⚔️ Boss Ranking System
+⚔️ Boss Ranking System - based on overall stats
 
 ![Hollow](https://img.shields.io/badge/Hollow-<=20-gray)
 ![Undead](https://img.shields.io/badge/Undead->20_&&_<=40-darkgreen)
@@ -43,7 +43,7 @@ Drop it in your profile README, your portfolio, blog, community.
 ![SoulOfCinder](https://img.shields.io/badge/Soul_Of_Cinder-%3E90-DC2626)
 
 
-🧙🏼‍♂️ Class System
+🧙🏼‍♂️ Class System - based on your highest stat
 
 ![Sorcerer](https://img.shields.io/badge/Sorcerer-INT-blue)
 ![BladeDancer](https://img.shields.io/badge/Blade_Dancer-DEX-red)
