@@ -15,8 +15,8 @@ Drop it in your profile README, your portfolio, blog, community.
 
 | Resource | Description |
 |---|---|
-| gitsouls.com/<username>.png | live boss card |
-| gitsouls.com/<username> | boss profile |
+| ```gitsouls.com/<username>.png``` | live boss card |
+| ```gitsouls.com/<username>``` | boss profile |
 
 
 ---
