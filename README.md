@@ -3,7 +3,7 @@
 > Turn your profile into a Souls-like boss.
 
 <p align="center">
-  <img src="public/img/octoSouls-nobg.png" width="380px" height="380px" alt="Questly" />
+  <img src="public/img/octoSouls-nobg.png" width="380px" height="380px" alt="OctoSouls" />
 </p>
 
 
