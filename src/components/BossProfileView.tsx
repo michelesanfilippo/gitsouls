@@ -3,31 +3,31 @@ import Link from "next/link";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";
 import StatBar from "./StatBar";
-import EngravedTitle from "./EngravedTitle";
 import ShareBox from "./ShareBox";
 import SkillsBox from "./SkillsBox";
 import RankPopup from "./RankPopup";
+import LanguageIcon from "./LanguageIcon";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];
 const RIGHT: StatKey[] = ["DEX", "FAI", "SOP"];
 
-/** Full boss layout: stats flank a fog-shrouded avatar, lore and share below. */
+/** Full boss layout: stats flank a fog-shrouded avatar, lore flanked by boxes. */
 export default function BossProfileView({ profile }: { profile: BossProfile }) {
   const { rank, bossClass, stats } = profile;
 
   return (
-    <div className="animate-fade-up relative mx-auto w-full max-w-5xl px-4 py-6">
-      {/* Back */}
+    <div className="animate-fade-up relative mx-auto w-full max-w-6xl px-4 py-4">
+      {/* Back — top-left of the page */}
       <Link
         href="/"
-        className="souls-focus mb-4 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gold/25 bg-void-2/50 px-3 py-1.5 font-display text-sm text-parchment/80 backdrop-blur transition-colors hover:border-gold/60 hover:text-gold"
+        className="souls-focus absolute left-4 top-0 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gold/25 bg-void-2/50 px-3 py-1.5 font-display text-sm text-parchment/80 backdrop-blur transition-colors hover:border-gold/60 hover:text-gold"
       >
         <span aria-hidden>←</span> Back
       </Link>
 
-      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-6">
+      <div className="mt-10 grid grid-cols-1 items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
         {/* Left stats */}
-        <div className="order-2 flex flex-col gap-5 md:order-none">
+        <div className="order-2 flex flex-col gap-4 md:order-none">
           {LEFT.map((k) => (
             <StatBar key={k} statKey={k} label={STAT_LABELS[k]} value={stats[k]} />
           ))}
@@ -35,13 +35,11 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
 
         {/* Avatar */}
         <div className="order-1 flex flex-col items-center md:order-none">
-          <EngravedTitle
-            as="span"
-            pulse
-            className="mb-3 text-2xl tracking-[0.35em] sm:text-3xl"
+          <span
+            className="emboss mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
           >
             {rank.name}
-          </EngravedTitle>
+          </span>
 
           <div className="relative">
             <div
@@ -54,10 +52,10 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               <Image
                 src={profile.avatarUrl}
                 alt={`${profile.login} avatar`}
-                width={240}
-                height={240}
+                width={220}
+                height={220}
                 priority
-                className="h-48 w-48 object-cover sm:h-56 sm:w-56"
+                className="h-40 w-40 object-cover sm:h-44 sm:w-44"
               />
               {/* Fog overlay */}
               <div
@@ -79,41 +77,40 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             </span>
           </div>
 
-          <h1 className="mt-7 text-center font-display text-4xl font-bold text-parchment sm:text-5xl">
+          <h1 className="mt-6 text-center font-display text-2xl font-bold text-parchment sm:text-3xl">
             {profile.name ?? profile.login}
           </h1>
           <a
             href={profile.htmlUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-base text-muted transition-colors hover:text-gold"
+            className="text-sm text-muted transition-colors hover:text-gold"
           >
             @{profile.login}
           </a>
 
-          <div className="mt-4 flex items-center gap-2">
-            <EngravedTitle
-              as="span"
-              className="text-xl tracking-[0.2em] sm:text-2xl"
-            >
-              {bossClass.name}
-            </EngravedTitle>
-          </div>
+          <span
+            className="mt-3 font-display text-xl font-semibold uppercase tracking-[0.2em] sm:text-2xl"
+            style={{
+              color: bossClass.color,
+              textShadow: `0 0 18px ${bossClass.color}55, 0 2px 4px rgba(0,0,0,0.6)`,
+            }}
+          >
+            {bossClass.name}
+          </span>
+
           {profile.topLanguage && (
-            <span
-              className="mt-3 rounded-full border px-4 py-1 font-display text-sm font-semibold"
-              style={{ borderColor: rank.color, color: rank.color }}
-            >
-              Weapon of choice · {profile.topLanguage}
-            </span>
+            <div className="mt-3">
+              <LanguageIcon language={profile.topLanguage} color={rank.color} />
+            </div>
           )}
-          <p className="mt-3 max-w-xs text-center text-sm italic text-muted">
+          <p className="mt-2 max-w-xs text-center text-sm italic text-muted">
             {bossClass.blurb}
           </p>
         </div>
 
         {/* Right stats */}
-        <div className="order-3 flex flex-col gap-5 md:order-none">
+        <div className="order-3 flex flex-col gap-4 md:order-none">
           {RIGHT.map((k) => (
             <StatBar
               key={k}
@@ -127,7 +124,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
       </div>
 
       {/* Facts */}
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-base text-muted">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-base text-muted">
         <span>
           <span className="text-parchment">{profile.followers}</span> followers
         </span>
@@ -143,25 +140,25 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         </span>
       </div>
 
-      <div className="rule mx-auto my-8 max-w-2xl" />
-
-      {/* Lore */}
-      <p className="mx-auto max-w-2xl text-center font-serif text-base italic leading-relaxed text-parchment/80">
-        {profile.lore}
-      </p>
-
-      {!profile.hasContributionData && (
-        <p className="mt-6 text-center text-xs text-muted/70">
-          Contribution stats are estimated — set a GITHUB_TOKEN for full power.
-        </p>
-      )}
-
-      {/* Share + skills */}
-      <div className="mt-12 grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-        <div className="order-2 md:order-none">
+      {/* Share (left) · Lore (center) · Skills (right) */}
+      <div className="mt-6 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div className="order-2 lg:order-none">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>
-        <div className="order-1 flex flex-col items-end gap-3 md:order-none">
+
+        <div className="order-1 flex flex-col items-center justify-center text-center lg:order-none">
+          <div className="rule mx-auto mb-4 w-24" />
+          <p className="font-serif text-base italic leading-relaxed text-parchment/80">
+            {profile.lore}
+          </p>
+          {!profile.hasContributionData && (
+            <p className="mt-4 text-xs text-muted/70">
+              Contribution stats are estimated — set a GITHUB_TOKEN for full power.
+            </p>
+          )}
+        </div>
+
+        <div className="order-3 flex flex-col items-end gap-3 lg:order-none">
           <SkillsBox skills={profile.skills} />
           <RankPopup rankInfo={profile.rankInfo} color={rank.color} />
         </div>

@@ -11,14 +11,14 @@ export default function Home() {
       <TopBar />
       <main className="relative flex flex-1 flex-col items-center justify-center px-4 text-center">
         {/* Floating OctoSouls, left at title height */}
-        <div className="animate-float-slow pointer-events-none absolute left-[6%] top-1/2 hidden -translate-y-1/2 lg:block xl:left-[12%]">
+        <div className="animate-float-slow pointer-events-none absolute left-[4%] top-[38%] hidden -translate-y-1/2 lg:block xl:left-[9%]">
           <Image
             src="/img/octoSouls-nobg.png"
             alt="OctoSouls"
             width={495}
             height={504}
             priority
-            className="h-auto w-48 opacity-90 drop-shadow-[0_10px_40px_rgba(220,38,38,0.35)] xl:w-60"
+            className="h-auto w-64 opacity-90 drop-shadow-[0_10px_40px_rgba(220,38,38,0.35)] xl:w-80"
           />
         </div>
 

@@ -31,10 +31,10 @@ export default function SwordCursor() {
       style={{ filter: "drop-shadow(0 8px 20px rgba(220,38,38,0.35))" }}
     >
       <Image
-        src="/img/cursor_sword.png"
+        src="/img/sword.png"
         alt="Souls sword"
-        width={348}
-        height={128}
+        width={300}
+        height={300}
         className="h-auto w-40 sm:w-52"
         priority
       />
