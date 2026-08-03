@@ -11,10 +11,10 @@ export default function TopBar() {
 
   return (
     <>
-      <header className="flex w-full items-center justify-end gap-4 p-4 text-sm sm:gap-6 sm:p-6">
+      <header className="flex w-full items-center justify-end gap-4 p-4 text-base sm:gap-6 sm:p-6">
         <button
           onClick={() => setOpen(true)}
-          className="souls-focus rounded-sm text-muted transition-colors hover:text-gold"
+          className="souls-focus cursor-pointer rounded-sm font-display text-base tracking-wide text-parchment/80 transition-colors hover:text-gold"
         >
           How it works
         </button>
@@ -22,9 +22,9 @@ export default function TopBar() {
           href={REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="souls-focus flex items-center gap-2 rounded-sm text-muted transition-colors hover:text-gold"
+          className="souls-focus flex cursor-pointer items-center gap-2 rounded-lg border border-gold/30 bg-void-2/50 px-4 py-2 font-display text-base text-parchment/80 backdrop-blur transition-colors hover:border-gold/60 hover:text-gold"
         >
-          <GitHubLogo className="h-4 w-4" />
+          <GitHubLogo className="h-5 w-5" />
           <span>Star on GitHub</span>
         </a>
       </header>

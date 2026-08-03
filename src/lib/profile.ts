@@ -6,8 +6,16 @@ import {
   computeStats,
   getClass,
   getRank,
+  generateSkills,
+  getRankInfo,
 } from "./scoring";
-import type { BossClass, Rank, Stats } from "./scoring/types";
+import type {
+  BossClass,
+  Rank,
+  Stats,
+  Skill,
+  RankInfo,
+} from "./scoring";
 import { generateLore } from "./lore/generate";
 
 export interface BossProfile {
@@ -31,6 +39,8 @@ export interface BossProfile {
   topLanguage: string | null;
   topRepoName: string | null;
   lore: string;
+  skills: Skill[];
+  rankInfo: RankInfo;
   hasContributionData: boolean;
 }
 
@@ -115,6 +125,8 @@ export async function getBossProfile(username: string): Promise<BossProfile> {
     topLanguage: lang,
     topRepoName: relic?.name ?? null,
     lore,
+    skills: generateSkills(metrics, overall, lang),
+    rankInfo: getRankInfo(overall),
     hasContributionData: metrics.hasContributionData,
   };
 }

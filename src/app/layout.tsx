@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel, EB_Garamond } from "next/font/google";
+import Backdrop from "@/components/Backdrop";
+import SwordCursorInit from "@/components/SwordCursorInit";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -42,7 +44,11 @@ export default function RootLayout({
       lang="en"
       className={`${cinzel.variable} ${garamond.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Backdrop />
+        <SwordCursorInit />
+        {children}
+      </body>
     </html>
   );
 }

@@ -89,3 +89,121 @@ body {
 .animate-fade-up {
   animation: fadeInUp 0.5s ease-out both;
 }
+
+/* Engraved ember/gold title (the "BEARER OF THE CURSE" look) */
+.engraved {
+  background: linear-gradient(
+    180deg,
+    #f7e3ad 0%,
+    #e0a53a 34%,
+    #dc2626 74%,
+    #8f1b1b 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(220, 38, 38, 0.4));
+}
+
+/* Twinkling stars */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Slow vertical float (octoSouls, sword) */
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+@keyframes swordSway {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(4deg);
+  }
+}
+
+.animate-sword {
+  animation: swordSway 7s ease-in-out infinite;
+}
+
+/* Drifting background orbs */
+@keyframes drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -20px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-drift {
+  animation: drift 18s ease-in-out infinite;
+}
+
+/* Frosted glass surface for cards/boxes */
+.glass {
+  background: rgba(20, 12, 30, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+/* Boss avatar fog: drifting mist over the portrait */
+@keyframes fogDrift {
+  0% {
+    transform: translateX(-8%) scale(1.1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(8%) scale(1.2);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(-8%) scale(1.1);
+    opacity: 0.55;
+  }
+}
+
+.animate-fog {
+  animation: fogDrift 9s ease-in-out infinite;
+}
+
+/* Sword cursor active for the whole tab */
+.sword-cursor,
+.sword-cursor * {
+  cursor: url("/img/cursor_sword_cursor.png") 4 4, auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ember,
+  .animate-float-slow,
+  .animate-sword,
+  .animate-drift,
+  .animate-fog,
+  .star {
+    animation: none !important;
+  }
+}
