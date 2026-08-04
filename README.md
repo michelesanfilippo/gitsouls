@@ -21,7 +21,7 @@ Drop it in your profile README, your portfolio, blog, community.
 
 
 ---
-<h2 align="left">⚙️ How stats work</h2>
+<h2 align="left">⚙️ How it works</h2>
 
 |  | Stat | Taken from |
 |---|---|---|
@@ -69,7 +69,5 @@ from the **Duel** button on any profile.
 
 ```Battle power: (VIT+END+INT+DEX+FAI+SOP)/6 + Σ(skill weights)```
 
-A duel always tells the same story for the same two profiles, so a shared link
-shows what you saw — but it is retold as either boss grows stronger.
 
 ![GitSouls Footer](https://capsule-render.vercel.app/api?type=waving&height=150&color=0:1A102A,50:DC2626,100:D4AF37&section=footer)
