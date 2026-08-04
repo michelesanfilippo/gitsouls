@@ -133,7 +133,7 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
                 onClick={() => setMenuOpen(false)}
                 className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm text-parchment/85 transition-colors hover:bg-white/5 hover:text-gold"
               >
-                🖼️ Download card (PNG)
+                🖼️ Download story card
               </a>
               <button
                 onClick={copyLink}

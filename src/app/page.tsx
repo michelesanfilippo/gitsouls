@@ -4,6 +4,7 @@ import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import EngravedTitle from "@/components/EngravedTitle";
 import SwordCursor from "@/components/SwordCursor";
+import SoulsCounter from "@/components/SoulsCounter";
 
 export default function Home() {
   return (
@@ -22,8 +23,8 @@ export default function Home() {
           />
         </div>
 
-        {/* Floating sword, right at subtitle height */}
-        <div className="absolute right-[6%] top-1/2 hidden -translate-y-1/2 lg:block xl:right-[12%]">
+        {/* Floating sword, right and a little below the search box */}
+        <div className="absolute right-[6%] top-[68%] hidden -translate-y-1/2 lg:block xl:right-[12%]">
           <SwordCursor />
         </div>
 
@@ -40,6 +41,7 @@ export default function Home() {
 
         <div className="mt-10 flex w-full flex-col items-center">
           <ScoutForm />
+          <SoulsCounter />
         </div>
       </main>
       <Footer />

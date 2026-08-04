@@ -61,24 +61,21 @@ export default function Backdrop() {
         />
       ))}
 
-      {/* Rolling fog — low-lying mist and a mid-height drift */}
+      {/*
+        Rolling fog. Deliberately blurred, over-sized blobs with rounded-[50%]:
+        a rectangular element carrying a radial-gradient shows a hard seam
+        wherever the gradient is still opaque when it meets the element's edge,
+        which reads as a box outline. Blur + generous overflow avoids that.
+      */}
+      <div className="animate-fog-drift absolute -bottom-[18vh] -left-[10%] h-[65vh] w-[130%] rounded-[50%] bg-[rgba(178,178,205,0.13)] blur-[90px]" />
+      <div className="animate-fog-drift-slow absolute -left-[20%] top-[22%] h-[45vh] w-[110%] rounded-[50%] bg-[rgba(158,158,190,0.09)] blur-[100px]" />
       <div
-        className="animate-fog-drift absolute inset-x-0 bottom-0 h-[45vh]"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 100% at 50% 100%, rgba(170,170,195,0.1), transparent 70%)",
-        }}
-      />
-      <div
-        className="animate-fog-drift-slow absolute inset-x-0 top-1/4 h-[40vh]"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 100% at 30% 50%, rgba(150,150,180,0.06), transparent 65%)",
-        }}
+        className="animate-fog-drift absolute -right-[15%] top-[52%] h-[40vh] w-[95%] rounded-[50%] bg-[rgba(150,150,185,0.07)] blur-[110px]"
+        style={{ animationDelay: "9s" }}
       />
 
       {/* Subtle vignette for depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.5)_100%)]" />
     </div>
   );
 }

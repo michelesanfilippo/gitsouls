@@ -3,21 +3,13 @@
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { RANKS } from "@/lib/scoring/rank";
 import { CLASS_BY_STAT } from "@/lib/scoring/class";
+import { STAT_EXPLAINERS, SAMPLING_NOTE } from "@/lib/scoring/explain";
 import Modal from "./Modal";
 
 interface HowItWorksModalProps {
   open: boolean;
   onClose: () => void;
 }
-
-const STAT_SOURCES: Record<string, string> = {
-  VIT: "Total contributions & commits",
-  END: "Streak, active months, account age",
-  INT: "Language breadth & repo quality",
-  DEX: "Repo count, creation cadence, commits",
-  FAI: "Owned repos, forks received, public PRs",
-  SOP: "Followers, stars, watchers",
-};
 
 /** Souls-styled modal explaining how stats, ranks and classes are derived. */
 export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps) {
@@ -42,13 +34,16 @@ export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps)
             </span>
             <span className="text-parchment/80">
               <span className="text-parchment">{STAT_LABELS[key]}</span> —{" "}
-              {STAT_SOURCES[key]}
+              {STAT_EXPLAINERS[key].summary}
             </span>
           </li>
         ))}
       </ul>
       <p className="mt-3 text-xs italic text-muted">
         Overall power = (VIT + END + INT + DEX + FAI + SOP) / 6
+      </p>
+      <p className="mt-1 text-xs italic text-muted/70">
+        Hover any stat on a profile for its exact weighting. {SAMPLING_NOTE}
       </p>
 
       <div className="rule my-5" />

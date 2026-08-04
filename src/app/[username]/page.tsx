@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import BossProfileView from "@/components/BossProfileView";
 import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
+import { recordSummon } from "@/lib/souls";
 
 export async function generateMetadata({
   params,
@@ -50,6 +51,10 @@ export default async function BossPage({ params }: PageProps<"/[username]">) {
     }
     // rate limited → fall through and render the RateLimited notice
   }
+
+  // Count the summon only once the boss actually resolved, so failed and
+  // misspelled lookups never inflate the tally.
+  if (profile) await recordSummon(profile.login);
 
   return (
     <div className="flex min-h-dvh flex-col">

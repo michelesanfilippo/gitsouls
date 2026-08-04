@@ -1,0 +1,66 @@
+name: Cleanup deployments
+
+# Vercel registers a GitHub Deployment for every push, and GitHub keeps them all
+# listed as active forever. This prunes them so only the newest survives.
+on:
+  deployment_status:
+  workflow_dispatch:
+
+# Never race two prunes against the same list.
+concurrency:
+  group: cleanup-deployments
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    # Only once a deployment has actually settled, so we never delete the record
+    # of a deployment still in flight.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.deployment_status.state == 'success' ||
+      github.event.deployment_status.state == 'failure' ||
+      github.event.deployment_status.state == 'error'
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - name: Delete all but the most recent deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+
+            // Newest first.
+            const all = await github.paginate(
+              github.rest.repos.listDeployments,
+              { owner, repo, per_page: 100 },
+            );
+
+            if (all.length <= 1) {
+              core.info(`Nothing to prune (${all.length} deployment(s)).`);
+              return;
+            }
+
+            const [keep, ...stale] = all;
+            core.info(`Keeping #${keep.id} (${keep.environment}), pruning ${stale.length}.`);
+
+            for (const d of stale) {
+              try {
+                // A deployment must be marked inactive before it can be deleted.
+                await github.rest.repos.createDeploymentStatus({
+                  owner, repo, deployment_id: d.id, state: 'inactive',
+                });
+              } catch (err) {
+                core.info(`Could not deactivate #${d.id}: ${err.message}`);
+              }
+
+              try {
+                await github.rest.repos.deleteDeployment({
+                  owner, repo, deployment_id: d.id,
+                });
+                core.info(`Deleted #${d.id}`);
+              } catch (err) {
+                // Keep going: one stubborn record shouldn't fail the run.
+                core.warning(`Could not delete #${d.id}: ${err.message}`);
+              }
+            }

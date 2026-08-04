@@ -4,24 +4,36 @@ import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";
 import StatBar from "./StatBar";
 import ShareBox from "./ShareBox";
 import SkillsBox from "./SkillsBox";
-import RankPopup from "./RankPopup";
+import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];
 const RIGHT: StatKey[] = ["DEX", "FAI", "SOP"];
 
-/** Full boss layout: stats flank a fog-shrouded avatar, lore flanked by boxes. */
+/**
+ * Full boss layout. Two side columns flank the avatar: each carries its three
+ * stats with a box beneath (share on the left, skills on the right), so the
+ * page fills out without the lore leaving a dead band across the middle.
+ */
 export default function BossProfileView({ profile }: { profile: BossProfile }) {
   const { rank, bossClass, stats } = profile;
 
   return (
-    <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-10 px-4 py-8 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-12 lg:gap-20">
-        {/* Left stats */}
-        <div className="order-2 flex w-full max-w-sm flex-col gap-4 md:order-none md:mr-auto">
-          {LEFT.map((k) => (
-            <StatBar key={k} statKey={k} label={STAT_LABELS[k]} value={stats[k]} />
-          ))}
+    <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-12">
+      <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-8 lg:gap-10">
+        {/* Left column — stats, then the share box */}
+        <div className="order-2 flex w-full flex-col gap-5 md:order-none md:max-w-md">
+          <div className="flex flex-col gap-4">
+            {LEFT.map((k) => (
+              <StatBar
+                key={k}
+                statKey={k}
+                label={STAT_LABELS[k]}
+                value={stats[k]}
+              />
+            ))}
+          </div>
+          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>
 
         {/* Avatar */}
@@ -105,61 +117,58 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <p className="mt-2 max-w-xs text-center text-sm italic text-muted">
             {bossClass.blurb}
           </p>
+
+          {/* Facts */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted">
+            <span>
+              <span className="text-parchment">{profile.followers}</span>{" "}
+              followers
+            </span>
+            <span>
+              <span className="text-parchment">{profile.totalStars}</span> stars
+            </span>
+            <span>
+              <span className="text-parchment">{profile.publicRepos}</span> repos
+            </span>
+            <span>
+              <span className="text-parchment">{Math.floor(profile.years)}</span>{" "}
+              yrs of ash
+            </span>
+          </div>
+
+          <div className="mt-5 w-full max-w-xs">
+            <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
+          </div>
         </div>
 
-        {/* Right stats */}
-        <div className="order-3 flex w-full max-w-sm flex-col gap-4 md:order-none md:ml-auto">
-          {RIGHT.map((k) => (
-            <StatBar
-              key={k}
-              statKey={k}
-              label={STAT_LABELS[k]}
-              value={stats[k]}
-              align="right"
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Facts */}
-      <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-base text-muted">
-        <span>
-          <span className="text-parchment">{profile.followers}</span> followers
-        </span>
-        <span>
-          <span className="text-parchment">{profile.totalStars}</span> stars
-        </span>
-        <span>
-          <span className="text-parchment">{profile.publicRepos}</span> repos
-        </span>
-        <span>
-          <span className="text-parchment">{Math.floor(profile.years)}</span> yrs
-          of ash
-        </span>
-      </div>
-
-      {/* Share (left) · Lore (center) · Skills (right) */}
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div className="order-2 lg:order-none">
-          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
-        </div>
-
-        <div className="order-1 flex flex-col items-center justify-center text-center lg:order-none">
-          <div className="rule mx-auto mb-4 w-24" />
-          <p className="mx-auto max-w-2xl font-serif text-base italic leading-relaxed text-parchment/80">
-            {profile.lore}
-          </p>
-          {!profile.hasContributionData && (
-            <p className="mt-4 text-xs text-muted/70">
-              Contribution stats are estimated — set a GITHUB_TOKEN for full power.
-            </p>
-          )}
-        </div>
-
-        <div className="order-3 flex flex-col items-end gap-3 lg:order-none">
+        {/* Right column — stats, then the skills box */}
+        <div className="order-3 flex w-full flex-col gap-5 md:order-none md:ml-auto md:max-w-md">
+          <div className="flex flex-col gap-4">
+            {RIGHT.map((k) => (
+              <StatBar
+                key={k}
+                statKey={k}
+                label={STAT_LABELS[k]}
+                value={stats[k]}
+                align="right"
+              />
+            ))}
+          </div>
           <SkillsBox skills={profile.skills} />
-          <RankPopup rankInfo={profile.rankInfo} color={rank.color} />
         </div>
+      </div>
+
+      {/* Lore */}
+      <div className="flex flex-col items-center text-center">
+        <div className="rule mx-auto mb-4 w-24" />
+        <p className="mx-auto max-w-3xl font-serif text-base italic leading-relaxed text-parchment/80">
+          {profile.lore}
+        </p>
+        {!profile.hasContributionData && (
+          <p className="mt-4 text-xs text-muted/70">
+            Contribution stats are estimated — set a GITHUB_TOKEN for full power.
+          </p>
+        )}
       </div>
     </div>
   );

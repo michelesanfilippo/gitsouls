@@ -129,7 +129,7 @@ body {
 }
 
 .animate-float-slow {
-  animation: floatSlow 6s ease-in-out infinite;
+  animation: floatSlow 11s ease-in-out infinite;
 }
 
 @keyframes swordSway {
@@ -143,7 +143,7 @@ body {
 }
 
 .animate-sword {
-  animation: swordSway 7s ease-in-out infinite;
+  animation: swordSway 13s ease-in-out infinite;
 }
 
 /* Drifting background orbs */

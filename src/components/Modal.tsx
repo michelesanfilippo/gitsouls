@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -27,9 +27,6 @@ export default function Modal({
   maxWidth = "max-w-2xl",
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) return;
@@ -46,7 +43,9 @@ export default function Modal({
     };
   }, [open, onClose]);
 
-  if (!open || !mounted) return null;
+  // `open` only ever becomes true from a user interaction, so this never runs
+  // during SSR; the document check is a cheap belt-and-braces guard.
+  if (!open || typeof document === "undefined") return null;
 
   return createPortal(
     <div

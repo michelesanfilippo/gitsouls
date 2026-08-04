@@ -98,7 +98,8 @@ export default function ScoutForm() {
           className="cursor-pointer text-gold/80 underline underline-offset-4 transition-colors hover:text-gold"
         >
           michelesanfilippo
-        </button>
+        </button>{" "}
+        or your own
       </p>
     </div>
   );

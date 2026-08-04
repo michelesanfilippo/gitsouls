@@ -56,7 +56,14 @@ describe("generateSkills", () => {
   it("returns objects without the internal unlocked flag", () => {
     const skills = generateSkills(base, 0, "Go");
     for (const s of skills) {
-      expect(Object.keys(s).sort()).toEqual(["icon", "name", "note"]);
+      expect(Object.keys(s).sort()).toEqual(["how", "icon", "name", "note"]);
+    }
+  });
+
+  it("explains how each unlocked skill was earned", () => {
+    const skills = generateSkills({ ...base, followers: 1500 }, 0, "Go");
+    for (const s of skills) {
+      expect(s.how.length).toBeGreaterThan(0);
     }
   });
 });
