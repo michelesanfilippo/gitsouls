@@ -14,11 +14,15 @@ interface HowItWorksModalProps {
 /** Souls-styled modal explaining how stats, ranks and classes are derived. */
 export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps) {
   return (
-    <Modal open={open} onClose={onClose} label="How GitSouls works">
-      <h2 className="font-display text-2xl font-semibold tracking-wide text-gold">
-        How the souls are weighed
-      </h2>
-      <p className="mt-2 text-sm text-parchment/70">
+    // Wider than the default so the stat and class lists sit two-up, which keeps
+    // the dialog from running taller than a laptop viewport.
+    <Modal
+      open={open}
+      onClose={onClose}
+      label="How the souls are weighed"
+      maxWidth="max-w-3xl"
+    >
+      <p className="text-sm text-parchment/70">
         Every boss is forged in real time from public GitHub data. No account, no
         database — just your commits, repos and reputation.
       </p>
@@ -26,7 +30,7 @@ export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps)
       <div className="rule my-5" />
 
       <h3 className="font-display text-lg text-parchment">The six stats</h3>
-      <ul className="mt-3 space-y-2 text-sm">
+      <ul className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
         {STAT_KEYS.map((key) => (
           <li key={key} className="flex gap-3">
             <span className="w-10 shrink-0 font-display font-semibold text-ember">
