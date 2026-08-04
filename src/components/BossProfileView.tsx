@@ -20,10 +20,10 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
 
   return (
     <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-6 lg:gap-8">
-        {/* Left column — stats, then the share box. ml-auto pulls it in toward
-            the avatar; the top padding drops it below the rank heading. */}
-        <div className="order-2 flex w-full flex-col gap-5 md:order-none md:ml-auto md:max-w-sm md:pt-24 lg:max-w-md">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch md:gap-10 lg:gap-14">
+        {/* Left column — stats, then the share box. The share box is pushed to
+            the bottom so it lines up with the percentile box under the avatar. */}
+        <div className="order-2 flex w-full flex-col gap-8 md:order-none md:ml-auto md:h-full md:max-w-sm md:pt-28 lg:max-w-md">
           <div className="flex flex-col gap-4">
             {LEFT.map((k) => (
               <StatBar
@@ -34,7 +34,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               />
             ))}
           </div>
-          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
+          {/* mt-auto drops it to the bottom, level with the percentile box */}
+          <div className="md:mt-auto">
+            <ShareBox
+              login={profile.login}
+              name={profile.name ?? profile.login}
+            />
+          </div>
         </div>
 
         {/* Avatar */}
@@ -144,7 +150,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         </div>
 
         {/* Right column — stats, then the skills box */}
-        <div className="order-3 flex w-full flex-col gap-5 md:order-none md:mr-auto md:max-w-sm md:pt-24 lg:max-w-md">
+        <div className="order-3 flex w-full flex-col gap-8 md:order-none md:mr-auto md:h-full md:max-w-sm md:pt-28 lg:max-w-md">
           <div className="flex flex-col gap-4">
             {RIGHT.map((k) => (
               <StatBar
@@ -156,7 +162,9 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               />
             ))}
           </div>
-          <SkillsBox skills={profile.skills} />
+          <div className="md:mt-auto">
+            <SkillsBox skills={profile.skills} />
+          </div>
         </div>
       </div>
 

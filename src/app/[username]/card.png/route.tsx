@@ -2,8 +2,56 @@ import { ImageResponse } from "next/og";
 import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
+import { deviconUrl } from "@/lib/devicon";
 
 export const runtime = "nodejs";
+
+/**
+ * Cinzel, the display face used across the site. Fetched from Google Fonts at
+ * render time: satori needs the raw font bytes, and without them everything
+ * falls back to the single bundled sans (which also has no bold, so weights
+ * silently flatten).
+ */
+async function loadCinzel(weight: 400 | 700): Promise<ArrayBuffer | null> {
+  try {
+    const css = await fetch(
+      `https://fonts.googleapis.com/css2?family=Cinzel:wght@${weight}`,
+      {
+        // A UA string that gets us TTF rather than WOFF2, which satori can't read.
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; gitsouls)" },
+        next: { revalidate: 60 * 60 * 24 * 30 },
+      },
+    ).then((r) => (r.ok ? r.text() : null));
+    if (!css) return null;
+
+    const url = css.match(/src:\s*url\(([^)]+)\)/)?.[1];
+    if (!url) return null;
+
+    const res = await fetch(url, {
+      next: { revalidate: 60 * 60 * 24 * 30 },
+    });
+    return res.ok ? await res.arrayBuffer() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Devicon SVG as a data URI — satori can't fetch remote SVGs reliably. */
+async function fetchLanguageIcon(language: string): Promise<string | null> {
+  const url = deviconUrl(language);
+  if (!url) return null;
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+      next: { revalidate: 60 * 60 * 24 * 30 },
+    });
+    if (!res.ok) return null;
+    const svg = await res.text();
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Fetch the avatar up-front as a data URI. Satori would otherwise fetch it
@@ -45,7 +93,26 @@ export async function GET(
   }
 
   const { rank, bossClass } = profile;
-  const avatar = await fetchAvatar(profile.avatarUrl);
+
+  const [avatar, langIcon, cinzel, cinzelBold] = await Promise.all([
+    fetchAvatar(profile.avatarUrl),
+    profile.topLanguage
+      ? fetchLanguageIcon(profile.topLanguage)
+      : Promise.resolve(null),
+    loadCinzel(400),
+    loadCinzel(700),
+  ]);
+
+  const fonts = [
+    ...(cinzel
+      ? [{ name: "Cinzel", data: cinzel, weight: 400 as const, style: "normal" as const }]
+      : []),
+    ...(cinzelBold
+      ? [{ name: "Cinzel", data: cinzelBold, weight: 700 as const, style: "normal" as const }]
+      : []),
+  ];
+  // Only claim the family when we actually loaded it, else satori errors out.
+  const fontFamily = fonts.length > 0 ? "Cinzel" : "sans-serif";
 
   return new ImageResponse(
     (
@@ -63,11 +130,11 @@ export async function GET(
             // Last two layers are the drifting fog banks.
             "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%), radial-gradient(1100px 520px at 22% 74%, rgba(178,178,205,0.16), transparent 68%), radial-gradient(950px 460px at 82% 34%, rgba(158,158,190,0.12), transparent 66%)",
           color: "#e8e0cf",
-          fontFamily: "sans-serif",
+          fontFamily,
           padding: "110px 80px",
         }}
       >
-        {/* Rank */}
+        {/* Rank — coloured and glowing like the profile heading */}
         <div
           style={{
             display: "flex",
@@ -75,6 +142,7 @@ export async function GET(
             letterSpacing: "16px",
             textTransform: "uppercase",
             color: rank.color,
+            textShadow: `0 0 26px ${rank.glow}, 0 2px 4px rgba(0,0,0,0.85)`,
           }}
         >
           {rank.name}
@@ -187,14 +255,13 @@ export async function GET(
           @{profile.login}
         </div>
 
-        {/* Class, with the top language beside it. Rendered as text rather than
-            a devicon SVG: satori's SVG-over-URL support is unreliable and a
-            failed fetch would corrupt the whole image. */}
+        {/* Class chip, mirroring the profile page: tinted fill, matching border
+            and an outer glow. The top language sits beside it as its icon. */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "20px",
+            gap: "24px",
             marginTop: "40px",
           }}
         >
@@ -203,8 +270,11 @@ export async function GET(
               display: "flex",
               borderRadius: "22px",
               border: `4px solid ${bossClass.color}`,
+              backgroundColor: `${bossClass.color}26`,
+              boxShadow: `0 0 32px ${bossClass.color}4d`,
               padding: "12px 32px",
               fontSize: "36px",
+              fontWeight: 700,
               letterSpacing: "6px",
               textTransform: "uppercase",
               color: bossClass.color,
@@ -212,19 +282,36 @@ export async function GET(
           >
             {bossClass.name}
           </div>
-          {profile.topLanguage && (
-            <div
-              style={{
-                display: "flex",
-                borderRadius: "22px",
-                border: `4px solid ${rank.color}`,
-                padding: "12px 28px",
-                fontSize: "32px",
-                color: rank.color,
-              }}
-            >
-              {profile.topLanguage}
-            </div>
+
+          {langIcon ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={langIcon}
+              alt=""
+              width={68}
+              height={68}
+              style={{ width: "68px", height: "68px" }}
+            />
+          ) : (
+            profile.topLanguage && (
+              // No icon for this language — fall back to its initials.
+              <div
+                style={{
+                  display: "flex",
+                  width: "68px",
+                  height: "68px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "9999px",
+                  border: `3px solid ${rank.color}`,
+                  fontSize: "26px",
+                  fontWeight: 700,
+                  color: rank.color,
+                }}
+              >
+                {profile.topLanguage.slice(0, 2).toUpperCase()}
+              </div>
+            )
           )}
         </div>
 
@@ -312,6 +399,7 @@ export async function GET(
     {
       width: 1080,
       height: 1920,
+      ...(fonts.length > 0 ? { fonts } : {}),
       headers: {
         // Force a save dialog: the <a download> attribute alone is ignored by
         // iOS Safari and in-app webviews, which just display the image instead.

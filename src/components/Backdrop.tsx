@@ -35,13 +35,13 @@ export default function Backdrop() {
       className="gpu-layer pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       {/* Drifting glass orbs */}
-      <div className="animate-drift gpu-layer absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-ember/20 blur-[120px]" />
+      <div className="animate-drift gpu-layer absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-ember/20 blur-[70px]" />
       <div
-        className="animate-drift gpu-layer absolute -bottom-40 right-1/4 h-96 w-96 rounded-full bg-gold/15 blur-[130px]"
+        className="animate-drift gpu-layer absolute -bottom-40 right-1/4 h-96 w-96 rounded-full bg-gold/15 blur-[70px]"
         style={{ animationDelay: "6s" }}
       />
       <div
-        className="animate-drift gpu-layer absolute left-[10%] top-1/2 h-72 w-72 rounded-full bg-void-2/60 blur-[110px]"
+        className="animate-drift gpu-layer absolute left-[10%] top-1/2 h-72 w-72 rounded-full bg-void-2/60 blur-[60px]"
         style={{ animationDelay: "3s" }}
       />
 
@@ -72,10 +72,10 @@ export default function Backdrop() {
         otherwise makes the clip edge re-rasterise every frame, which flickers
         as a thin dark line.
       */}
-      <div className="animate-fog-drift gpu-layer absolute -bottom-[18vh] -left-[10%] h-[65vh] w-[130%] rounded-[50%] bg-[rgba(178,178,205,0.13)] blur-[90px]" />
-      <div className="animate-fog-drift-slow gpu-layer absolute -left-[20%] top-[22%] h-[45vh] w-[110%] rounded-[50%] bg-[rgba(158,158,190,0.09)] blur-[100px]" />
+      <div className="animate-fog-drift gpu-layer absolute -bottom-[18vh] -left-[10%] h-[65vh] w-[130%] rounded-[50%] bg-[rgba(178,178,205,0.13)] blur-[64px]" />
+      <div className="animate-fog-drift-slow gpu-layer absolute -left-[20%] top-[22%] h-[45vh] w-[110%] rounded-[50%] bg-[rgba(158,158,190,0.09)] blur-[64px]" />
       <div
-        className="animate-fog-drift gpu-layer absolute -right-[15%] top-[52%] h-[40vh] w-[95%] rounded-[50%] bg-[rgba(150,150,185,0.07)] blur-[110px]"
+        className="animate-fog-drift gpu-layer absolute -right-[15%] top-[52%] h-[40vh] w-[95%] rounded-[50%] bg-[rgba(150,150,185,0.07)] blur-[64px]"
         style={{ animationDelay: "9s" }}
       />
 

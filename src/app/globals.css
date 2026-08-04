@@ -45,14 +45,16 @@ body {
 }
 
 /*
- * Force an element onto its own compositor layer. Needed for the large blurred,
- * transform-animated backdrop blobs: without it the browser re-rasterises the
- * blur against the clipping parent each frame, which shows up as a flickering
- * hairline. backface-visibility also suppresses seams on subpixel positions.
+ * Keep an element on its own compositor layer.
+ *
+ * Note the animations below all carry an explicit translateZ(0): a keyframe
+ * setting `transform` overrides the one declared here, so without it the layer
+ * promotion is lost for the whole duration of the animation — which is exactly
+ * when it is needed. `will-change` is deliberately NOT set: on several large
+ * blurred elements at once it inflates GPU memory and makes the tearing worse.
  */
 .gpu-layer {
   transform: translateZ(0);
-  will-change: transform;
   backface-visibility: hidden;
 }
 
@@ -102,7 +104,13 @@ body {
   animation: fadeInUp 0.5s ease-out both;
 }
 
-/* Engraved ember/gold title (the "BEARER OF THE CURSE" look) */
+/*
+ * Engraved ember/gold title (the "BEARER OF THE CURSE" look).
+ *
+ * No `filter: drop-shadow` here: combined with background-clip:text and the
+ * ember opacity animation it makes Chrome re-composite the clipped text every
+ * frame, which tears as black hairlines. A wrapper div carries the glow instead.
+ */
 .engraved {
   background: linear-gradient(
     180deg,
@@ -115,7 +123,7 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  filter: drop-shadow(0 2px 12px rgba(220, 38, 38, 0.4));
+  transform: translateZ(0);
 }
 
 /* Twinkling stars */
@@ -133,10 +141,10 @@ body {
 @keyframes floatSlow {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translateY(-18px);
+    transform: translate3d(0, -18px, 0);
   }
 }
 
@@ -147,10 +155,10 @@ body {
 @keyframes swordSway {
   0%,
   100% {
-    transform: translateY(0) rotate(-4deg);
+    transform: translate3d(0, 0, 0) rotate(-4deg);
   }
   50% {
-    transform: translateY(-14px) rotate(4deg);
+    transform: translate3d(0, -14px, 0) rotate(4deg);
   }
 }
 
@@ -161,13 +169,13 @@ body {
 /* Drifting background orbs */
 @keyframes drift {
   0% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate(30px, -20px);
+    transform: translate3d(30px, -20px, 0);
   }
   100% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -215,11 +223,11 @@ body {
 @keyframes fogRoll {
   0%,
   100% {
-    transform: translateX(-6%);
+    transform: translate3d(-6%, 0, 0);
     opacity: 0.7;
   }
   50% {
-    transform: translateX(6%);
+    transform: translate3d(6%, 0, 0);
     opacity: 1;
   }
 }
