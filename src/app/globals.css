@@ -98,7 +98,10 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  /* Same as var(--void). Transparent would let the OS default show through on
+     some engines (Opera, Edge), which is exactly what reads as the vertical
+     strip on the right edge of the landing page. */
+  background: #0b0710;
 }
 
 ::-webkit-scrollbar-thumb {

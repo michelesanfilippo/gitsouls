@@ -7,8 +7,11 @@ import HowItWorksModal from "./HowItWorksModal";
 import { REPO_URL } from "@/lib/links";
 
 interface TopBarProps {
-  /** show the "Back" link on the left (profile pages) */
-  showBack?: boolean;
+  /**
+   * Destination for the "Back" link. Pass a string to show the link;
+   * omit (or pass undefined) to hide it.
+   */
+  backHref?: string;
   /**
    * Hide the "How it works" trigger. The landing page shows it in its status
    * line beside the summon count instead, so keeping it here too would duplicate
@@ -19,7 +22,7 @@ interface TopBarProps {
 
 /** Page chrome: optional "Back" on the left, "How it works" and "Star on GitHub" on the right. */
 export default function TopBar({
-  showBack = false,
+  backHref,
   hideHowItWorks = false,
 }: TopBarProps) {
   const [open, setOpen] = useState(false);
@@ -27,9 +30,9 @@ export default function TopBar({
   return (
     <>
       <header className="flex w-full items-center justify-between gap-4 p-4 text-base sm:p-6">
-        {showBack ? (
+        {backHref ? (
           <Link
-            href="/"
+            href={backHref}
             className="souls-focus flex cursor-pointer items-center gap-2 rounded-sm font-display text-base tracking-wide text-parchment/80 transition-colors hover:text-gold"
           >
             <span aria-hidden>←</span> Back

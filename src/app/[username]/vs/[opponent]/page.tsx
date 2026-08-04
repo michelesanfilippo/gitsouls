@@ -4,6 +4,7 @@ import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import DuelView from "@/components/DuelView";
+import SupportButton from "@/components/SupportButton";
 import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { recordSummon } from "@/lib/souls";
@@ -100,7 +101,7 @@ export default async function DuelPage({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <TopBar showBack />
+      <TopBar backHref={`/${username}`} />
       {profiles ? (
         <main className="flex flex-1 flex-col">
           <DuelView left={profiles[0]} right={profiles[1]} />
@@ -117,6 +118,11 @@ export default async function DuelPage({
         />
       )}
       <Footer />
+      <div className="pointer-events-none fixed bottom-5 right-5 z-30 hidden sm:block">
+        <div className="pointer-events-auto">
+          <SupportButton />
+        </div>
+      </div>
     </div>
   );
 }

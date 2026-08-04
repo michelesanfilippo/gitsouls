@@ -7,6 +7,7 @@ import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { resolveDuel, skillPower } from "@/lib/lore/duel";
 import StatHexagon from "./StatHexagon";
 import DuelShare from "./DuelShare";
+import LanguageIcon from "./LanguageIcon";
 
 /** ms between each stat row being revealed */
 const STEP_MS = 460;
@@ -117,25 +118,35 @@ function Fighter({
         </span>
       </div>
 
-      <a
-        href={`/${profile.login}`}
-        className="mt-7 font-display text-2xl font-bold text-parchment transition-colors hover:text-gold sm:text-3xl"
-      >
+      <span className="mt-7 font-display text-2xl font-bold text-parchment sm:text-3xl">
         {profile.name ?? profile.login}
-      </a>
-      <span className="text-sm text-muted">@{profile.login}</span>
-
-      <span
-        className="mt-3 rounded-xl border-2 px-3.5 py-1.5 font-display text-sm font-semibold uppercase tracking-[0.18em] sm:text-base"
-        style={{
-          color: defeated ? "#9ca3af" : bossClass.color,
-          borderColor: defeated ? "#4b5563" : bossClass.color,
-          backgroundColor: defeated ? "transparent" : `${bossClass.color}15`,
-          boxShadow: defeated ? "none" : `0 0 20px ${bossClass.color}30`,
-        }}
-      >
-        {bossClass.name}
       </span>
+      <a
+        href={profile.htmlUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-muted transition-colors hover:text-gold"
+      >
+        @{profile.login}
+      </a>
+
+      {/* Class chip + top language, matching the profile page layout */}
+      <div className="mt-3 flex items-center gap-3">
+        <span
+          className="rounded-xl border-2 px-3.5 py-1.5 font-display text-sm font-semibold uppercase tracking-[0.18em] sm:text-base"
+          style={{
+            color: defeated ? "#9ca3af" : bossClass.color,
+            borderColor: defeated ? "#4b5563" : bossClass.color,
+            backgroundColor: defeated ? "transparent" : `${bossClass.color}15`,
+            boxShadow: defeated ? "none" : `0 0 20px ${bossClass.color}30`,
+          }}
+        >
+          {bossClass.name}
+        </span>
+        {profile.topLanguage && (
+          <LanguageIcon language={profile.topLanguage} color={rank.color} />
+        )}
+      </div>
 
       {outcome === "won" && (
         <span

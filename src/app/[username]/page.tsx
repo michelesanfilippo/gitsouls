@@ -4,6 +4,7 @@ import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import BossProfileView from "@/components/BossProfileView";
+import SupportButton from "@/components/SupportButton";
 import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { recordSummon } from "@/lib/souls";
@@ -14,7 +15,8 @@ export async function generateMetadata({
   const { username } = await params;
   const title = `${username} — GitSouls`;
   const description = `The Souls-like boss forged from @${username}'s GitHub profile.`;
-  const image = { url: `/${username}/og.png`, width: 1200, height: 630 };
+  // v=2 busts the crawler cache from before this route existed.
+  const image = { url: `/${username}/og.png?v=2`, width: 1200, height: 630 };
   const url = `https://gitsouls.com/${username}`;
 
   return {
@@ -81,7 +83,7 @@ export default async function BossPage({ params }: PageProps<"/[username]">) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <TopBar showBack />
+      <TopBar backHref="/" />
       {profile ? (
         <main className="flex flex-1 flex-col">
           <BossProfileView profile={profile} />
@@ -90,6 +92,11 @@ export default async function BossPage({ params }: PageProps<"/[username]">) {
         <RateLimited />
       )}
       <Footer />
+      <div className="pointer-events-none fixed bottom-5 right-5 z-30 hidden sm:block">
+        <div className="pointer-events-auto">
+          <SupportButton />
+        </div>
+      </div>
     </div>
   );
 }
