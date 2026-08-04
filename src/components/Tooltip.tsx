@@ -40,7 +40,7 @@ export default function Tooltip({
         <span
           id={id}
           role="tooltip"
-          className={`animate-fade-up pointer-events-none absolute bottom-full z-30 mb-2 w-64 rounded-xl border border-gold/25 bg-void-2/97 p-3 text-left shadow-[0_8px_30px_rgba(0,0,0,0.6)] backdrop-blur ${
+          className={`animate-fade-up pointer-events-none absolute bottom-full z-30 mb-2 w-64 rounded-xl border border-gold/25 bg-void-2 p-3 text-left shadow-[0_8px_30px_rgba(0,0,0,0.6)] ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >

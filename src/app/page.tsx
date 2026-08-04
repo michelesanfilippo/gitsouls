@@ -28,7 +28,7 @@ export default function Home() {
           <SwordCursor />
         </div>
 
-        <EngravedTitle pulse className="text-lg tracking-[0.45em] sm:text-2xl">
+        <EngravedTitle className="text-lg tracking-[0.45em] sm:text-2xl">
           Bearer of the Curse
         </EngravedTitle>
 

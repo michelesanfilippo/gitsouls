@@ -131,7 +131,7 @@ export async function GET(
             "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%), radial-gradient(1100px 520px at 22% 74%, rgba(178,178,205,0.16), transparent 68%), radial-gradient(950px 460px at 82% 34%, rgba(158,158,190,0.12), transparent 66%)",
           color: "#e8e0cf",
           fontFamily,
-          padding: "110px 80px",
+          padding: "80px 80px 60px",
         }}
       >
         {/* Rank — coloured and glowing like the profile heading */}
@@ -383,12 +383,32 @@ export async function GET(
           ))}
         </div>
 
-        {/* Footer */}
+        {/* Lore. Generated lore runs ~310-360 characters, which is 5-6 lines at
+            this size — comfortable in the space left below the stats. */}
+        <div
+          style={{
+            display: "flex",
+            marginTop: "70px",
+            width: "100%",
+            justifyContent: "center",
+            fontSize: "29px",
+            lineHeight: 1.55,
+            fontStyle: "italic",
+            textAlign: "center",
+            color: "rgba(232,224,207,0.72)",
+          }}
+        >
+          {profile.lore}
+        </div>
+
+        {/* Footer, pinned to the bottom edge */}
         <div
           style={{
             display: "flex",
             marginTop: "auto",
+            paddingTop: "50px",
             fontSize: "30px",
+            letterSpacing: "2px",
             color: "#8a8172",
           }}
         >

@@ -116,11 +116,15 @@ export default function Backdrop() {
       ))}
 
       {/*
-        Depth at the top and bottom only. A centred ellipse reads as a frame
-        around the page: anchored to a fixed backdrop, its dark ring stays put
-        while the content scrolls past it.
+        Depth at the top and bottom only — a centred ellipse would read as a
+        frame around the page, since a fixed backdrop keeps its dark ring in
+        place while content scrolls past.
+
+        Many intermediate stops, and never two identical colours at different
+        positions: a gradient that holds one value across a wide flat span shows
+        a visible banding seam where it finally starts to change.
       */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.35),transparent_28%,transparent_72%,rgba(0,0,0,0.35))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.34)_0%,rgba(0,0,0,0.22)_8%,rgba(0,0,0,0.12)_16%,rgba(0,0,0,0.05)_26%,rgba(0,0,0,0)_40%,rgba(0,0,0,0)_60%,rgba(0,0,0,0.05)_74%,rgba(0,0,0,0.12)_84%,rgba(0,0,0,0.22)_92%,rgba(0,0,0,0.34)_100%)]" />
     </div>
   );
 }

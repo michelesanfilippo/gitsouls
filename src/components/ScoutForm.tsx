@@ -56,7 +56,7 @@ export default function ScoutForm() {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            className="souls-focus flex-1 rounded-2xl border border-gold/25 bg-black/30 px-5 py-3 font-serif text-parchment backdrop-blur placeholder:text-muted/70"
+            className="souls-focus flex-1 rounded-2xl border border-gold/25 bg-black/55 px-5 py-3 font-serif text-parchment placeholder:text-muted/70"
           />
           <button
             type="submit"

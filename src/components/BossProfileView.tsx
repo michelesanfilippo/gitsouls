@@ -67,13 +67,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
                 priority
                 className="h-40 w-40 object-cover sm:h-44 sm:w-44"
               />
-              {/* Fog overlay */}
+              {/* Fog over the portrait. No mix-blend-mode and no animated
+                  transform: blending forces the portrait beneath to be
+                  re-composited every frame. Opacity alone is free. */}
               <div
                 className="animate-fog pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(circle at 30% 70%, rgba(200,200,220,0.35), transparent 55%), radial-gradient(circle at 70% 40%, rgba(180,180,200,0.25), transparent 50%)",
-                  mixBlendMode: "screen",
+                    "radial-gradient(circle at 30% 70%, rgba(216,216,236,0.30), transparent 55%), radial-gradient(circle at 70% 40%, rgba(196,196,220,0.22), transparent 50%)",
                 }}
               />
               <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_-30px_50px_rgba(0,0,0,0.75)]" />
@@ -102,7 +103,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           {/* Class, with the top language alongside it */}
           <div className="mt-3 flex items-center gap-3">
             <span
-              className="rounded-xl border-2 px-3 py-1.5 font-display text-base font-semibold uppercase tracking-[0.2em] backdrop-blur-sm sm:text-lg"
+              className="rounded-xl border-2 px-3 py-1.5 font-display text-base font-semibold uppercase tracking-[0.2em] sm:text-lg"
               style={{
                 color: bossClass.color,
                 borderColor: bossClass.color,
@@ -155,13 +156,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         </div>
 
         {/* Second row — the three boxes, aligned to each other */}
-        <div className="order-4 md:ml-auto md:max-w-sm lg:max-w-md">
+        <div className="order-4 w-full md:ml-auto md:max-w-sm lg:max-w-md">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>
         <div className="order-5 mx-auto w-full max-w-[15rem]">
           <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
         </div>
-        <div className="order-6 md:mr-auto md:max-w-sm lg:max-w-md">
+        {/* Wider than the left cell: the skills list spills into extra columns */}
+        <div className="order-6 w-full md:mr-auto md:max-w-md lg:max-w-lg">
           <SkillsBox skills={profile.skills} />
         </div>
       </div>

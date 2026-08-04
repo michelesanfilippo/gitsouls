@@ -4,8 +4,6 @@ interface EngravedTitleProps {
   as?: ElementType;
   children: ReactNode;
   className?: string;
-  /** add the slow ember pulse (used for the hero eyebrow) */
-  pulse?: boolean;
 }
 
 /**
@@ -20,32 +18,15 @@ export default function EngravedTitle({
   as,
   children,
   className = "",
-  pulse = false,
 }: EngravedTitleProps) {
   const Tag = as ?? "h2";
 
-  if (!pulse) {
-    return (
-      <Tag className={`engraved font-display uppercase ${className}`}>
-        {children}
-      </Tag>
-    );
-  }
-
+  // The pulse is intentionally not an animation. Stacking an animated layer over
+  // text that uses background-clip:text made Chrome re-composite the clipped
+  // glyphs every frame, which tore as black hairlines on the landing page.
   return (
-    <span className="relative inline-block">
-      {/* Pulsing glow behind the glyphs. text-shadow rather than a blur filter:
-          a blur on an animated element is re-rasterised every frame. */}
-      <span
-        aria-hidden
-        className={`animate-ember pointer-events-none absolute inset-0 font-display uppercase text-transparent ${className}`}
-        style={{ textShadow: "0 0 18px rgba(220,38,38,0.55)" }}
-      >
-        {children}
-      </span>
-      <Tag className={`engraved relative font-display uppercase ${className}`}>
-        {children}
-      </Tag>
-    </span>
+    <Tag className={`engraved font-display uppercase ${className}`}>
+      {children}
+    </Tag>
   );
 }
