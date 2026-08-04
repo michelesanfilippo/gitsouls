@@ -118,7 +118,7 @@ export default async function DuelPage({
         />
       )}
       <Footer />
-      <div className="pointer-events-none fixed bottom-5 right-5 z-30 hidden sm:block">
+      <div className="pointer-events-none fixed bottom-5 right-5 z-30 block">
         <div className="pointer-events-auto">
           <SupportButton />
         </div>

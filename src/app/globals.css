@@ -75,35 +75,8 @@ html {
 }
 
 
-/*
- * Souls-styled scrollbar. The track is transparent so the root background shows
- * through the reserved gutter, leaving nothing that reads as an edge.
- */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  /* Same as var(--void). Transparent would let the OS default show through on
-     some engines (Opera, Edge), which is exactly what reads as the vertical
-     strip on the right edge of the landing page. */
-  background: #0b0710;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.28);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.45);
-}
+/* Scrollbar: browser default. Explicit styling removed — custom track colours
+   rendered as a visible strip in Opera regardless of the value used. */
 
 /*
  * Transparent, so the atmosphere painted on the root element shows through. An

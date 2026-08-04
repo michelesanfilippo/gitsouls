@@ -45,19 +45,27 @@ export default function TopBar({
           {!hideHowItWorks && (
             <button
               onClick={() => setOpen(true)}
-              className="souls-focus cursor-pointer rounded-sm font-display text-base tracking-wide text-parchment/80 transition-colors hover:text-gold"
+              className="souls-focus cursor-pointer rounded-sm font-display text-sm tracking-wide text-parchment/80 transition-colors hover:text-gold sm:text-base"
             >
               How it works
             </button>
           )}
+
+          {/* Mobile: round icon only. sm+: pill with label. */}
           <a
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="souls-focus flex cursor-pointer items-center gap-2 rounded-lg border border-gold/30 bg-void-2/80 px-4 py-2 font-display text-base text-parchment/80 transition-colors hover:border-gold/60 hover:text-gold"
+            aria-label="Star on GitHub"
+            className="souls-focus flex cursor-pointer items-center transition-colors"
           >
-            <GitHubLogo className="h-5 w-5" />
-            <span>Star on GitHub</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-void-2/80 hover:border-gold/60 hover:text-gold sm:hidden">
+              <GitHubLogo className="h-5 w-5" />
+            </span>
+            <span className="hidden items-center gap-2 rounded-lg border border-gold/30 bg-void-2/80 px-4 py-2 font-display text-base text-parchment/80 hover:border-gold/60 hover:text-gold sm:flex">
+              <GitHubLogo className="h-5 w-5" />
+              Star on GitHub
+            </span>
           </a>
         </div>
       </header>

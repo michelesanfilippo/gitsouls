@@ -28,7 +28,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         opposite box out of line.
       */}
       <div className="grid grid-cols-1 items-start gap-x-6 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-8">
-        {/* Left — stats, then the share box */}
+        {/* Left stats */}
         <div className="order-2 flex w-full flex-col gap-6 md:order-none md:max-w-sm md:pt-28 lg:max-w-md">
           {LEFT.map((k) => (
             <StatBar
@@ -38,8 +38,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               value={stats[k]}
             />
           ))}
-          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
-          <DuelBox login={profile.login} />
+          {/* Share + duel: visible only on md+, nested here so they sit under
+              the left stats. On mobile they are rendered in the separate block
+              below (order-6) which places them after skills. */}
+          <div className="hidden md:flex md:flex-col md:gap-6">
+            <ShareBox login={profile.login} name={profile.name ?? profile.login} />
+            <DuelBox login={profile.login} />
+          </div>
         </div>
 
         {/* Avatar */}
@@ -149,8 +154,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           </div>
         </div>
 
-        {/* Right — stats, then the skills box. Wider than the left column so a
-            long skills list spills into extra columns rather than growing tall. */}
+        {/* Right — stats, then the skills box. */}
         <div className="order-3 flex w-full flex-col gap-6 md:order-none md:ml-auto md:max-w-md md:pt-28 lg:max-w-lg">
           {RIGHT.map((k) => (
             <StatBar
@@ -162,6 +166,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             />
           ))}
           <SkillsBox skills={profile.skills} />
+        </div>
+
+        {/* Mobile-only: share + duel below skills. Hidden on md+ where they
+            live inside the left column. */}
+        <div className="order-4 flex w-full flex-col gap-6 md:hidden">
+          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
+          <DuelBox login={profile.login} />
         </div>
       </div>
 

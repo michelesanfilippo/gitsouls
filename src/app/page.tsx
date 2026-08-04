@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex min-h-dvh flex-col">
       <TopBar hideHowItWorks />
-      <main className="relative flex flex-1 flex-col items-center justify-center px-4 text-center">
+      <main className="relative flex flex-1 flex-col items-center justify-center px-4 pt-10 text-center sm:pt-0">
         {/* Floating OctoSouls, left at title height */}
         <div className="animate-float-slow pointer-events-none absolute left-[4%] top-[38%] hidden -translate-y-1/2 lg:block xl:left-[9%]">
           <Image
@@ -27,6 +27,18 @@ export default function Home() {
         {/* Floating sword, right and a little below the search box */}
         <div className="absolute right-[6%] top-[60%] hidden -translate-y-1/2 lg:block xl:right-[12%]">
           <SwordCursor />
+        </div>
+
+        {/* Small gitOcto shown only on mobile, above the text */}
+        <div className="mb-4 block sm:hidden">
+          <Image
+            src="/img/octoSouls-nobg.png"
+            alt=""
+            aria-hidden
+            width={495}
+            height={504}
+            className="h-auto w-20 opacity-80"
+          />
         </div>
 
         <EngravedTitle lit className="text-lg tracking-[0.45em] sm:text-2xl">
@@ -49,7 +61,7 @@ export default function Home() {
 
       {/* Fixed so it holds the bottom-right corner regardless of page height.
           Hidden on small screens, where it would crowd the footer. */}
-      <div className="pointer-events-none fixed bottom-5 right-5 z-30 hidden sm:block">
+      <div className="pointer-events-none fixed bottom-5 right-5 z-30 block">
         <div className="pointer-events-auto">
           <SupportButton />
         </div>
