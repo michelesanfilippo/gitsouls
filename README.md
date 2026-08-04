@@ -1,4 +1,4 @@
-<h1 align="center">GitSouls</h1>
+<h1 align="center"><a href="https://gitsouls.com">GitSouls</a></h1>
 
 > Turn your profile into a Souls-like boss.
 
@@ -11,12 +11,13 @@
 Your GitSouls summoned at URL.</br>
 Drop it in your profile README, your portfolio, blog, community.
 
-```[![My GitSouls card](https://gitsouls.com/YOUR_USERNAME.png)](https://gitsouls.com/YOUR_USERNAME)```
+```[![My GitSouls card](https://gitsouls.com/YOUR_USERNAME/card.png)](https://gitsouls.com/YOUR_USERNAME)```
 
 | Resource | Description |
 |---|---|
-| ```gitsouls.com/<username>.png``` | live boss card |
 | ```gitsouls.com/<username>``` | boss profile |
+| ```gitsouls.com/<username>/card.png``` | shareable boss card, 1080×1920 (story format) |
+| ```gitsouls.com/<username>/vs/<opponent>``` | duel between two bosses |
 
 
 ---
@@ -51,5 +52,24 @@ Drop it in your profile README, your portfolio, blog, community.
 ![Juggernaut](https://img.shields.io/badge/Juggernaut-VIT-silver)
 ![Vanguard](https://img.shields.io/badge/Vanguard-END-purple)
 ![Soulkeeper](https://img.shields.io/badge/Soulkeeper-SOP-gold)
+
+
+🗡️ Duel System - two bosses, one arena
+
+Pit any two profiles against each other at ```gitsouls.com/<you>/vs/<them>```, or
+from the **Duel** button on any profile.
+
+| | How it works |
+|---|---|
+| **Battle power** | Overall power **+** the summed weight of every unlocked skill. Highest total wins — so a deeper skill roster can take a fight that raw stats alone would lose. |
+| **Skills** | Each unlocked skill carries a weight of 1–5; rarer conditions weigh more. |
+| **Health** | The victor keeps the share of their power the loser could not answer. A near-equal opponent leaves them at a sliver; a far weaker one barely scratches them. |
+| **Tie** | Equal battle power means neither survives. |
+| **The tale** | Written from both fighters — their ranks, classes, and the skills they lean on. |
+
+```Battle power: (VIT+END+INT+DEX+FAI+SOP)/6 + Σ(skill weights)```
+
+A duel always tells the same story for the same two profiles, so a shared link
+shows what you saw — but it is retold as either boss grows stronger.
 
 ![GitSouls Footer](https://capsule-render.vercel.app/api?type=waving&height=150&color=0:1A102A,50:DC2626,100:D4AF37&section=footer)

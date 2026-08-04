@@ -71,6 +71,6 @@ export const STAT_EXPLAINERS: Record<StatKey, StatExplainer> = {
   },
 };
 
-/** Shared caveat: repo-derived metrics only sample the newest 100 repos. */
+/** Shared caveat: repo-derived metrics sample only the most recent repos. */
 export const SAMPLING_NOTE =
-  "Repo figures come from your 100 most recently pushed repositories.";
+  "Repo figures come from your 300 most recently pushed repositories.";

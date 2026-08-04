@@ -166,12 +166,14 @@ function Fighter({
       </div>
 
       {/* Skill roster, names only */}
-      <ul className="mt-3 flex flex-wrap justify-center gap-x-2.5 gap-y-1">
+      <ul className="mt-5 flex flex-wrap justify-center gap-x-2 gap-y-1.5">
         {profile.skills.map((s) => (
           <li
             key={s.name}
-            className={`text-[11px] ${
-              defeated ? "text-muted/60" : "text-parchment/60"
+            className={`rounded-full border px-2.5 py-1 font-display text-xs ${
+              defeated
+                ? "border-white/10 text-muted/70"
+                : "border-gold/20 text-gold/85"
             }`}
           >
             {s.name}

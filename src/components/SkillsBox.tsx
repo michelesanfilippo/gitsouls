@@ -28,7 +28,10 @@ export default function SkillsBox({ skills }: { skills: Skill[] }) {
           <ul key={i} className="flex min-w-[11rem] flex-1 flex-col gap-2.5">
             {column.map((s) => (
               <li key={s.name} className="flex items-start gap-2.5">
-                <Icon name={s.icon} className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" />
+                <Icon
+                  name={s.icon}
+                  className="mt-0.5 h-5 w-5 shrink-0 text-gold/70"
+                />
                 <Tooltip
                   content={
                     <>
@@ -49,10 +52,10 @@ export default function SkillsBox({ skills }: { skills: Skill[] }) {
                     aria-label={`How ${s.name} is earned`}
                     className="souls-focus cursor-help rounded-sm text-left"
                   >
-                    <span className="font-display text-sm font-semibold text-parchment decoration-gold/30 decoration-dotted underline-offset-4 hover:underline">
+                    <span className="font-display text-base font-semibold text-parchment decoration-gold/30 decoration-dotted underline-offset-4 hover:underline">
                       {s.name}
                     </span>
-                    <span className="block text-xs italic text-muted">
+                    <span className="block text-sm italic text-muted">
                       {s.note}
                     </span>
                   </button>

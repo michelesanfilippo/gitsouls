@@ -50,19 +50,47 @@ export async function fetchUser(username: string): Promise<GitHubUser> {
   return (await res.json()) as GitHubUser;
 }
 
-/** Fetch up to 100 of the user's most recently pushed repositories. */
+const PER_PAGE = 100;
+/**
+ * Cap on repositories sampled. Stars, forks, watchers and language breadth are
+ * all summed from this sample, so a single page under-counted anyone prolific —
+ * three pages covers the vast majority of accounts. The cap exists because each
+ * page is a rate-limited request and the tail adds almost nothing to the totals.
+ */
+const MAX_REPO_PAGES = 3;
+
+/**
+ * Fetch the user's most recently pushed repositories, following pagination up to
+ * MAX_REPO_PAGES. Stops early on a short page (the last one) and degrades to
+ * whatever was collected if a later page fails, since repos are non-essential.
+ */
 export async function fetchRepos(username: string): Promise<GitHubRepo[]> {
-  const res = await fetch(
-    `https://api.github.com/users/${encodeURIComponent(
-      username,
-    )}/repos?per_page=100&sort=pushed`,
-    { headers: authHeaders(), next: { revalidate: REVALIDATE } },
-  );
-  if (!res.ok) {
-    // Repos are non-essential: degrade to an empty list rather than failing.
-    return [];
+  const user = encodeURIComponent(username);
+  const repos: GitHubRepo[] = [];
+
+  for (let page = 1; page <= MAX_REPO_PAGES; page++) {
+    let res: Response;
+    try {
+      res = await fetch(
+        `https://api.github.com/users/${user}/repos?per_page=${PER_PAGE}&sort=pushed&page=${page}`,
+        { headers: authHeaders(), next: { revalidate: REVALIDATE } },
+      );
+    } catch {
+      break;
+    }
+
+    if (!res.ok) break;
+
+    const batch = (await res.json()) as GitHubRepo[];
+    if (!Array.isArray(batch) || batch.length === 0) break;
+
+    repos.push(...batch);
+
+    // A page shorter than the limit is the last one.
+    if (batch.length < PER_PAGE) break;
   }
-  return (await res.json()) as GitHubRepo[];
+
+  return repos;
 }
 
 const CONTRIBUTIONS_QUERY = `

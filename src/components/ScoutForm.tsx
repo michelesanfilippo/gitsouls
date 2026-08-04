@@ -52,7 +52,7 @@ export default function ScoutForm() {
           <button
             type="submit"
             disabled={pending}
-            className="souls-focus flex shrink-0 cursor-pointer items-center gap-2.5 rounded-2xl border border-ember bg-ember px-8 py-4 font-display text-lg font-semibold uppercase tracking-widest text-parchment shadow-[0_0_24px_rgba(220,38,38,0.35)] transition-colors hover:bg-ember-glow disabled:opacity-60"
+            className="souls-focus flex shrink-0 cursor-pointer items-center gap-2.5 rounded-2xl border border-ember bg-ember px-8 py-4 font-display text-lg font-semibold uppercase tracking-widest text-parchment shadow-[0_0_24px_rgba(220,38,38,0.35)] transition-colors hover:border-parchment hover:bg-parchment hover:text-ember disabled:opacity-60"
           >
             {pending ? "…" : "Summon"}
             {!pending && (
@@ -74,7 +74,7 @@ export default function ScoutForm() {
           </button>
         </div>
 
-        <p className="mt-3 text-left text-sm text-muted">
+        <p className="mt-3 text-left text-base text-muted">
           try{" "}
           <button
             type="button"

@@ -86,6 +86,60 @@ export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps)
           );
         })}
       </ul>
+
+      <div className="rule my-5" />
+
+      <h3 className="font-display text-lg text-parchment">Skills</h3>
+      <p className="mt-1 text-sm text-parchment/70">
+        Unlocked by crossing thresholds — six languages, a thirty-day streak, a
+        hundred stars, and so on. Hover any skill on a profile to see exactly
+        what earned it. Each also carries a weight from 1 to 5, and rarer
+        conditions weigh more.
+      </p>
+
+      <div className="rule my-5" />
+
+      <h3 className="font-display text-lg text-parchment">Duels</h3>
+      <p className="mt-1 text-sm text-parchment/70">
+        Two bosses can be pitted against each other at{" "}
+        <span className="text-parchment">gitsouls.com/you/vs/them</span>, or from
+        the Duel button on any profile.
+      </p>
+      <ul className="mt-3 space-y-2 text-sm text-parchment/80">
+        <li className="flex gap-3">
+          <span className="w-24 shrink-0 font-display font-semibold text-ember">
+            Battle power
+          </span>
+          <span>
+            Overall power plus the summed weight of every unlocked skill. The
+            higher total wins, so a deeper roster can take a fight that raw stats
+            alone would lose.
+          </span>
+        </li>
+        <li className="flex gap-3">
+          <span className="w-24 shrink-0 font-display font-semibold text-ember">
+            Health
+          </span>
+          <span>
+            The victor keeps the share of their power the loser could not answer.
+            A near-equal opponent leaves them at a sliver; a far weaker one
+            barely scratches them.
+          </span>
+        </li>
+        <li className="flex gap-3">
+          <span className="w-24 shrink-0 font-display font-semibold text-ember">
+            The tale
+          </span>
+          <span>
+            Written from both fighters — their ranks, classes and the skills they
+            lean on. Equal power means neither survives.
+          </span>
+        </li>
+      </ul>
+      <p className="mt-3 text-xs italic text-muted">
+        A duel always tells the same story for the same two profiles, so a shared
+        link shows what you saw — but it is retold as either boss grows stronger.
+      </p>
     </Modal>
   );
 }
