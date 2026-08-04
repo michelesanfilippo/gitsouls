@@ -22,20 +22,20 @@ export default function PercentileBox({
         }%`;
 
   return (
-    <div className="glass-soft rounded-2xl p-4">
-      <p className="mb-2 font-display text-xs uppercase tracking-[0.3em] text-gold/80">
+    <div className="glass-soft rounded-2xl p-3">
+      <p className="mb-1.5 font-display text-[10px] uppercase tracking-[0.3em] text-gold/80">
         Where you rank
       </p>
-      <p className="font-display text-2xl font-bold" style={{ color }}>
+      <p className="font-display text-xl font-bold" style={{ color }}>
         Top {pctLabel}
-        <span className="ml-1.5 align-middle font-serif text-sm font-normal text-parchment/60">
+        <span className="ml-1.5 align-middle font-serif text-xs font-normal text-parchment/60">
           of GitHub
         </span>
       </p>
 
       {/* Population scale: the lit tier is this boss's */}
       <div
-        className="mt-3 flex h-8 items-end gap-1"
+        className="mt-2.5 flex h-6 items-end gap-1"
         role="img"
         aria-label={`Overall ${rankInfo.buckets[rankInfo.userBucket].from} to ${
           rankInfo.buckets[rankInfo.userBucket].to
@@ -56,7 +56,7 @@ export default function PercentileBox({
           );
         })}
       </div>
-      <p className="mt-1.5 text-[11px] text-muted">
+      <p className="mt-1.5 text-[10px] text-muted">
         Boss level 0 → 99 · your tier is lit
       </p>
     </div>

@@ -44,6 +44,18 @@ body {
   min-height: 100dvh;
 }
 
+/*
+ * Force an element onto its own compositor layer. Needed for the large blurred,
+ * transform-animated backdrop blobs: without it the browser re-rasterises the
+ * blur against the clipping parent each frame, which shows up as a flickering
+ * hairline. backface-visibility also suppresses seams on subpixel positions.
+ */
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
 /* Thin engraved divider */
 .rule {
   height: 1px;

@@ -29,9 +29,8 @@ export const metadata: Metadata = {
     siteName: "GitSouls",
     type: "website",
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
+  // No `icons` entry: App Router picks up src/app/icon.png automatically and
+  // hashes its URL for cache-busting.
 };
 
 export default function RootLayout({

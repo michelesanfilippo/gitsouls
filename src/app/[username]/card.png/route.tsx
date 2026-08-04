@@ -60,7 +60,8 @@ export async function GET(
           // parsing is its least reliable path.
           backgroundColor: "#0b0710",
           backgroundImage:
-            "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%)",
+            // Last two layers are the drifting fog banks.
+            "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%), radial-gradient(1100px 520px at 22% 74%, rgba(178,178,205,0.16), transparent 68%), radial-gradient(950px 460px at 82% 34%, rgba(158,158,190,0.12), transparent 66%)",
           color: "#e8e0cf",
           fontFamily: "sans-serif",
           padding: "110px 80px",
@@ -79,15 +80,17 @@ export async function GET(
           {rank.name}
         </div>
 
-        {/* Avatar */}
+        {/* Avatar. The radius goes on the <img> itself, not just the wrapper:
+            satori does not clip children to a rounded parent, which is why a
+            square photo used to sit inside a circular border. */}
         <div
           style={{
             display: "flex",
+            position: "relative",
             marginTop: "56px",
             borderRadius: "9999px",
             border: `10px solid ${rank.color}`,
             boxShadow: `0 0 90px ${rank.glow}`,
-            overflow: "hidden",
           }}
         >
           {avatar ? (
@@ -97,7 +100,12 @@ export async function GET(
               alt=""
               width={400}
               height={400}
-              style={{ width: "400px", height: "400px", objectFit: "cover" }}
+              style={{
+                width: "400px",
+                height: "400px",
+                objectFit: "cover",
+                borderRadius: "9999px",
+              }}
             />
           ) : (
             <div
@@ -107,6 +115,7 @@ export async function GET(
                 height: "400px",
                 alignItems: "center",
                 justifyContent: "center",
+                borderRadius: "9999px",
                 backgroundColor: "#1a102a",
                 fontSize: "160px",
                 color: rank.color,
@@ -115,6 +124,35 @@ export async function GET(
               {(profile.name ?? profile.login).slice(0, 1).toUpperCase()}
             </div>
           )}
+
+          {/* Fog over the portrait, echoing the profile page */}
+          <div
+            style={{
+              display: "flex",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "400px",
+              height: "400px",
+              borderRadius: "9999px",
+              backgroundImage:
+                "radial-gradient(circle at 30% 72%, rgba(205,205,225,0.34), transparent 56%), radial-gradient(circle at 72% 38%, rgba(180,180,205,0.24), transparent 52%)",
+            }}
+          />
+          {/* Shadow pooling at the base of the portrait */}
+          <div
+            style={{
+              display: "flex",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "400px",
+              height: "400px",
+              borderRadius: "9999px",
+              backgroundImage:
+                "linear-gradient(to top, rgba(0,0,0,0.62), transparent 46%)",
+            }}
+          />
         </div>
 
         {/* Level */}
@@ -149,21 +187,45 @@ export async function GET(
           @{profile.login}
         </div>
 
-        {/* Class */}
+        {/* Class, with the top language beside it. Rendered as text rather than
+            a devicon SVG: satori's SVG-over-URL support is unreliable and a
+            failed fetch would corrupt the whole image. */}
         <div
           style={{
             display: "flex",
+            alignItems: "center",
+            gap: "20px",
             marginTop: "40px",
-            borderRadius: "26px",
-            border: `4px solid ${bossClass.color}`,
-            padding: "16px 42px",
-            fontSize: "44px",
-            letterSpacing: "8px",
-            textTransform: "uppercase",
-            color: bossClass.color,
           }}
         >
-          {bossClass.name}
+          <div
+            style={{
+              display: "flex",
+              borderRadius: "22px",
+              border: `4px solid ${bossClass.color}`,
+              padding: "12px 32px",
+              fontSize: "36px",
+              letterSpacing: "6px",
+              textTransform: "uppercase",
+              color: bossClass.color,
+            }}
+          >
+            {bossClass.name}
+          </div>
+          {profile.topLanguage && (
+            <div
+              style={{
+                display: "flex",
+                borderRadius: "22px",
+                border: `4px solid ${rank.color}`,
+                padding: "12px 28px",
+                fontSize: "32px",
+                color: rank.color,
+              }}
+            >
+              {profile.topLanguage}
+            </div>
+          )}
         </div>
 
         {/* Stats, one per row */}
@@ -234,28 +296,16 @@ export async function GET(
           ))}
         </div>
 
-        {/* Overall + footer */}
+        {/* Footer */}
         <div
           style={{
             display: "flex",
             marginTop: "auto",
-            flexDirection: "column",
-            alignItems: "center",
+            fontSize: "30px",
+            color: "#8a8172",
           }}
         >
-          <div style={{ display: "flex", fontSize: "34px", color: "#d4af37" }}>
-            OVERALL {profile.overall}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              marginTop: "16px",
-              fontSize: "30px",
-              color: "#8a8172",
-            }}
-          >
-            gitsouls.com/{profile.login}
-          </div>
+          gitsouls.com/{profile.login}
         </div>
       </div>
     ),
