@@ -16,16 +16,16 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
   const { rank, bossClass, stats } = profile;
 
   return (
-    <div className="animate-fade-up relative mx-auto w-full max-w-6xl px-4 py-4">
+    <div className="animate-fade-up relative mx-auto w-full max-w-7xl px-6 py-8 lg:px-8">
       {/* Back — top-left of the page */}
       <Link
         href="/"
-        className="souls-focus absolute left-4 top-0 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gold/25 bg-void-2/50 px-3 py-1.5 font-display text-sm text-parchment/80 backdrop-blur transition-colors hover:border-gold/60 hover:text-gold"
+        className="souls-focus absolute left-4 top-4 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gold/40 bg-void-2/70 px-4 py-2 font-display text-base text-parchment backdrop-blur transition-colors hover:border-gold hover:bg-void-2/90 hover:text-gold"
       >
         <span aria-hidden>←</span> Back
       </Link>
 
-      <div className="mt-10 grid grid-cols-1 items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
+      <div className="mt-10 grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-12">
         {/* Left stats */}
         <div className="order-2 flex flex-col gap-4 md:order-none">
           {LEFT.map((k) => (
@@ -37,6 +37,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         <div className="order-1 flex flex-col items-center md:order-none">
           <span
             className="emboss mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
+            style={{ color: rank.color }}
           >
             {rank.name}
           </span>
@@ -90,10 +91,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           </a>
 
           <span
-            className="mt-3 font-display text-xl font-semibold uppercase tracking-[0.2em] sm:text-2xl"
+            className="mt-3 rounded-xl border-2 px-4 py-2 font-display text-xl font-semibold uppercase tracking-[0.2em] backdrop-blur-sm sm:text-2xl"
             style={{
               color: bossClass.color,
+              borderColor: bossClass.color,
+              backgroundColor: `${bossClass.color}15`,
               textShadow: `0 0 18px ${bossClass.color}55, 0 2px 4px rgba(0,0,0,0.6)`,
+              boxShadow: `0 0 20px ${bossClass.color}30`,
             }}
           >
             {bossClass.name}
@@ -141,7 +145,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
       </div>
 
       {/* Share (left) · Lore (center) · Skills (right) */}
-      <div className="mt-6 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className="mt-10 grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
         <div className="order-2 lg:order-none">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>

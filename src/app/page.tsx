@@ -18,7 +18,7 @@ export default function Home() {
             width={495}
             height={504}
             priority
-            className="h-auto w-64 opacity-90 drop-shadow-[0_10px_40px_rgba(220,38,38,0.35)] xl:w-80"
+            className="h-auto w-72 opacity-90 drop-shadow-[0_10px_40px_rgba(220,38,38,0.35)] xl:w-[22rem]"
           />
         </div>
 

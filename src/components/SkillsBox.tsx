@@ -5,7 +5,7 @@ export default function SkillsBox({ skills }: { skills: Skill[] }) {
   return (
     <div className="glass rounded-2xl p-4">
       <p className="mb-3 font-display text-xs uppercase tracking-[0.3em] text-gold/80">
-        Skills · {skills.length}
+        Skills
       </p>
       <ul className="flex flex-col gap-2.5">
         {skills.map((s) => (
