@@ -27,9 +27,10 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         from stretching, which is what previously let a tall skills list drag the
         opposite box out of line.
       */}
-      <div className="grid grid-cols-1 items-start gap-x-4 gap-y-8 md:grid-cols-[minmax(0,20rem)_auto_minmax(0,24rem)]">
+      <div className="mx-auto w-full max-w-4xl">
+      <div className="grid grid-cols-1 items-start gap-x-4 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
         {/* Left stats */}
-        <div className="order-2 flex w-full flex-col gap-6 md:order-none md:pt-28">
+        <div className="order-2 flex w-full flex-col gap-6 md:order-none md:max-w-sm md:pt-28 lg:max-w-md">
           {LEFT.map((k) => (
             <StatBar
               key={k}
@@ -155,7 +156,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         </div>
 
         {/* Right — stats, then the skills box. */}
-        <div className="order-3 flex w-full flex-col gap-6 md:order-none md:pt-28">
+        <div className="order-3 flex w-full flex-col gap-6 md:order-none md:ml-auto md:max-w-md md:pt-28 lg:max-w-lg">
           {RIGHT.map((k) => (
             <StatBar
               key={k}
@@ -174,6 +175,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
           <DuelBox login={profile.login} />
         </div>
+      </div>
       </div>
 
       {/* Lore */}
