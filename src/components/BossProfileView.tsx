@@ -20,7 +20,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
   const { rank, bossClass, stats } = profile;
 
   return (
-    <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-12">
+    <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-28 xl:px-40">
       {/*
         Three columns, each a flow of its own: stats then that column's box, so
         every box sits directly beneath its stats. `items-start` keeps the columns
