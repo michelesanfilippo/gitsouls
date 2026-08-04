@@ -33,7 +33,8 @@ export default function Home() {
             intrinsic={400}
             sizeClass="w-24 sm:w-32"
             animClass="animate-bow"
-            auraColor="rgba(59,130,246,0.40)"
+            auraColor="rgba(59,130,246,0.20)"
+            auraHover="rgba(59,130,246,0.55)"
             label="Take the bow in hand"
             hoverTitle="Nock an arrow"
             hoverSub="Distance is just another kind of aim"
@@ -54,7 +55,8 @@ export default function Home() {
             intrinsic={256}
             sizeClass="w-24 sm:w-32"
             animClass="animate-wand"
-            auraColor="rgba(34,197,94,0.40)"
+            auraColor="rgba(34,197,94,0.20)"
+            auraHover="rgba(34,197,94,0.55)"
             label="Take the wand in hand"
             hoverTitle="Channel the arcane"
             hoverSub="The spell begins where the cursor ends"

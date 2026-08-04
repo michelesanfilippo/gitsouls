@@ -298,18 +298,22 @@ body {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(3deg); }
   50%       { transform: translate3d(0, -12px, 0) rotate(-3deg); }
 }
-.animate-bow {
-  animation: bowSway 15s ease-in-out infinite;
-}
+.animate-bow { animation: bowSway 15s ease-in-out infinite; }
 
 /* Wand drift */
 @keyframes wandDrift {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(-6deg); }
   50%       { transform: translate3d(0, -10px, 0) rotate(6deg); }
 }
-.animate-wand {
-  animation: wandDrift 12s ease-in-out infinite;
+.animate-wand { animation: wandDrift 12s ease-in-out infinite; }
+
+/* Hover spin: one full turn then slow return via ease-out */
+@keyframes weaponSpin {
+  0%   { transform: rotate(0deg); }
+  60%  { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
 }
+.weapon-spin { animation: weaponSpin 0.9s ease-out forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-ember,

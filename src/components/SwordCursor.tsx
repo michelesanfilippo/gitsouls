@@ -9,7 +9,8 @@ export default function SwordCursor() {
       intrinsic={300}
       sizeClass="w-24 sm:w-32"
       animClass="animate-sword"
-      auraColor="rgba(220,38,38,0.45)"
+      auraColor="rgba(220,38,38,0.22)"
+      auraHover="rgba(220,38,38,0.60)"
       label="Take the sword in hand"
       hoverTitle="Take up the blade"
       hoverSub="Only the cursed may wield it"
