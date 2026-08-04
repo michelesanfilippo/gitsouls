@@ -29,9 +29,9 @@ export default function Home() {
         <div className="absolute right-[3%] top-[36%] hidden -translate-y-1/2 lg:block xl:right-[9%]">
           <WeaponDecoration
             weapon="bow"
-            src="/img/bow.jpg"
+            src="/img/bow.png"
             intrinsic={400}
-            sizeClass="w-20 sm:w-28"
+            sizeClass="w-24 sm:w-32"
             animClass="animate-bow"
             auraColor="rgba(59,130,246,0.40)"
             label="Take the bow in hand"
@@ -50,9 +50,9 @@ export default function Home() {
         <div className="absolute right-[2%] top-[82%] hidden -translate-y-1/2 lg:block xl:right-[8%]">
           <WeaponDecoration
             weapon="wand"
-            src="/img/magic_wand.avif"
+            src="/img/wand.png"
             intrinsic={256}
-            sizeClass="w-16 sm:w-24"
+            sizeClass="w-24 sm:w-32"
             animClass="animate-wand"
             auraColor="rgba(34,197,94,0.40)"
             label="Take the wand in hand"
