@@ -44,6 +44,29 @@ html {
    * the viewport narrower and the wrap more marginal.
    */
   scrollbar-gutter: stable;
+
+  /*
+   * The atmosphere lives HERE, on the root element, and not on a fixed child.
+   * The root's background painting area covers the entire canvas — including the
+   * strip reserved above — whereas a position:fixed element is laid out against
+   * the viewport excluding that strip, so its gradients stopped short and left a
+   * vertical seam down the right edge. `fixed` attachment keeps the glows
+   * anchored to the viewport rather than scrolling with the document.
+   */
+  background:
+    radial-gradient(closest-side, rgba(220, 38, 38, 0.2), transparent) no-repeat
+      fixed -8% -18% / 42rem 42rem,
+    radial-gradient(closest-side, rgba(212, 175, 55, 0.14), transparent)
+      no-repeat fixed 108% 112% / 44rem 44rem,
+    radial-gradient(closest-side, rgba(26, 16, 42, 0.65), transparent) no-repeat
+      fixed 2% 52% / 32rem 32rem,
+    radial-gradient(closest-side, rgba(178, 178, 205, 0.14), transparent)
+      no-repeat fixed 40% 108% / 150% 70vh,
+    radial-gradient(closest-side, rgba(158, 158, 190, 0.1), transparent)
+      no-repeat fixed -10% 26% / 130% 52vh,
+    radial-gradient(closest-side, rgba(150, 150, 185, 0.08), transparent)
+      no-repeat fixed 108% 52% / 115% 46vh,
+    var(--void);
 }
 
 /* Fallback for engines without scrollbar-gutter: keep the bar always present. */
@@ -54,13 +77,39 @@ html {
 }
 
 /*
- * Flat fill only. The atmosphere lives in Backdrop, which is viewport-fixed;
- * gradients here were both a duplicate and a defect — sized to the body box,
- * they shifted as the page grew, and at alpha 0.08-0.12 over near-black they
- * banded into a visible line on 6-bit laptop panels.
+ * Souls-styled scrollbar. The track is transparent so the root background shows
+ * through the reserved gutter, leaving nothing that reads as an edge.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.28);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.45);
+}
+
+/*
+ * Transparent, so the atmosphere painted on the root element shows through. An
+ * opaque fill here would hide it, and gradients here would be wrong anyway:
+ * sized to the body box, they shift as the page grows.
  */
 body {
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-serif), Georgia, serif;
   min-height: 100dvh;
@@ -119,10 +168,10 @@ body {
 /*
  * Engraved ember/gold title (the "BEARER OF THE CURSE" look).
  *
- * Nothing here may be animated, and no filter may be applied: background-clip
- * text is expensive to composite, and animating it (or anything stacked over it)
- * makes Chrome re-composite the clipped glyphs every frame, tearing as black
- * hairlines. Keep this element completely static.
+ * Do not add a filter here, and do not stack an animated layer over it:
+ * background-clip:text is costly to composite, and either of those makes the
+ * browser re-composite the clipped glyphs every frame. Animating
+ * background-position (below) is safe because it only repaints this element.
  */
 .engraved {
   background: linear-gradient(
@@ -136,7 +185,35 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  transform: translateZ(0);
+}
+
+/*
+ * A light slowly travelling down the engraving. Over-sizes the gradient and
+ * shifts its position, so only this element's own paint changes.
+ */
+@keyframes engravedSheen {
+  0%,
+  100% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+}
+
+.engraved-lit {
+  background-image: linear-gradient(
+    180deg,
+    #8f1b1b 0%,
+    #dc2626 18%,
+    #e0a53a 38%,
+    #fff4d0 50%,
+    #e0a53a 62%,
+    #dc2626 82%,
+    #8f1b1b 100%
+  );
+  background-size: 100% 320%;
+  animation: engravedSheen 7s ease-in-out infinite;
 }
 
 /* Slow vertical float (octoSouls, sword) */
@@ -151,7 +228,7 @@ body {
 }
 
 .animate-float-slow {
-  animation: floatSlow 11s ease-in-out infinite;
+  animation: floatSlow 16s ease-in-out infinite;
 }
 
 @keyframes swordSway {
@@ -204,6 +281,27 @@ body {
   animation: fogDrift 9s ease-in-out infinite;
 }
 
+/*
+ * Boss rank breathing: the heading swells slightly and its glow brightens, then
+ * settles. Scale is safe here because the element is small and its own paint is
+ * cheap — unlike the page-sized backdrop layers, which must never animate.
+ */
+@keyframes rankBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.88;
+  }
+  50% {
+    transform: scale(1.055);
+    opacity: 1;
+  }
+}
+
+.animate-rank {
+  animation: rankBreathe 4.5s ease-in-out infinite;
+}
+
 /* Sword cursor active for the whole tab */
 .sword-cursor,
 .sword-cursor * {
@@ -215,7 +313,9 @@ body {
   .animate-float-slow,
   .animate-sword,
   .animate-fog,
-  .animate-fade-up {
+  .animate-fade-up,
+  .engraved-lit,
+  .animate-rank {
     animation: none !important;
   }
 }

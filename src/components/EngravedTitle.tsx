@@ -4,28 +4,33 @@ interface EngravedTitleProps {
   as?: ElementType;
   children: ReactNode;
   className?: string;
+  /** slowly wash a light down the engraving */
+  lit?: boolean;
 }
 
 /**
  * Reusable engraved ember/gold title — the "BEARER OF THE CURSE" look.
  * Used for the hero eyebrow and the profile rank/class headings.
  *
- * The pulse animates a glow layer behind the text rather than the text's own
- * opacity: animating an element that uses background-clip:text makes Chrome
- * re-composite the clipped glyphs each frame, which tears as black hairlines.
+ * `lit` washes a slow light down the letters. It animates background-position,
+ * which only repaints this element — do not reach for a filter or an overlaid
+ * animated layer instead, as either forces the clipped glyphs to re-composite
+ * every frame.
  */
 export default function EngravedTitle({
   as,
   children,
   className = "",
+  lit = false,
 }: EngravedTitleProps) {
   const Tag = as ?? "h2";
 
-  // The pulse is intentionally not an animation. Stacking an animated layer over
-  // text that uses background-clip:text made Chrome re-composite the clipped
-  // glyphs every frame, which tore as black hairlines on the landing page.
   return (
-    <Tag className={`engraved font-display uppercase ${className}`}>
+    <Tag
+      className={`engraved ${
+        lit ? "engraved-lit" : ""
+      } font-display uppercase ${className}`}
+    >
       {children}
     </Tag>
   );

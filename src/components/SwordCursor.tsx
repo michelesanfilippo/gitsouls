@@ -91,7 +91,7 @@ export default function SwordCursor() {
           alt="Souls sword"
           width={300}
           height={300}
-          className="h-auto w-28 sm:w-36"
+          className="h-auto w-24 sm:w-32"
           priority
         />
 

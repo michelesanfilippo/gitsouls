@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { parseUsername, VALID_USERNAME } from "@/lib/username";
+import Icon from "./Icon";
 
 /**
  * "Duel" call to action. Opens an inline prompt for a challenger's handle and
@@ -44,7 +45,7 @@ export default function DuelBox({ login }: { login: string }) {
         onClick={() => setOpen(true)}
         className="souls-focus flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-ember to-ember-glow px-6 py-3.5 font-display text-base font-semibold uppercase tracking-[0.15em] text-parchment shadow-[0_0_28px_rgba(220,38,38,0.4)] transition-transform hover:scale-[1.02]"
       >
-        <span aria-hidden>⚔️</span> Duel
+        <Icon name="swords" className="h-5 w-5" /> Duel
       </button>
     );
   }

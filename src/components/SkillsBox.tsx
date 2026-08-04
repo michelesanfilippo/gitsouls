@@ -1,5 +1,6 @@
 import type { Skill } from "@/lib/scoring";
 import Tooltip from "./Tooltip";
+import Icon from "./Icon";
 
 /** Max skills per column before spilling into another one. */
 const PER_COLUMN = 4;
@@ -27,9 +28,7 @@ export default function SkillsBox({ skills }: { skills: Skill[] }) {
           <ul key={i} className="flex min-w-[11rem] flex-1 flex-col gap-2.5">
             {column.map((s) => (
               <li key={s.name} className="flex items-start gap-2.5">
-                <span className="mt-0.5 text-base leading-none" aria-hidden>
-                  {s.icon}
-                </span>
+                <Icon name={s.icon} className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" />
                 <Tooltip
                   content={
                     <>

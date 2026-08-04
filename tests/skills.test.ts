@@ -56,7 +56,23 @@ describe("generateSkills", () => {
   it("returns objects without the internal unlocked flag", () => {
     const skills = generateSkills(base, 0, "Go");
     for (const s of skills) {
-      expect(Object.keys(s).sort()).toEqual(["how", "icon", "name", "note"]);
+      expect(Object.keys(s).sort()).toEqual([
+        "how",
+        "icon",
+        "name",
+        "note",
+        "power",
+        "verb",
+      ]);
+    }
+  });
+
+  it("gives every skill a duel weight and a way to read mid-fight", () => {
+    const skills = generateSkills({ ...base, followers: 1500 }, 90, "Go");
+    for (const s of skills) {
+      expect(s.power).toBeGreaterThanOrEqual(1);
+      expect(s.power).toBeLessThanOrEqual(5);
+      expect(s.verb.length).toBeGreaterThan(0);
     }
   });
 

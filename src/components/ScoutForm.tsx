@@ -33,9 +33,9 @@ export default function ScoutForm() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-xl">
       <form onSubmit={onSubmit}>
-        <div className="flex items-stretch gap-2">
+        <div className="flex items-stretch gap-2.5">
           <input
             value={value}
             onChange={(e) => {
@@ -47,18 +47,18 @@ export default function ScoutForm() {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            className="souls-focus flex-1 rounded-2xl border border-gold/25 bg-black/55 px-5 py-3 font-serif text-parchment placeholder:text-muted/70"
+            className="souls-focus min-w-0 flex-1 rounded-2xl border border-gold/25 bg-black/55 px-6 py-4 font-serif text-lg text-parchment placeholder:text-muted/70"
           />
           <button
             type="submit"
             disabled={pending}
-            className="souls-focus flex cursor-pointer items-center gap-2 rounded-2xl border border-ember/60 bg-ember/10 px-6 py-3 font-display font-semibold uppercase tracking-widest text-ember transition-colors hover:bg-ember/20 disabled:opacity-60"
+            className="souls-focus flex shrink-0 cursor-pointer items-center gap-2.5 rounded-2xl border border-ember bg-ember px-8 py-4 font-display text-lg font-semibold uppercase tracking-widest text-parchment shadow-[0_0_24px_rgba(220,38,38,0.35)] transition-colors hover:bg-ember-glow disabled:opacity-60"
           >
-            {pending ? "…" : "Scout"}
+            {pending ? "…" : "Summon"}
             {!pending && (
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -73,25 +73,23 @@ export default function ScoutForm() {
             )}
           </button>
         </div>
-        <p
-          className="mt-2 h-5 text-center text-sm text-ember/90"
-          aria-live="polite"
-        >
+
+        <p className="mt-3 text-left text-sm text-muted">
+          try{" "}
+          <button
+            type="button"
+            onClick={() => scout("michelesanfilippo")}
+            className="cursor-pointer text-gold/80 underline underline-offset-4 transition-colors hover:text-gold"
+          >
+            michelesanfilippo
+          </button>{" "}
+          or your own
+        </p>
+
+        <p className="mt-1 h-5 text-left text-sm text-ember/90" aria-live="polite">
           {error}
         </p>
       </form>
-
-      <p className="mt-3 text-center text-sm text-muted">
-        try{" "}
-        <button
-          type="button"
-          onClick={() => scout("michelesanfilippo")}
-          className="cursor-pointer text-gold/80 underline underline-offset-4 transition-colors hover:text-gold"
-        >
-          michelesanfilippo
-        </button>{" "}
-        or your own
-      </p>
     </div>
   );
 }

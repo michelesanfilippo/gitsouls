@@ -4,7 +4,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
-import { resolveDuel } from "@/lib/lore/duel";
+import { resolveDuel, skillPower } from "@/lib/lore/duel";
+import StatHexagon from "./StatHexagon";
+import DuelShare from "./DuelShare";
 
 /** ms between each stat row being revealed */
 const STEP_MS = 460;
@@ -16,6 +18,7 @@ function toSide(p: BossProfile) {
     className: p.bossClass.name,
     rankName: p.rank.name,
     overall: p.overall,
+    skills: p.skills,
   };
 }
 
@@ -152,6 +155,29 @@ function Fighter({
           Slain
         </span>
       )}
+
+      {/* Stat shape — a spike reads as specialisation, an even spread as balance */}
+      <div className="mt-6 w-full max-w-[15rem]">
+        <StatHexagon
+          stats={profile.stats}
+          color={rank.color}
+          muted={defeated}
+        />
+      </div>
+
+      {/* Skill roster, names only */}
+      <ul className="mt-3 flex flex-wrap justify-center gap-x-2.5 gap-y-1">
+        {profile.skills.map((s) => (
+          <li
+            key={s.name}
+            className={`text-[11px] ${
+              defeated ? "text-muted/60" : "text-parchment/60"
+            }`}
+          >
+            {s.name}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -186,6 +212,15 @@ export default function DuelView({
     if (!duel.winner) return 0;
     return duel.winner.login === login ? duel.winnerHp : 0;
   };
+
+  const nameOf = (p: BossProfile) => p.name ?? p.login;
+  const shareSummary = duel.winner
+    ? `${
+        duel.winner.name?.trim() || duel.winner.login
+      } slew ${
+        duel.loser?.name?.trim() || duel.loser?.login
+      } on GitSouls — ${duel.winnerHp}% HP left ⚔️`
+    : `${nameOf(left)} and ${nameOf(right)} destroyed each other on GitSouls ⚔️`;
 
   return (
     <div className="animate-fade-up mx-auto flex w-full max-w-7xl flex-1 flex-col gap-14 px-4 py-8 sm:px-8">
@@ -239,32 +274,46 @@ export default function DuelView({
             );
           })}
 
-          {/* Overall, once every stat is in */}
+          {/* Skill weight and the final battle score, once every stat is in */}
           <div
-            className="mt-3 grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-3 border-t border-gold/15 pt-4 transition-opacity duration-700"
+            className="mt-3 flex flex-col gap-3 border-t border-gold/15 pt-4 transition-opacity duration-700"
             style={{ opacity: done ? 1 : 0 }}
           >
-            <span
-              className={`text-right font-display text-3xl font-bold tabular-nums ${
-                duel.winner?.login === left.login
-                  ? "text-gold"
-                  : "text-parchment/55"
-              }`}
-            >
-              {left.overall}
-            </span>
-            <span className="text-center font-display text-sm uppercase tracking-[0.25em] text-gold/80">
-              Overall
-            </span>
-            <span
-              className={`font-display text-3xl font-bold tabular-nums ${
-                duel.winner?.login === right.login
-                  ? "text-gold"
-                  : "text-parchment/55"
-              }`}
-            >
-              {right.overall}
-            </span>
+            <div className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-3">
+              <span className="text-right font-display text-xl font-bold tabular-nums text-parchment/55">
+                +{skillPower(left.skills)}
+              </span>
+              <span className="text-center font-display text-[11px] uppercase tracking-[0.25em] text-muted">
+                Skills
+              </span>
+              <span className="font-display text-xl font-bold tabular-nums text-parchment/55">
+                +{skillPower(right.skills)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-3">
+              <span
+                className={`text-right font-display text-3xl font-bold tabular-nums ${
+                  duel.winner?.login === left.login
+                    ? "text-gold"
+                    : "text-parchment/55"
+                }`}
+              >
+                {duel.scores[left.login]}
+              </span>
+              <span className="text-center font-display text-sm uppercase tracking-[0.25em] text-gold/80">
+                Power
+              </span>
+              <span
+                className={`font-display text-3xl font-bold tabular-nums ${
+                  duel.winner?.login === right.login
+                    ? "text-gold"
+                    : "text-parchment/55"
+                }`}
+              >
+                {duel.scores[right.login]}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -275,7 +324,7 @@ export default function DuelView({
         />
       </div>
 
-      {/* The tale, once the dust settles */}
+      {/* The tale and the share row, once the dust settles */}
       <div
         className="flex min-h-[6rem] flex-col items-center text-center transition-opacity duration-1000"
         style={{ opacity: done ? 1 : 0 }}
@@ -284,6 +333,14 @@ export default function DuelView({
         <p className="mx-auto max-w-3xl font-serif text-lg italic leading-relaxed text-parchment/85 sm:text-xl">
           {duel.lore}
         </p>
+
+        {/* Rendered only once resolved, so the buttons can't be clicked while
+            the outcome is still hidden. */}
+        {done && (
+          <div className="mt-8">
+            <DuelShare summary={shareSummary} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,10 +9,19 @@ import { REPO_URL } from "@/lib/links";
 interface TopBarProps {
   /** show the "Back" link on the left (profile pages) */
   showBack?: boolean;
+  /**
+   * Hide the "How it works" trigger. The landing page shows it in its status
+   * line beside the summon count instead, so keeping it here too would duplicate
+   * it in two places on the same screen.
+   */
+  hideHowItWorks?: boolean;
 }
 
 /** Page chrome: optional "Back" on the left, "How it works" and "Star on GitHub" on the right. */
-export default function TopBar({ showBack = false }: TopBarProps) {
+export default function TopBar({
+  showBack = false,
+  hideHowItWorks = false,
+}: TopBarProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -30,12 +39,14 @@ export default function TopBar({ showBack = false }: TopBarProps) {
         )}
 
         <div className="flex items-center gap-4 sm:gap-6">
-          <button
-            onClick={() => setOpen(true)}
-            className="souls-focus cursor-pointer rounded-sm font-display text-base tracking-wide text-parchment/80 transition-colors hover:text-gold"
-          >
-            How it works
-          </button>
+          {!hideHowItWorks && (
+            <button
+              onClick={() => setOpen(true)}
+              className="souls-focus cursor-pointer rounded-sm font-display text-base tracking-wide text-parchment/80 transition-colors hover:text-gold"
+            >
+              How it works
+            </button>
+          )}
           <a
             href={REPO_URL}
             target="_blank"

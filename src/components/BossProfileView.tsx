@@ -45,7 +45,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         {/* Avatar */}
         <div className="order-1 flex flex-col items-center md:order-none">
           <span
-            className="mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
+            className="animate-rank mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
             style={{
               color: rank.color,
               textShadow: `0 0 22px ${rank.glow}, 0 2px 4px rgba(0,0,0,0.85)`,
@@ -144,7 +144,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             </span>
           </div>
 
-          <div className="mt-5 w-full max-w-[15rem]">
+          <div className="mt-5 w-full max-w-[17rem]">
             <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
 
       {/* Lore */}
       <div className="flex flex-col items-center text-center">
-        <p className="mx-auto max-w-2xl font-serif text-base italic leading-relaxed text-parchment/80 sm:text-lg">
+        <p className="mx-auto max-w-3xl font-serif text-base italic leading-relaxed text-parchment/80 sm:text-lg">
           {profile.lore}
         </p>
         {!profile.hasContributionData && (
