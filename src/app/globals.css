@@ -46,27 +46,14 @@ html {
   scrollbar-gutter: stable;
 
   /*
-   * The atmosphere lives HERE, on the root element, and not on a fixed child.
-   * The root's background painting area covers the entire canvas — including the
-   * strip reserved above — whereas a position:fixed element is laid out against
-   * the viewport excluding that strip, so its gradients stopped short and left a
-   * vertical seam down the right edge. `fixed` attachment keeps the glows
-   * anchored to the viewport rather than scrolling with the document.
+   * Flat colour only. The atmosphere lives in Backdrop, sized in vw so it spans
+   * the gutter reserved above — `100vw` includes the scrollbar's width, whereas
+   * a fixed element pinned with inset-0 is laid out against the viewport
+   * *excluding* it. That mismatch left an unpainted strip down the right edge,
+   * which read as the page being cut off (most visibly on the landing page,
+   * which does not scroll, so the strip held no scrollbar at all).
    */
-  background:
-    radial-gradient(closest-side, rgba(220, 38, 38, 0.2), transparent) no-repeat
-      fixed -8% -18% / 42rem 42rem,
-    radial-gradient(closest-side, rgba(212, 175, 55, 0.14), transparent)
-      no-repeat fixed 108% 112% / 44rem 44rem,
-    radial-gradient(closest-side, rgba(26, 16, 42, 0.65), transparent) no-repeat
-      fixed 2% 52% / 32rem 32rem,
-    radial-gradient(closest-side, rgba(178, 178, 205, 0.14), transparent)
-      no-repeat fixed 40% 108% / 150% 70vh,
-    radial-gradient(closest-side, rgba(158, 158, 190, 0.1), transparent)
-      no-repeat fixed -10% 26% / 130% 52vh,
-    radial-gradient(closest-side, rgba(150, 150, 185, 0.08), transparent)
-      no-repeat fixed 108% 52% / 115% 46vh,
-    var(--void);
+  background: var(--void);
 }
 
 /* Fallback for engines without scrollbar-gutter: keep the bar always present. */

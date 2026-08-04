@@ -100,6 +100,14 @@ const PATHS: Record<IconName, ReactNode> = {
       <path d="M14 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1" />
     </>
   ),
+  // Support the builder — a steaming cup
+  coffee: (
+    <>
+      <path d="M3.5 9h13v5.5a4.5 4.5 0 0 1-4.5 4.5H8a4.5 4.5 0 0 1-4.5-4.5V9Z" />
+      <path d="M16.5 10.5H19a2.25 2.25 0 0 1 0 4.5h-2.5" />
+      <path d="M7.5 2.8c-.9 1-.9 2 0 3M12 2.5c-.9 1-.9 2 0 3" />
+    </>
+  ),
 };
 
 interface IconProps {

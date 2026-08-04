@@ -1,18 +1,19 @@
 /**
- * Star field, fixed behind all content.
+ * Atmospheric backdrop: ember/gold orbs, fog banks and a star field, fixed
+ * behind all content.
  *
- * The orbs and fog banks are NOT here — they are painted on the root element in
- * globals.css. A position:fixed element is sized to the viewport excluding the
- * strip that scrollbar-gutter reserves, so gradients drawn here stopped short of
- * the right edge and left a visible vertical seam. Only the root's background
- * covers the full canvas.
+ * Sized `w-screen`/`h-screen` (i.e. 100vw × 100vh) rather than pinned with
+ * `inset-0`. That is the important detail: 100vw *includes* the width of the
+ * scrollbar gutter reserved in globals.css, while a fixed element pinned to
+ * inset-0 is laid out against the viewport excluding it — which left an
+ * unpainted strip down the right edge that read as the page being cut off.
  *
- * Stars stay in a DOM element because 60 stacked gradients are easier to keep
- * legible here, and they are faint enough that clipping at the gutter is
- * imperceptible. Nothing animates: on hybrid graphics, animating large
- * composited layers here tore as flickering hairlines.
+ * Nothing here animates, and there are no blur() or backdrop-filter
+ * declarations. On hybrid-graphics laptops, animating large composited layers
+ * here tore as flickering black hairlines; see CONTRIBUTING.md.
  *
- * Positions are generated deterministically so server and client markup match.
+ * Star positions are generated deterministically so server and client markup
+ * match (no hydration drift).
  */
 
 const STAR_LAYERS: string = (() => {
@@ -30,12 +31,31 @@ const STAR_LAYERS: string = (() => {
   }).join(", ");
 })();
 
+/**
+ * Orbs and fog. `closest-side` makes each gradient reach full transparency
+ * exactly at its own box, so no hard seam can form at an edge.
+ */
+const ATMOSPHERE = [
+  // Ember glow, upper left
+  "radial-gradient(closest-side, rgba(220,38,38,0.20), transparent) no-repeat -8% -18% / 42rem 42rem",
+  // Gold glow, lower right
+  "radial-gradient(closest-side, rgba(212,175,55,0.14), transparent) no-repeat 108% 112% / 44rem 44rem",
+  // Cold void glow, mid left
+  "radial-gradient(closest-side, rgba(26,16,42,0.65), transparent) no-repeat 2% 52% / 32rem 32rem",
+  // Low fog bank
+  "radial-gradient(closest-side, rgba(178,178,205,0.14), transparent) no-repeat 40% 108% / 150% 70vh",
+  // Mid fog bank
+  "radial-gradient(closest-side, rgba(158,158,190,0.10), transparent) no-repeat -10% 26% / 130% 52vh",
+  // Upper-right fog wisp
+  "radial-gradient(closest-side, rgba(150,150,185,0.08), transparent) no-repeat 108% 52% / 115% 46vh",
+].join(", ");
+
 export default function Backdrop() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{ background: STAR_LAYERS }}
+      className="pointer-events-none fixed left-0 top-0 -z-10 h-screen w-screen overflow-hidden"
+      style={{ background: `${STAR_LAYERS}, ${ATMOSPHERE}` }}
     />
   );
 }

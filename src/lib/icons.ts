@@ -17,4 +17,5 @@ export type IconName =
   | "crown"
   | "sun"
   | "image"
-  | "link";
+  | "link"
+  | "coffee";

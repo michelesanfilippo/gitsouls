@@ -12,10 +12,17 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[username]">): Promise<Metadata> {
   const { username } = await params;
+  const description = `The Souls-like boss forged from @${username}'s GitHub profile.`;
+  const image = { url: `/${username}/og.png`, width: 1200, height: 630 };
+
   return {
     // The root layout's template wraps this as "GitSouls - <username>".
     title: username,
-    description: `The Souls-like boss forged from @${username}'s GitHub profile.`,
+    description,
+    // Overrides the site-wide opengraph-image with this boss's own card.
+    openGraph: { title: `${username} — GitSouls`, description, images: [image] },
+    twitter: { card: "summary_large_image", images: [image] },
+    alternates: { canonical: `/${username}` },
   };
 }
 

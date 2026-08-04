@@ -12,9 +12,22 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[username]/vs/[opponent]">): Promise<Metadata> {
   const { username, opponent } = await params;
+  const title = `${username} vs ${opponent}`;
+  const description = `${username} and ${opponent} meet in the arena. Only one leaves.`;
+  const image = {
+    url: `/${username}/vs/${opponent}/og.png`,
+    width: 1200,
+    height: 630,
+  };
+
   return {
-    title: `${username} vs ${opponent}`,
-    description: `${username} and ${opponent} meet in the arena. Only one leaves.`,
+    title,
+    description,
+    // A duel preview names two people, so it is the most shareable image we
+    // produce — worth overriding the site-wide default for.
+    openGraph: { title: `${title} — GitSouls`, description, images: [image] },
+    twitter: { card: "summary_large_image", images: [image] },
+    alternates: { canonical: `/${username}/vs/${opponent}` },
   };
 }
 

@@ -3,38 +3,9 @@ import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { deviconUrl } from "@/lib/devicon";
+import { fetchImageDataUri, loadFonts } from "@/lib/og";
 
 export const runtime = "nodejs";
-
-/**
- * Cinzel, the display face used across the site. Fetched from Google Fonts at
- * render time: satori needs the raw font bytes, and without them everything
- * falls back to the single bundled sans (which also has no bold, so weights
- * silently flatten).
- */
-async function loadCinzel(weight: 400 | 700): Promise<ArrayBuffer | null> {
-  try {
-    const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Cinzel:wght@${weight}`,
-      {
-        // A UA string that gets us TTF rather than WOFF2, which satori can't read.
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; gitsouls)" },
-        next: { revalidate: 60 * 60 * 24 * 30 },
-      },
-    ).then((r) => (r.ok ? r.text() : null));
-    if (!css) return null;
-
-    const url = css.match(/src:\s*url\(([^)]+)\)/)?.[1];
-    if (!url) return null;
-
-    const res = await fetch(url, {
-      next: { revalidate: 60 * 60 * 24 * 30 },
-    });
-    return res.ok ? await res.arrayBuffer() : null;
-  } catch {
-    return null;
-  }
-}
 
 /** Devicon SVG as a data URI — satori can't fetch remote SVGs reliably. */
 async function fetchLanguageIcon(language: string): Promise<string | null> {
@@ -48,27 +19,6 @@ async function fetchLanguageIcon(language: string): Promise<string | null> {
     if (!res.ok) return null;
     const svg = await res.text();
     return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Fetch the avatar up-front as a data URI. Satori would otherwise fetch it
- * lazily while the response stream is already open with a 200 status, so a
- * failure there yields a truncated PNG rather than an error — the classic
- * "downloaded file is broken" symptom. Returns null so we can fall back.
- */
-async function fetchAvatar(url: string): Promise<string | null> {
-  try {
-    const res = await fetch(url, {
-      signal: AbortSignal.timeout(5000),
-      next: { revalidate: 60 * 60 * 24 },
-    });
-    if (!res.ok) return null;
-    const type = res.headers.get("content-type") ?? "image/png";
-    const buf = Buffer.from(await res.arrayBuffer());
-    return `data:${type};base64,${buf.toString("base64")}`;
   } catch {
     return null;
   }
@@ -94,25 +44,13 @@ export async function GET(
 
   const { rank, bossClass } = profile;
 
-  const [avatar, langIcon, cinzel, cinzelBold] = await Promise.all([
-    fetchAvatar(profile.avatarUrl),
+  const [avatar, langIcon, { fonts, fontFamily }] = await Promise.all([
+    fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage
       ? fetchLanguageIcon(profile.topLanguage)
       : Promise.resolve(null),
-    loadCinzel(400),
-    loadCinzel(700),
+    loadFonts(),
   ]);
-
-  const fonts = [
-    ...(cinzel
-      ? [{ name: "Cinzel", data: cinzel, weight: 400 as const, style: "normal" as const }]
-      : []),
-    ...(cinzelBold
-      ? [{ name: "Cinzel", data: cinzelBold, weight: 700 as const, style: "normal" as const }]
-      : []),
-  ];
-  // Only claim the family when we actually loaded it, else satori errors out.
-  const fontFamily = fonts.length > 0 ? "Cinzel" : "sans-serif";
 
   return new ImageResponse(
     (

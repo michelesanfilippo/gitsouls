@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import EngravedTitle from "@/components/EngravedTitle";
 import SwordCursor from "@/components/SwordCursor";
 import LandingStatus from "@/components/LandingStatus";
+import SupportButton from "@/components/SupportButton";
 
 export default function Home() {
   return (
@@ -24,7 +25,7 @@ export default function Home() {
         </div>
 
         {/* Floating sword, right and a little below the search box */}
-        <div className="absolute right-[6%] top-[68%] hidden -translate-y-1/2 lg:block xl:right-[12%]">
+        <div className="absolute right-[6%] top-[60%] hidden -translate-y-1/2 lg:block xl:right-[12%]">
           <SwordCursor />
         </div>
 
@@ -45,6 +46,14 @@ export default function Home() {
         </div>
       </main>
       <Footer />
+
+      {/* Fixed so it holds the bottom-right corner regardless of page height.
+          Hidden on small screens, where it would crowd the footer. */}
+      <div className="pointer-events-none fixed bottom-5 right-5 z-30 hidden sm:block">
+        <div className="pointer-events-auto">
+          <SupportButton />
+        </div>
+      </div>
     </div>
   );
 }

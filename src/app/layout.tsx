@@ -26,9 +26,16 @@ export const metadata: Metadata = {
     "GitSouls forges your GitHub profile into a Souls-like boss: stats, class, rank and lore, summoned in real time.",
   openGraph: {
     title: "GitSouls",
-    description: "Turn your GitHub profile into a Souls-like boss.",
+    description: "Your github profile turned into a Souls-like boss.",
     siteName: "GitSouls",
     type: "website",
+    // The image comes from src/app/opengraph-image.tsx, which App Router picks
+    // up and attaches automatically.
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GitSouls",
+    description: "Your github profile turned into a Souls-like boss.",
   },
   // No `icons` entry: App Router picks up src/app/icon.png automatically and
   // hashes its URL for cache-busting.
