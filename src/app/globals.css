@@ -32,6 +32,25 @@
 
 html {
   color-scheme: dark;
+
+  /*
+   * Always reserve the scrollbar gutter. Without this the page oscillates when
+   * its content height sits within a scrollbar-width of the viewport height:
+   * content overflows by a hair, the scrollbar appears, that narrows the content
+   * box, text re-wraps shorter, the scrollbar is no longer needed, it vanishes —
+   * and the cycle repeats every frame. That loop is what flickered as a black
+   * hairline (the scrollbar itself, blinking), which is why it persisted with
+   * hardware acceleration disabled and was worst in Opera, whose sidebar makes
+   * the viewport narrower and the wrap more marginal.
+   */
+  scrollbar-gutter: stable;
+}
+
+/* Fallback for engines without scrollbar-gutter: keep the bar always present. */
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
 }
 
 /*

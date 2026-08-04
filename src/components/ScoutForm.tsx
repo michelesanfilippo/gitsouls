@@ -2,16 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-
-/** Extract a bare username from raw input (handles @user and github URLs). */
-function parseUsername(raw: string): string {
-  let v = raw.trim();
-  const urlMatch = v.match(/github\.com\/([^/?#]+)/i);
-  if (urlMatch) v = urlMatch[1];
-  return v.replace(/^@/, "").trim();
-}
-
-const VALID = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+import { parseUsername, VALID_USERNAME } from "@/lib/username";
 
 /** Landing search: type a username, press Scout, open its boss profile. */
 export default function ScoutForm() {
@@ -34,7 +25,7 @@ export default function ScoutForm() {
       setError("Speak a name into the fog.");
       return;
     }
-    if (!VALID.test(username)) {
+    if (!VALID_USERNAME.test(username)) {
       setError("That is no valid GitHub name.");
       return;
     }

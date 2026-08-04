@@ -4,6 +4,7 @@ import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";
 import StatBar from "./StatBar";
 import ShareBox from "./ShareBox";
 import SkillsBox from "./SkillsBox";
+import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
 
@@ -38,6 +39,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             />
           ))}
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
+          <DuelBox login={profile.login} />
         </div>
 
         {/* Avatar */}
