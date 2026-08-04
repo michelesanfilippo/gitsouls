@@ -18,8 +18,9 @@ const garamond = EB_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL("https://gitsouls.com"),
   title: {
-    default: "GitSouls — Turn your profile into a Souls-like boss",
-    template: "%s — GitSouls",
+    default: "GitSouls",
+    // Profile pages supply just the username, giving "GitSouls - <user>".
+    template: "GitSouls - %s",
   },
   description:
     "GitSouls forges your GitHub profile into a Souls-like boss: stats, class, rank and lore, summoned in real time.",

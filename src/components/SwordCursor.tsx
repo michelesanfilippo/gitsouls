@@ -80,10 +80,11 @@ export default function SwordCursor() {
         onClick={take}
         aria-label="Take the sword in hand"
         aria-pressed={wielded}
+        // No drop-shadow filter: a blur on a transform-animated element is
+        // re-rasterised every frame, which is what tore as black hairlines.
         className={`animate-sword group relative cursor-pointer select-none bg-transparent transition-all duration-500 hover:scale-110 ${
           wielded ? "pointer-events-none scale-90 opacity-0" : "opacity-100"
         }`}
-        style={{ filter: "drop-shadow(0 8px 20px rgba(220,38,38,0.35))" }}
       >
         <Image
           src="/img/sword.png"

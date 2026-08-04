@@ -34,10 +34,12 @@ export default function EngravedTitle({
 
   return (
     <span className="relative inline-block">
-      {/* Pulsing glow, painted behind the glyphs */}
+      {/* Pulsing glow behind the glyphs. text-shadow rather than a blur filter:
+          a blur on an animated element is re-rasterised every frame. */}
       <span
         aria-hidden
-        className={`animate-ember pointer-events-none absolute inset-0 font-display uppercase text-ember/45 blur-[14px] ${className}`}
+        className={`animate-ember pointer-events-none absolute inset-0 font-display uppercase text-transparent ${className}`}
+        style={{ textShadow: "0 0 18px rgba(220,38,38,0.55)" }}
       >
         {children}
       </span>

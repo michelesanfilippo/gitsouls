@@ -13,7 +13,8 @@ export async function generateMetadata({
 }: PageProps<"/[username]">): Promise<Metadata> {
   const { username } = await params;
   return {
-    title: `${username} — Souls-like boss`,
+    // The root layout's template wraps this as "GitSouls - <username>".
+    title: username,
     description: `The Souls-like boss forged from @${username}'s GitHub profile.`,
   };
 }

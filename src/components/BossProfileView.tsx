@@ -20,27 +20,23 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
 
   return (
     <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch md:gap-10 lg:gap-14">
-        {/* Left column — stats, then the share box. The share box is pushed to
-            the bottom so it lines up with the percentile box under the avatar. */}
-        <div className="order-2 flex w-full flex-col gap-8 md:order-none md:ml-auto md:h-full md:max-w-sm md:pt-28 lg:max-w-md">
-          <div className="flex flex-col gap-4">
-            {LEFT.map((k) => (
-              <StatBar
-                key={k}
-                statKey={k}
-                label={STAT_LABELS[k]}
-                value={stats[k]}
-              />
-            ))}
-          </div>
-          {/* mt-auto drops it to the bottom, level with the percentile box */}
-          <div className="md:mt-auto">
-            <ShareBox
-              login={profile.login}
-              name={profile.name ?? profile.login}
+      {/*
+        Two explicit grid rows: stats/avatar on the first, the three boxes on the
+        second. Aligning the boxes by row means a tall skills list can no longer
+        drag the share box out of line with the percentile box — which is what
+        happened when each column pushed its own box down with mt-auto.
+      */}
+      <div className="grid grid-cols-1 items-start gap-x-10 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-14">
+        {/* Left stats */}
+        <div className="order-2 flex w-full flex-col gap-6 md:order-none md:ml-auto md:max-w-sm md:pt-28 lg:max-w-md">
+          {LEFT.map((k) => (
+            <StatBar
+              key={k}
+              statKey={k}
+              label={STAT_LABELS[k]}
+              value={stats[k]}
             />
-          </div>
+          ))}
         </div>
 
         {/* Avatar */}
@@ -143,35 +139,36 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               yrs of ash
             </span>
           </div>
-
-          <div className="mt-5 w-full max-w-[15rem]">
-            <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
-          </div>
         </div>
 
-        {/* Right column — stats, then the skills box */}
-        <div className="order-3 flex w-full flex-col gap-8 md:order-none md:mr-auto md:h-full md:max-w-sm md:pt-28 lg:max-w-md">
-          <div className="flex flex-col gap-4">
-            {RIGHT.map((k) => (
-              <StatBar
-                key={k}
-                statKey={k}
-                label={STAT_LABELS[k]}
-                value={stats[k]}
-                align="right"
-              />
-            ))}
-          </div>
-          <div className="md:mt-auto">
-            <SkillsBox skills={profile.skills} />
-          </div>
+        {/* Right stats */}
+        <div className="order-3 flex w-full flex-col gap-6 md:order-none md:mr-auto md:max-w-sm md:pt-28 lg:max-w-md">
+          {RIGHT.map((k) => (
+            <StatBar
+              key={k}
+              statKey={k}
+              label={STAT_LABELS[k]}
+              value={stats[k]}
+              align="right"
+            />
+          ))}
+        </div>
+
+        {/* Second row — the three boxes, aligned to each other */}
+        <div className="order-4 md:ml-auto md:max-w-sm lg:max-w-md">
+          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
+        </div>
+        <div className="order-5 mx-auto w-full max-w-[15rem]">
+          <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
+        </div>
+        <div className="order-6 md:mr-auto md:max-w-sm lg:max-w-md">
+          <SkillsBox skills={profile.skills} />
         </div>
       </div>
 
       {/* Lore */}
       <div className="flex flex-col items-center text-center">
-        <div className="rule mx-auto mb-4 w-24" />
-        <p className="mx-auto max-w-2xl font-serif text-sm italic leading-relaxed text-parchment/80">
+        <p className="mx-auto max-w-2xl font-serif text-base italic leading-relaxed text-parchment/80 sm:text-lg">
           {profile.lore}
         </p>
         {!profile.hasContributionData && (

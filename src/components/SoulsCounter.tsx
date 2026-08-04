@@ -29,12 +29,12 @@ export default function SoulsCounter() {
   if (count === null) return null;
 
   return (
-    <div className="animate-fade-up mt-5 flex items-center gap-2.5 rounded-full border border-[#22c55e]/35 bg-[#22c55e]/10 px-4 py-2 backdrop-blur">
-      <span className="relative flex h-2 w-2" aria-hidden>
+    <div className="animate-fade-up mt-6 flex items-center gap-3 rounded-full border border-[#22c55e]/35 bg-[#22c55e]/10 px-6 py-3 backdrop-blur">
+      <span className="relative flex h-2.5 w-2.5" aria-hidden>
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-70" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#22c55e]" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#22c55e]" />
       </span>
-      <span className="font-display text-sm tracking-wide text-[#4ade80]">
+      <span className="font-display text-lg tracking-wide text-[#4ade80]">
         {formatSouls(count)} souls summoned
       </span>
     </div>

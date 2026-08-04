@@ -44,20 +44,6 @@ body {
   min-height: 100dvh;
 }
 
-/*
- * Keep an element on its own compositor layer.
- *
- * Note the animations below all carry an explicit translateZ(0): a keyframe
- * setting `transform` overrides the one declared here, so without it the layer
- * promotion is lost for the whole duration of the animation — which is exactly
- * when it is needed. `will-change` is deliberately NOT set: on several large
- * blurred elements at once it inflates GPU memory and makes the tearing worse.
- */
-.gpu-layer {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
 /* Thin engraved divider */
 .rule {
   height: 1px;
@@ -166,23 +152,6 @@ body {
   animation: swordSway 13s ease-in-out infinite;
 }
 
-/* Drifting background orbs */
-@keyframes drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(30px, -20px, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-.animate-drift {
-  animation: drift 18s ease-in-out infinite;
-}
-
 /* Frosted glass surface for cards/boxes */
 .glass {
   background: rgba(20, 12, 30, 0.45);
@@ -219,25 +188,34 @@ body {
   animation: fogDrift 9s ease-in-out infinite;
 }
 
-/* Page-wide rolling fog (landing + profile backdrop) */
-@keyframes fogRoll {
+/*
+ * Backdrop breathing. Opacity only — never transform.
+ *
+ * Animating a transform on these very large gradient layers made the browser
+ * re-composite huge surfaces each frame and tear as black hairlines. Opacity is
+ * handled entirely on the GPU against an already-painted layer, so the drift is
+ * traded for a slow pulse that costs nothing.
+ */
+@keyframes softPulse {
   0%,
   100% {
-    transform: translate3d(-6%, 0, 0);
-    opacity: 0.7;
+    opacity: 0.55;
   }
   50% {
-    transform: translate3d(6%, 0, 0);
     opacity: 1;
   }
 }
 
+.animate-glow {
+  animation: softPulse 16s ease-in-out infinite;
+}
+
 .animate-fog-drift {
-  animation: fogRoll 24s ease-in-out infinite;
+  animation: softPulse 24s ease-in-out infinite;
 }
 
 .animate-fog-drift-slow {
-  animation: fogRoll 34s ease-in-out infinite reverse;
+  animation: softPulse 34s ease-in-out infinite reverse;
 }
 
 /* Sword cursor active for the whole tab */
@@ -250,7 +228,7 @@ body {
   .animate-ember,
   .animate-float-slow,
   .animate-sword,
-  .animate-drift,
+  .animate-glow,
   .animate-fog,
   .animate-fog-drift,
   .animate-fog-drift-slow,
