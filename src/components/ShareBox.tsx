@@ -78,7 +78,7 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
   };
 
   return (
-    <div className="glass rounded-2xl p-4">
+    <div className="glass-soft rounded-2xl p-4">
       <p className="mb-3 font-display text-xs uppercase tracking-[0.3em] text-gold/80">
         Spread the curse
       </p>

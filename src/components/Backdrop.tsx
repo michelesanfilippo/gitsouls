@@ -61,6 +61,22 @@ export default function Backdrop() {
         />
       ))}
 
+      {/* Rolling fog — low-lying mist and a mid-height drift */}
+      <div
+        className="animate-fog-drift absolute inset-x-0 bottom-0 h-[45vh]"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 100% at 50% 100%, rgba(170,170,195,0.1), transparent 70%)",
+        }}
+      />
+      <div
+        className="animate-fog-drift-slow absolute inset-x-0 top-1/4 h-[40vh]"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 100% at 30% 50%, rgba(150,150,180,0.06), transparent 65%)",
+        }}
+      />
+
       {/* Subtle vignette for depth */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
     </div>

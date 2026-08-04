@@ -3,7 +3,7 @@ import type { Skill } from "@/lib/scoring";
 /** Bottom-right box listing the boss's unlocked skills. */
 export default function SkillsBox({ skills }: { skills: Skill[] }) {
   return (
-    <div className="glass rounded-2xl p-4">
+    <div className="glass-soft rounded-2xl p-4">
       <p className="mb-3 font-display text-xs uppercase tracking-[0.3em] text-gold/80">
         Skills
       </p>

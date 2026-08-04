@@ -53,7 +53,7 @@ export default async function BossPage({ params }: PageProps<"/[username]">) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <TopBar />
+      <TopBar showBack />
       {profile ? (
         <main className="flex flex-1 flex-col">
           <BossProfileView profile={profile} />

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";
 import StatBar from "./StatBar";
@@ -16,18 +15,10 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
   const { rank, bossClass, stats } = profile;
 
   return (
-    <div className="animate-fade-up relative mx-auto w-full max-w-7xl px-6 py-8 lg:px-8">
-      {/* Back — top-left of the page */}
-      <Link
-        href="/"
-        className="souls-focus absolute left-4 top-4 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gold/40 bg-void-2/70 px-4 py-2 font-display text-base text-parchment backdrop-blur transition-colors hover:border-gold hover:bg-void-2/90 hover:text-gold"
-      >
-        <span aria-hidden>←</span> Back
-      </Link>
-
-      <div className="mt-10 grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-12">
+    <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-10 px-4 py-8 sm:px-8 lg:px-12">
+      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-12 lg:gap-20">
         {/* Left stats */}
-        <div className="order-2 flex flex-col gap-4 md:order-none">
+        <div className="order-2 flex w-full max-w-sm flex-col gap-4 md:order-none md:mr-auto">
           {LEFT.map((k) => (
             <StatBar key={k} statKey={k} label={STAT_LABELS[k]} value={stats[k]} />
           ))}
@@ -36,8 +27,11 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         {/* Avatar */}
         <div className="order-1 flex flex-col items-center md:order-none">
           <span
-            className="emboss mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
-            style={{ color: rank.color }}
+            className="mb-2 font-display text-2xl uppercase tracking-[0.35em] sm:text-3xl"
+            style={{
+              color: rank.color,
+              textShadow: `0 0 22px ${rank.glow}, 0 2px 4px rgba(0,0,0,0.85)`,
+            }}
           >
             {rank.name}
           </span>
@@ -114,7 +108,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         </div>
 
         {/* Right stats */}
-        <div className="order-3 flex flex-col gap-4 md:order-none">
+        <div className="order-3 flex w-full max-w-sm flex-col gap-4 md:order-none md:ml-auto">
           {RIGHT.map((k) => (
             <StatBar
               key={k}
@@ -128,7 +122,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
       </div>
 
       {/* Facts */}
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-base text-muted">
+      <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-base text-muted">
         <span>
           <span className="text-parchment">{profile.followers}</span> followers
         </span>
@@ -145,14 +139,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
       </div>
 
       {/* Share (left) · Lore (center) · Skills (right) */}
-      <div className="mt-10 grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="order-2 lg:order-none">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>
 
         <div className="order-1 flex flex-col items-center justify-center text-center lg:order-none">
           <div className="rule mx-auto mb-4 w-24" />
-          <p className="font-serif text-base italic leading-relaxed text-parchment/80">
+          <p className="mx-auto max-w-2xl font-serif text-base italic leading-relaxed text-parchment/80">
             {profile.lore}
           </p>
           {!profile.hasContributionData && (

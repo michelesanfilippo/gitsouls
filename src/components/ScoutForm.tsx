@@ -98,16 +98,7 @@ export default function ScoutForm() {
           className="cursor-pointer text-gold/80 underline underline-offset-4 transition-colors hover:text-gold"
         >
           michelesanfilippo
-        </button>{" "}
-        ·{" "}
-        <button
-          type="button"
-          onClick={() => scout("torvalds")}
-          className="cursor-pointer text-gold/80 underline underline-offset-4 transition-colors hover:text-gold"
-        >
-          torvalds
-        </button>{" "}
-        · or your own
+        </button>
       </p>
     </div>
   );
