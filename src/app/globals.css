@@ -46,14 +46,34 @@ html {
   scrollbar-gutter: stable;
 
   /*
-   * Flat colour only. The atmosphere lives in Backdrop, sized in vw so it spans
-   * the gutter reserved above — `100vw` includes the scrollbar's width, whereas
-   * a fixed element pinned with inset-0 is laid out against the viewport
-   * *excluding* it. That mismatch left an unpainted strip down the right edge,
-   * which read as the page being cut off (most visibly on the landing page,
-   * which does not scroll, so the strip held no scrollbar at all).
+   * The atmosphere lives HERE, on the root element, with `background-attachment:
+   * fixed` (the `fixed` keyword in each layer's shorthand). This is the only
+   * approach that covers the full page canvas including the scrollbar gutter:
+   *
+   *   - A `position:fixed` element sized with `100vw` or `w-screen` is laid out
+   *     against the visual viewport, which EXCLUDES the gutter.
+   *   - `html { background }` covers the CSS "canvas" — the entire painted area
+   *     including the scrollbar gutter — so no strip is left unpainted.
+   *   - `background-attachment: fixed` keeps each gradient anchored to the
+   *     viewport so it does not scroll with the document.
+   *
+   * Only left-side orbs and center fog are included. The right-side gold orb
+   * (108% 112%) and right fog wisp (108% 52%) were centered just off-screen to
+   * the right and bled back into the viewport — producing the yellow aura around
+   * the sword, which sits at roughly (94%, 60%). Removing them leaves the right
+   * half of the page clean (base colour + stars only), which is what the sword
+   * deserves as a focal point.
    */
-  background: var(--void);
+  background:
+    radial-gradient(closest-side, rgba(220, 38, 38, 0.2), transparent)
+      no-repeat fixed -8% -18% / 42rem 42rem,
+    radial-gradient(closest-side, rgba(26, 16, 42, 0.65), transparent)
+      no-repeat fixed 2% 52% / 32rem 32rem,
+    radial-gradient(closest-side, rgba(178, 178, 205, 0.14), transparent)
+      no-repeat fixed 40% 108% / 150% 70vh,
+    radial-gradient(closest-side, rgba(158, 158, 190, 0.1), transparent)
+      no-repeat fixed -10% 26% / 130% 52vh,
+    var(--void);
 }
 
 /* Fallback for engines without scrollbar-gutter: keep the bar always present. */

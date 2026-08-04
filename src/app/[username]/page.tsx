@@ -12,17 +12,32 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[username]">): Promise<Metadata> {
   const { username } = await params;
+  const title = `${username} — GitSouls`;
   const description = `The Souls-like boss forged from @${username}'s GitHub profile.`;
   const image = { url: `/${username}/og.png`, width: 1200, height: 630 };
+  const url = `https://gitsouls.com/${username}`;
 
   return {
     // The root layout's template wraps this as "GitSouls - <username>".
     title: username,
     description,
-    // Overrides the site-wide opengraph-image with this boss's own card.
-    openGraph: { title: `${username} — GitSouls`, description, images: [image] },
-    twitter: { card: "summary_large_image", images: [image] },
-    alternates: { canonical: `/${username}` },
+    // Full openGraph object so merging with the layout default doesn't silently
+    // drop fields like type/siteName while keeping the image override.
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "GitSouls",
+      type: "profile",
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image.url],
+    },
+    alternates: { canonical: url },
   };
 }
 

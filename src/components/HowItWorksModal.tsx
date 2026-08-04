@@ -22,12 +22,7 @@ export default function HowItWorksModal({ open, onClose }: HowItWorksModalProps)
       label="How the souls are weighed"
       maxWidth="max-w-3xl"
     >
-      <p className="text-sm text-parchment/70">
-        Every boss is forged in real time from public GitHub data. No account, no
-        database — just your commits, repos and reputation.
-      </p>
-
-      <div className="rule my-5" />
+      <div className="rule my-4" />
 
       <h3 className="font-display text-lg text-parchment">The six stats</h3>
       <ul className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
