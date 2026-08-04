@@ -27,7 +27,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
         from stretching, which is what previously let a tall skills list drag the
         opposite box out of line.
       */}
-      <div className="grid grid-cols-1 items-start gap-x-10 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-14">
+      <div className="grid grid-cols-1 items-start gap-x-6 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-8">
         {/* Left — stats, then the share box */}
         <div className="order-2 flex w-full flex-col gap-6 md:order-none md:max-w-sm md:pt-28 lg:max-w-md">
           {LEFT.map((k) => (
@@ -144,7 +144,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             </span>
           </div>
 
-          <div className="mt-5 w-full max-w-[20rem]">
+          <div className="mt-5 w-full max-w-[22rem]">
             <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
           </div>
         </div>
