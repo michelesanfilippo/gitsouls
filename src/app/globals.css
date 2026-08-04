@@ -34,16 +34,14 @@ html {
   color-scheme: dark;
 
   /*
-   * Always reserve the scrollbar gutter. Without this the page oscillates when
-   * its content height sits within a scrollbar-width of the viewport height:
-   * content overflows by a hair, the scrollbar appears, that narrows the content
-   * box, text re-wraps shorter, the scrollbar is no longer needed, it vanishes —
-   * and the cycle repeats every frame. That loop is what flickered as a black
-   * hairline (the scrollbar itself, blinking), which is why it persisted with
-   * hardware acceleration disabled and was worst in Opera, whose sidebar makes
-   * the viewport narrower and the wrap more marginal.
+   * overflow-y: scroll keeps a permanent scrollbar on all pages so the gutter
+   * is always occupied by an actual scrollbar (not a reserved-but-empty strip).
+   * This avoids the oscillation loop that caused the original flicker, AND avoids
+   * the visible empty strip that `scrollbar-gutter: stable` left in Opera — that
+   * property reserves space for a scrollbar that may never appear, and Opera
+   * renders that space as a visually distinct strip regardless of track color.
    */
-  scrollbar-gutter: stable;
+  overflow-y: scroll;
 
   /*
    * The atmosphere lives HERE, on the root element, with `background-attachment:
@@ -76,12 +74,6 @@ html {
     var(--void);
 }
 
-/* Fallback for engines without scrollbar-gutter: keep the bar always present. */
-@supports not (scrollbar-gutter: stable) {
-  html {
-    overflow-y: scroll;
-  }
-}
 
 /*
  * Souls-styled scrollbar. The track is transparent so the root background shows
