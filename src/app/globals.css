@@ -277,10 +277,38 @@ body {
   animation: rankBreathe 4.5s ease-in-out infinite;
 }
 
-/* Sword cursor active for the whole tab */
+/* Weapon cursors — active for the whole tab */
 .sword-cursor,
 .sword-cursor * {
   cursor: url("/img/sword_cursor.png") 54 10, auto !important;
+}
+
+.bow-cursor,
+.bow-cursor * {
+  cursor: url("/img/bow_cursor.png") 16 16, auto !important;
+}
+
+.wand-cursor,
+.wand-cursor * {
+  cursor: url("/img/wand_cursor.png") 4 28, auto !important;
+}
+
+/* Bow hover sway */
+@keyframes bowSway {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(3deg); }
+  50%       { transform: translate3d(0, -12px, 0) rotate(-3deg); }
+}
+.animate-bow {
+  animation: bowSway 15s ease-in-out infinite;
+}
+
+/* Wand drift */
+@keyframes wandDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-6deg); }
+  50%       { transform: translate3d(0, -10px, 0) rotate(6deg); }
+}
+.animate-wand {
+  animation: wandDrift 12s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
