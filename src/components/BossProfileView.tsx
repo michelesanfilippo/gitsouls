@@ -21,13 +21,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
   return (
     <div className="animate-fade-up relative flex w-full flex-1 flex-col justify-center gap-8 px-4 py-6 sm:px-8 lg:px-12">
       {/*
-        Two explicit grid rows: stats/avatar on the first, the three boxes on the
-        second. Aligning the boxes by row means a tall skills list can no longer
-        drag the share box out of line with the percentile box — which is what
-        happened when each column pushed its own box down with mt-auto.
+        Three columns, each a flow of its own: stats then that column's box, so
+        every box sits directly beneath its stats. `items-start` keeps the columns
+        from stretching, which is what previously let a tall skills list drag the
+        opposite box out of line.
       */}
       <div className="grid grid-cols-1 items-start gap-x-10 gap-y-8 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-14">
-        {/* Left stats */}
+        {/* Left — stats, then the share box */}
         <div className="order-2 flex w-full flex-col gap-6 md:order-none md:ml-auto md:max-w-sm md:pt-28 lg:max-w-md">
           {LEFT.map((k) => (
             <StatBar
@@ -37,6 +37,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               value={stats[k]}
             />
           ))}
+          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
         </div>
 
         {/* Avatar */}
@@ -140,10 +141,15 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               yrs of ash
             </span>
           </div>
+
+          <div className="mt-5 w-full max-w-[15rem]">
+            <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
+          </div>
         </div>
 
-        {/* Right stats */}
-        <div className="order-3 flex w-full flex-col gap-6 md:order-none md:mr-auto md:max-w-sm md:pt-28 lg:max-w-md">
+        {/* Right — stats, then the skills box. Wider than the left column so a
+            long skills list spills into extra columns rather than growing tall. */}
+        <div className="order-3 flex w-full flex-col gap-6 md:order-none md:mr-auto md:max-w-md md:pt-28 lg:max-w-lg">
           {RIGHT.map((k) => (
             <StatBar
               key={k}
@@ -153,17 +159,6 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               align="right"
             />
           ))}
-        </div>
-
-        {/* Second row — the three boxes, aligned to each other */}
-        <div className="order-4 w-full md:ml-auto md:max-w-sm lg:max-w-md">
-          <ShareBox login={profile.login} name={profile.name ?? profile.login} />
-        </div>
-        <div className="order-5 mx-auto w-full max-w-[15rem]">
-          <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
-        </div>
-        {/* Wider than the left cell: the skills list spills into extra columns */}
-        <div className="order-6 w-full md:mr-auto md:max-w-md lg:max-w-lg">
           <SkillsBox skills={profile.skills} />
         </div>
       </div>

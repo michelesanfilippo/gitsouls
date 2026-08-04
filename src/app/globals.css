@@ -34,11 +34,14 @@ html {
   color-scheme: dark;
 }
 
+/*
+ * Flat fill only. The atmosphere lives in Backdrop, which is viewport-fixed;
+ * gradients here were both a duplicate and a defect — sized to the body box,
+ * they shifted as the page grew, and at alpha 0.08-0.12 over near-black they
+ * banded into a visible line on 6-bit laptop panels.
+ */
 body {
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(220, 38, 38, 0.12), transparent 60%),
-    radial-gradient(900px 500px at 50% 120%, rgba(212, 175, 55, 0.08), transparent 60%),
-    var(--background);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-serif), Georgia, serif;
   min-height: 100dvh;
@@ -75,19 +78,23 @@ body {
   animation: emberPulse 3.2s ease-in-out infinite;
 }
 
-@keyframes fadeInUp {
+/*
+ * Entry fade. Opacity only, no transform: `both` fill-mode leaves a transform on
+ * the element forever, and a transformed ancestor becomes the containing block
+ * for descendant position:fixed — which silently clipped modal overlays to the
+ * profile container. Keeping this transform-free removes that whole hazard.
+ */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .animate-fade-up {
-  animation: fadeInUp 0.5s ease-out both;
+  animation: fadeIn 0.4s ease-out both;
 }
 
 /*
@@ -111,17 +118,6 @@ body {
   -webkit-text-fill-color: transparent;
   color: transparent;
   transform: translateZ(0);
-}
-
-/* Twinkling stars */
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 1;
-  }
 }
 
 /* Slow vertical float (octoSouls, sword) */
@@ -189,36 +185,6 @@ body {
   animation: fogDrift 9s ease-in-out infinite;
 }
 
-/*
- * Backdrop breathing. Opacity only — never transform.
- *
- * Animating a transform on these very large gradient layers made the browser
- * re-composite huge surfaces each frame and tear as black hairlines. Opacity is
- * handled entirely on the GPU against an already-painted layer, so the drift is
- * traded for a slow pulse that costs nothing.
- */
-@keyframes softPulse {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-glow {
-  animation: softPulse 16s ease-in-out infinite;
-}
-
-.animate-fog-drift {
-  animation: softPulse 24s ease-in-out infinite;
-}
-
-.animate-fog-drift-slow {
-  animation: softPulse 34s ease-in-out infinite reverse;
-}
-
 /* Sword cursor active for the whole tab */
 .sword-cursor,
 .sword-cursor * {
@@ -229,11 +195,8 @@ body {
   .animate-ember,
   .animate-float-slow,
   .animate-sword,
-  .animate-glow,
   .animate-fog,
-  .animate-fog-drift,
-  .animate-fog-drift-slow,
-  .star {
+  .animate-fade-up {
     animation: none !important;
   }
 }

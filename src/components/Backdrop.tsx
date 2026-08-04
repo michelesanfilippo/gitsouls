@@ -1,130 +1,61 @@
 /**
- * Shared atmospheric backdrop: drifting ember/gold orbs plus a field of
- * twinkling stars. Fixed behind all content. Star positions are generated
- * deterministically so server and client markup match (no hydration drift).
+ * Shared atmospheric backdrop: ember/gold orbs, fog banks and a star field,
+ * fixed behind all content.
  *
- * Every soft edge here is a radial-gradient, never a `blur()` filter, and the
- * only animated property is `opacity`. That combination is deliberate: a large
- * blur on a transform-animated element forces the browser to re-rasterise the
- * blurred bitmap every frame, and under memory pressure it ships partially
- * painted tiles — which is what produced the flickering black hairlines. A
- * gradient is painted once and `opacity` is composited on the GPU, so there is
- * nothing left to re-rasterise. `closest-side` also guarantees the gradient
- * reaches full transparency exactly at the element's edge, so no seam can form.
+ * Everything is painted as background layers on ONE static element, and nothing
+ * here animates. That is deliberate and hard-won: earlier versions stacked seven
+ * large divs that animated opacity, and on hybrid-graphics laptops (Intel iGPU +
+ * discrete, e.g. an HP ZBook) Chromium tore them as flickering black hairlines.
+ * Tuning filters, layer promotion and animated properties did not fix it —
+ * removing the composited layers did. If you add motion here, test on hybrid
+ * graphics before assuming it is free.
+ *
+ * Star positions are generated deterministically so server and client markup
+ * match (no hydration drift).
  */
 
-interface Star {
-  top: number;
-  left: number;
-  size: number;
-  delay: number;
-  duration: number;
-}
-
-// Deterministic pseudo-random star field (seeded LCG).
-const STARS: Star[] = (() => {
+// Deterministic pseudo-random star field (seeded LCG), baked into a single
+// background-image declaration so the stars cost no extra elements.
+const STAR_LAYERS: string = (() => {
   let seed = 1337;
   const rand = () => {
     seed = (seed * 1103515245 + 12345) & 0x7fffffff;
     return seed / 0x7fffffff;
   };
-  return Array.from({ length: 55 }, () => ({
-    top: rand() * 100,
-    left: rand() * 100,
-    size: 1 + rand() * 2,
-    delay: rand() * 5,
-    duration: 2.5 + rand() * 4,
-  }));
+  return Array.from({ length: 60 }, () => {
+    const top = (rand() * 100).toFixed(2);
+    const left = (rand() * 100).toFixed(2);
+    const size = (0.6 + rand() * 0.9).toFixed(2);
+    const alpha = (0.25 + rand() * 0.5).toFixed(2);
+    return `radial-gradient(circle ${size}px at ${left}% ${top}%, rgba(232,224,207,${alpha}), transparent 100%)`;
+  }).join(", ");
 })();
 
-/** A soft, gradient-based glow. No blur filter, so nothing re-rasterises. */
-function Glow({
-  className,
-  color,
-  delay,
-  animation = "animate-glow",
-}: {
-  className: string;
-  color: string;
-  delay?: string;
-  animation?: string;
-}) {
-  return (
-    <div
-      className={`${animation} absolute ${className}`}
-      style={{
-        backgroundImage: `radial-gradient(closest-side, ${color}, transparent)`,
-        animationDelay: delay,
-      }}
-    />
-  );
-}
+/**
+ * Orbs and fog. `closest-side` makes each gradient reach full transparency
+ * exactly at its own box, so no hard seam can form at an edge.
+ */
+const ATMOSPHERE = [
+  // Ember glow, upper left
+  "radial-gradient(closest-side, rgba(220,38,38,0.20), transparent) no-repeat -8% -18% / 42rem 42rem",
+  // Gold glow, lower right
+  "radial-gradient(closest-side, rgba(212,175,55,0.14), transparent) no-repeat 108% 112% / 44rem 44rem",
+  // Cold void glow, mid left
+  "radial-gradient(closest-side, rgba(26,16,42,0.65), transparent) no-repeat 2% 52% / 32rem 32rem",
+  // Low fog bank
+  "radial-gradient(closest-side, rgba(178,178,205,0.14), transparent) no-repeat 40% 108% / 150% 70vh",
+  // Mid fog bank
+  "radial-gradient(closest-side, rgba(158,158,190,0.10), transparent) no-repeat -10% 26% / 130% 52vh",
+  // Upper-right fog wisp
+  "radial-gradient(closest-side, rgba(150,150,185,0.08), transparent) no-repeat 108% 52% / 115% 46vh",
+].join(", ");
 
 export default function Backdrop() {
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-    >
-      {/* Ember and gold orbs */}
-      <Glow
-        className="-top-40 left-[18%] h-[38rem] w-[38rem]"
-        color="rgba(220,38,38,0.20)"
-      />
-      <Glow
-        className="-bottom-52 right-[16%] h-[40rem] w-[40rem]"
-        color="rgba(212,175,55,0.14)"
-        delay="7s"
-      />
-      <Glow
-        className="left-[6%] top-1/2 h-[30rem] w-[30rem]"
-        color="rgba(26,16,42,0.65)"
-        delay="3.5s"
-      />
-
-      {/* Rolling fog banks */}
-      <Glow
-        className="-bottom-[22vh] -left-[15%] h-[70vh] w-[130%]"
-        color="rgba(178,178,205,0.14)"
-        animation="animate-fog-drift"
-      />
-      <Glow
-        className="-left-[25%] top-[18%] h-[50vh] w-[115%]"
-        color="rgba(158,158,190,0.10)"
-        animation="animate-fog-drift-slow"
-      />
-      <Glow
-        className="-right-[20%] top-[48%] h-[45vh] w-[100%]"
-        color="rgba(150,150,185,0.08)"
-        animation="animate-fog-drift"
-        delay="11s"
-      />
-
-      {/* Twinkling stars */}
-      {STARS.map((s, i) => (
-        <span
-          key={i}
-          className="star absolute rounded-full bg-parchment"
-          style={{
-            top: `${s.top}%`,
-            left: `${s.left}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            animation: `twinkle ${s.duration}s ease-in-out ${s.delay}s infinite`,
-          }}
-        />
-      ))}
-
-      {/*
-        Depth at the top and bottom only — a centred ellipse would read as a
-        frame around the page, since a fixed backdrop keeps its dark ring in
-        place while content scrolls past.
-
-        Many intermediate stops, and never two identical colours at different
-        positions: a gradient that holds one value across a wide flat span shows
-        a visible banding seam where it finally starts to change.
-      */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.34)_0%,rgba(0,0,0,0.22)_8%,rgba(0,0,0,0.12)_16%,rgba(0,0,0,0.05)_26%,rgba(0,0,0,0)_40%,rgba(0,0,0,0)_60%,rgba(0,0,0,0.05)_74%,rgba(0,0,0,0.12)_84%,rgba(0,0,0,0.22)_92%,rgba(0,0,0,0.34)_100%)]" />
-    </div>
+      style={{ background: `${STAR_LAYERS}, ${ATMOSPHERE}` }}
+    />
   );
 }
