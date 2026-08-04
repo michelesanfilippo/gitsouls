@@ -57,4 +57,27 @@ describe("resolveDuel", () => {
     const close = resolveDuel(strong, { ...weak, overall: 87 }).lore;
     expect(close).not.toBe(rout);
   });
+
+  it("leaves the victor more health after a rout than after a close fight", () => {
+    const rout = resolveDuel(strong, weak).winnerHp;
+    const close = resolveDuel(strong, { ...weak, overall: 87 }).winnerHp;
+    expect(rout).toBeGreaterThan(close);
+    expect(rout).toBeLessThanOrEqual(100);
+    expect(close).toBeGreaterThanOrEqual(1);
+  });
+
+  it("reports no survivor's health on a tie", () => {
+    expect(resolveDuel(strong, { ...weak, overall: strong.overall }).winnerHp).toBe(
+      0,
+    );
+  });
+
+  it("never divides by zero when both sides have no power", () => {
+    const r = resolveDuel(
+      { ...strong, overall: 0 },
+      { ...weak, overall: 0 },
+    );
+    expect(r.winnerHp).toBe(0);
+    expect(Number.isFinite(r.margin)).toBe(true);
+  });
 });

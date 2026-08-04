@@ -14,6 +14,12 @@ export interface DuelResult {
   loser: DuelSide | null;
   /** absolute difference in overall power */
   margin: number;
+  /**
+   * Health the victor walks away with, 1–100. Modelled as the share of their own
+   * power the loser could not answer: a near-equal opponent leaves them at a
+   * sliver, a far weaker one barely scratches them. 0 when both fall.
+   */
+  winnerHp: number;
   lore: string;
 }
 
@@ -142,5 +148,18 @@ export function resolveDuel(a: DuelSide, b: DuelSide): DuelResult {
 
   const lore = [opening, fill(clashTemplate), fill(finisher)].join(" ");
 
-  return { winner, loser, margin, lore };
+  return { winner, loser, margin, winnerHp: winnerHp(winner, loser), lore };
+}
+
+/**
+ * Remaining health for the victor as a percentage. The loser's power is read as
+ * damage dealt: the closer the two were, the less the winner has left. Floored
+ * at 1 so a survivor never reads as dead, and 0 when nobody survived.
+ */
+function winnerHp(winner: DuelSide | null, loser: DuelSide | null): number {
+  if (!winner || !loser) return 0;
+  // Guard against a 0-power winner, which would divide by zero.
+  if (winner.overall <= 0) return 1;
+  const survived = 1 - loser.overall / winner.overall;
+  return Math.max(1, Math.min(100, Math.round(survived * 100)));
 }

@@ -52,9 +52,16 @@ const ATMOSPHERE = [
 
 export default function Backdrop() {
   return (
+    /*
+     * Deliberately inset NEGATIVELY rather than `inset-0`. Two reasons:
+     * scrollbar-gutter: stable reserves a strip that a viewport-fixed element
+     * does not cover, so a glow reaching the edge left a visible seam beside it;
+     * and any gradient still opaque where its own box ends would be clipped into
+     * a hard line. Overhanging the viewport puts both off-screen.
+     */
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      className="pointer-events-none fixed -inset-16 -z-10 overflow-hidden"
       style={{ background: `${STAR_LAYERS}, ${ATMOSPHERE}` }}
     />
   );
