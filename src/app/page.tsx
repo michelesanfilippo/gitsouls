@@ -37,7 +37,7 @@ export default function Home() {
             aria-hidden
             width={495}
             height={504}
-            className="h-auto w-36 opacity-80"
+            className="h-auto w-48 opacity-80"
           />
         </div>
 
