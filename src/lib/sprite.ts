@@ -9,17 +9,15 @@ import type { ClassName, RankName } from "./scoring/types";
  * coordinates of its top-left frame (sx0, sy0) and its frame dimensions.
  */
 export interface AnimPhase {
-  /** pixel Y of the first row of this animation */
   sy0: number;
-  /** pixel X of the first frame (always 0) */
   sx0: number;
   frameW: number;
   frameH: number;
+  /** destination Y in the 96px canvas, bottom-aligns the character */
+  destY: number;
   frameCount: number;
   fps: number;
-  /** how many full loops before advancing */
   repeats: number;
-  /** play frames reversed (stand-up = sit-down backward) */
   backward?: boolean;
 }
 
@@ -35,19 +33,25 @@ export interface AnimPhase {
  *
  * Sequence: sit → stand → walk → attack → walk → sit → loop
  */
+/**
+ * destY: where to draw the frame in the 96-px canvas so the character's
+ * feet are always at the canvas bottom.
+ *
+ * Measured content_maxY (0-indexed, inclusive):
+ *   64px frames (walk/sit): maxY = 62 → destY = 96 - 1 - 62 = 33
+ *   96px frames (attack):   maxY = 32 → destY = 96 - 1 - 32 = 63
+ */
 export const STORY_SEQUENCE: AnimPhase[] = [
-  // sit idle (hold a moment)
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 3,  repeats: 2 },
-  // stand up (sit reversed)
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 5,  repeats: 1, backward: true },
+  // stand up (sit-down reversed) — start sequence here, no idle loop
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,  repeats: 1, backward: true },
   // walk with weapon (slow)
-  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, frameCount: 9, fps: 6,  repeats: 2 },
-  // sword attack (96px, South = 96px-row 38 = py 3648)
-  { sy0: 3648, sx0: 0, frameW: 96, frameH: 96, frameCount: 8, fps: 7,  repeats: 1 },
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,  repeats: 2 },
+  // sword attack (South, 96×96)
+  { sy0: 3648, sx0: 0, frameW: 96, frameH: 96, destY: 63, frameCount: 8, fps: 7,  repeats: 1 },
   // walk back (slow)
-  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, frameCount: 9, fps: 6,  repeats: 2 },
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,  repeats: 2 },
   // sit down
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 5,  repeats: 1 },
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,  repeats: 1 },
 ];
 
 /** Canonical display size for rendering — the canvas clips to this. */

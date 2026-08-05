@@ -20,7 +20,7 @@ interface PixelBossProps {
 }
 
 export default function PixelBoss({
-  bio, className, rankName, displaySize = 90,
+  bio, className, rankName, displaySize = 106,
 }: PixelBossProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef    = useRef<HTMLImageElement | null>(null);
@@ -77,10 +77,10 @@ export default function PixelBoss({
 
       ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
 
-      // Centre the 64px frames inside the 96px canvas so the character
-      // doesn't jump position between 64px and 96px animations.
-      const offset = (DISPLAY_FRAME - ph.frameW) / 2;
-      ctx.drawImage(img, sx, sy, ph.frameW, ph.frameH, offset, offset, ph.frameW, ph.frameH);
+      // destY bottom-aligns the character in the canvas so feet stay at the
+      // same pixel regardless of whether the frame is 64px or 96px.
+      const destX = (DISPLAY_FRAME - ph.frameW) / 2; // always centre horizontally
+      ctx.drawImage(img, sx, sy, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
       rafRef.current = requestAnimationFrame(tick);
     };

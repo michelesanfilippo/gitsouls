@@ -151,29 +151,30 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
 
           {/* Pixel boss sprite — below facts, inside the central column */}
           <div
-            className="relative mt-5 w-full overflow-hidden rounded-2xl border border-gold/10"
-            style={{ minHeight: "140px" }}
+            className="relative mt-5 w-full overflow-hidden rounded-2xl border border-gold/15"
+            style={{ minHeight: "170px" }}
           >
-            {/* Pixel-paper background with fade effect */}
+            {/* Background scene — full opacity so colours show */}
             <div
               className="absolute inset-0"
               style={{
                 backgroundImage: "url('/img/pixel-paper.png')",
                 backgroundSize: "cover",
-                backgroundPosition: "center",
-                opacity: 0.18,
+                backgroundPosition: "center bottom",
               }}
             />
-            {/* Gradient overlay so the paper fades into the box colour */}
-            <div className="absolute inset-0 bg-gradient-to-b from-void-2/60 via-transparent to-void-2/70" />
+            {/* Subtle dark vignette so it blends with the page */}
+            <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/30 to-transparent" />
+            {/* Side fades */}
+            <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/20" />
 
-            {/* Sprite shifted right of centre */}
-            <div className="relative flex h-full w-full items-center justify-end pr-6 py-4">
+            {/* Sprite pinned to bottom-right, aligned with the bonfire */}
+            <div className="absolute bottom-0 right-8 pb-1">
               <PixelBoss
                 bio={profile.bio}
                 className={profile.bossClass.name}
                 rankName={profile.rank.name}
-                displaySize={90}
+                displaySize={106}
               />
             </div>
           </div>
