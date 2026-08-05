@@ -31,25 +31,22 @@ export interface AnimPhase {
 }
 
 /**
- * The automatic sequence played on loop:
- *   sitting → stand up → walk → attack × 2 → walk → sit down → …
+ * The automatic sequence played on loop. Rows are 0-indexed.
+ * Confirmed by pixel-scanning the male-sword spritesheet:
+ *   row 32 = sit/stand (3 frames)  — user's "row 33"
+ *   row 10 = walk with weapon (9 frames) — user's "row 11"
+ *   row 60 = sword attack (12 frames)    — user's "row 61"
  *
- * Row groups confirmed from spritesheet inspection:
- *   8  = walk         (9 frames)
- *   12 = slash        (6 frames, sword trail)
- *   32 = sit-down     (3 frames)
- *   36 = sit-idle     (3 frames)
- *
- * All other groups visible in the sheet (spellcast/thrust/shoot/hurt) are
- * available for future use but are not in the default sequence.
+ * All animations are played front-facing only (no direction cycle).
+ * The sprite is NOT clickable.
  */
 export const STORY_SEQUENCE: AnimPhase[] = [
-  { rowGroup: 36, frameCount: 3, fps: 2,  repeats: 3 },                    // sit idle (hold)
-  { rowGroup: 32, frameCount: 3, fps: 8,  repeats: 1, backward: true },    // stand up (sit reversed)
-  { rowGroup:  8, frameCount: 9, fps: 9,  repeats: 2 },                    // walk
-  { rowGroup: 12, frameCount: 6, fps: 9,  repeats: 2 },                    // slash attack ×2
-  { rowGroup:  8, frameCount: 9, fps: 9,  repeats: 2 },                    // walk back
-  { rowGroup: 32, frameCount: 3, fps: 8,  repeats: 1 },                    // sit down
+  { rowGroup: 32, frameCount: 3, fps: 5,  repeats: 3 },                    // sit idle (hold)
+  { rowGroup: 32, frameCount: 3, fps: 7,  repeats: 1, backward: true },    // stand up (reversed)
+  { rowGroup: 10, frameCount: 9, fps: 9,  repeats: 2 },                    // walk with weapon
+  { rowGroup: 60, frameCount: 12, fps: 9, repeats: 1 },                    // sword attack
+  { rowGroup: 10, frameCount: 9, fps: 9,  repeats: 2 },                    // walk back
+  { rowGroup: 32, frameCount: 3, fps: 7,  repeats: 1 },                    // sit down
 ];
 
 // ── Sprite file mapping ──────────────────────────────────────────────────────

@@ -43,9 +43,7 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <div className="hidden md:flex md:flex-col md:gap-6">
             <ShareBox login={profile.login} name={profile.name ?? profile.login} />
             <DuelBox login={profile.login} />
-            <div className="w-full max-w-[22rem]">
-              <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
-            </div>
+            <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
           </div>
         </div>
 
@@ -152,12 +150,12 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           </div>
 
           {/* Pixel boss sprite — below facts, inside the central column */}
-          <div className="glass-soft mt-5 flex items-center justify-center rounded-2xl p-4">
+          <div className="glass-soft mt-5 flex w-full items-center justify-center rounded-2xl px-6 py-6">
             <PixelBoss
               bio={profile.bio}
               className={profile.bossClass.name}
               rankName={profile.rank.name}
-              displaySize={112}
+              displaySize={128}
             />
           </div>
         </div>
