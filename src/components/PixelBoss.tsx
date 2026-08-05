@@ -16,19 +16,19 @@ interface PixelBossProps {
 }
 
 /**
- * CSS filters that tint armour/metal without touching skin tones too much.
- * Using sepia+hue-rotate rather than per-pixel getImageData avoids all
- * canvas readback issues (willReadFrequently, naturalWidth timing, etc.)
- * The sepia base desaturates first, then hue-rotate pushes to the rank colour,
- * and saturate amplifies it. Skin tones shift slightly but remain recognisable.
+ * Rank colour as an rgba string for the multiply-blend overlay.
+ * multiply blend mode: result = base * overlay / 255.
+ * Dark metal pixels (low value) get fully tinted; bright skin pixels
+ * (high value, near white) are multiplied by near-white → stay bright.
+ * This preserves skin tones while colouring armour/weapons.
  */
-const RANK_CSS_FILTER: Record<RankName, string> = {
-  "Hollow":         "grayscale(0.85) brightness(0.70)",
-  "Undead":         "sepia(0.5) hue-rotate(80deg) brightness(0.75)",
-  "Knight":         "sepia(0.4) hue-rotate(180deg) saturate(3) brightness(0.92)",
-  "Abyss Walker":   "sepia(0.4) hue-rotate(250deg) saturate(4) brightness(0.88)",
-  "Lord":           "sepia(0.6) saturate(4) brightness(1.05)",
-  "Soul of Cinder": "sepia(0.5) hue-rotate(320deg) saturate(6) brightness(1.10)",
+const RANK_TINT_COLOR: Record<RankName, string> = {
+  "Hollow":         "rgba(80, 80, 100, 0.85)",
+  "Undead":         "rgba(60, 90, 60,  0.85)",
+  "Knight":         "rgba(40, 80, 220, 0.80)",
+  "Abyss Walker":   "rgba(110, 30, 210, 0.80)",
+  "Lord":           "rgba(200, 160, 20, 0.80)",
+  "Soul of Cinder": "rgba(210, 50, 10,  0.85)",
 };
 
 export default function PixelBoss({
@@ -42,7 +42,7 @@ export default function PixelBoss({
   const gender = detectGender(bio);
   const src    = spritesheetPath(className, gender);
   const glow   = RANK_GLOW_COLOR[rankName];
-  const filter = RANK_CSS_FILTER[rankName];
+  const tintColor = RANK_TINT_COLOR[rankName];
 
   const [loaded, setLoaded] = useState(false);
 
@@ -106,17 +106,35 @@ export default function PixelBoss({
         className="pointer-events-none absolute inset-0 rounded-full blur-xl opacity-40"
         style={{ background: `radial-gradient(circle, ${glow}, transparent 70%)` }}
       />
-      <canvas
-        ref={canvasRef}
-        width={DISPLAY_FRAME}
-        height={DISPLAY_FRAME}
+      {/* Wrapper with overflow:hidden clips the overlay to the sprite only */}
+      <div
         style={{
-          imageRendering: "pixelated",
+          width: DISPLAY_FRAME,
+          height: DISPLAY_FRAME,
           transform: `scale(${scale})`,
           transformOrigin: "top left",
-          filter,
+          position: "relative",
+          display: "inline-block",
         }}
-      />
+      >
+        <canvas
+          ref={canvasRef}
+          width={DISPLAY_FRAME}
+          height={DISPLAY_FRAME}
+          style={{ imageRendering: "pixelated", display: "block" }}
+        />
+        {/* multiply overlay tints dark (metal) pixels while leaving light (skin) near-white */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: tintColor,
+            mixBlendMode: "multiply",
+            pointerEvents: "none",
+          }}
+        />
+      </div>
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           Summoning…

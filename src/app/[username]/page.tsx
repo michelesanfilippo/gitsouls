@@ -15,8 +15,7 @@ export async function generateMetadata({
   const { username } = await params;
   const title = `${username} — GitSouls`;
   const description = `The Souls-like boss forged from @${username}'s GitHub profile.`;
-  // v=2 busts the crawler cache from before this route existed.
-  const image = { url: `/${username}/og.png?v=2`, width: 1200, height: 630 };
+  const image = { url: `/${username}/og.png?v=3`, width: 1200, height: 630 };
   const url = `https://gitsouls.com/${username}`;
 
   return {

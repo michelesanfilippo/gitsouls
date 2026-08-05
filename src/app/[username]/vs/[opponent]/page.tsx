@@ -17,7 +17,7 @@ export async function generateMetadata({
   const title = `${titleText} — GitSouls`;
   const description = `${username} and ${opponent} meet in the arena. Only one leaves.`;
   const image = {
-    url: `/${username}/vs/${opponent}/og.png`,
+    url: `/${username}/vs/${opponent}/og.png?v=2`,
     width: 1200,
     height: 630,
   };

@@ -17,13 +17,13 @@ interface PixelDuelistProps {
   displaySize?: number;
 }
 
-const RANK_CSS_FILTER: Record<RankName, string> = {
-  "Hollow":         "grayscale(0.85) brightness(0.70)",
-  "Undead":         "sepia(0.5) hue-rotate(80deg) brightness(0.75)",
-  "Knight":         "sepia(0.4) hue-rotate(180deg) saturate(3) brightness(0.92)",
-  "Abyss Walker":   "sepia(0.4) hue-rotate(250deg) saturate(4) brightness(0.88)",
-  "Lord":           "sepia(0.6) saturate(4) brightness(1.05)",
-  "Soul of Cinder": "sepia(0.5) hue-rotate(320deg) saturate(6) brightness(1.10)",
+const RANK_TINT_COLOR: Record<RankName, string> = {
+  "Hollow":         "rgba(80, 80, 100, 0.85)",
+  "Undead":         "rgba(60, 90, 60,  0.85)",
+  "Knight":         "rgba(40, 80, 220, 0.80)",
+  "Abyss Walker":   "rgba(110, 30, 210, 0.80)",
+  "Lord":           "rgba(200, 160, 20, 0.80)",
+  "Soul of Cinder": "rgba(210, 50, 10,  0.85)",
 };
 
 function runSequence(
@@ -76,7 +76,7 @@ export default function PixelDuelist({
   const gender = detectGender(bio);
   const src    = spritesheetPath(className, gender);
   const glow   = RANK_GLOW_COLOR[rankName];
-  const filter = RANK_CSS_FILTER[rankName];
+  const tintColor = RANK_TINT_COLOR[rankName];
 
   const [loaded, setLoaded] = useState(false);
 
@@ -115,17 +115,15 @@ export default function PixelDuelist({
         className="pointer-events-none absolute inset-0 rounded-full blur-xl opacity-35"
         style={{ background: `radial-gradient(circle, ${glow}, transparent 70%)` }}
       />
-      <canvas
-        ref={canvasRef}
-        width={DISPLAY_FRAME}
-        height={DISPLAY_FRAME}
-        style={{
-          imageRendering: "pixelated",
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-          filter,
-        }}
-      />
+      <div style={{ width: DISPLAY_FRAME, height: DISPLAY_FRAME, transform: `scale(${scale})`, transformOrigin: "top left", position: "relative", display: "inline-block" }}>
+        <canvas
+          ref={canvasRef}
+          width={DISPLAY_FRAME}
+          height={DISPLAY_FRAME}
+          style={{ imageRendering: "pixelated", display: "block" }}
+        />
+        <div aria-hidden style={{ position: "absolute", inset: 0, background: tintColor, mixBlendMode: "multiply", pointerEvents: "none" }} />
+      </div>
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           …

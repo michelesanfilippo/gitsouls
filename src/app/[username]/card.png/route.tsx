@@ -8,7 +8,6 @@ import { deviconUrl } from "@/lib/devicon";
 import { fetchImageDataUri, loadFonts } from "@/lib/og";
 import {
   spritesheetPath, detectGender,
-  RANK_TINT_RGB, applyArmourTint,
 } from "@/lib/sprite";
 
 export const runtime = "nodejs";
@@ -23,7 +22,6 @@ export const runtime = "nodejs";
  */
 async function buildSpriteBox(
   spritePath: string,
-  rankName: keyof typeof RANK_TINT_RGB,
   boxW: number,
   boxH: number,
 ): Promise<string | null> {
@@ -36,26 +34,17 @@ async function buildSpriteBox(
       readFile(path.join(root, "public", "img", "pixel-paper.png")),
     ]);
 
-    // Sprite: row 11 0-indexed (user's "row 12", py=704), frame 0, 64×64
-    // → walk-with-weapon pose (same row as DUEL_IDLE_SEQUENCE)
+    // Sprite: row 11 (0-indexed), py=704, frame 0, 64×64 → nearest-neighbour upscale
     const FRAME_SIZE = 64;
-    const SPRITE_ROW_PY = 704; // row 11 (0-indexed) = walk/stand with weapon
+    const SPRITE_ROW_PY = 704;
     const spriteOut = Math.round(boxH * 0.62);
 
-    const rawBuf = await sharp(sheetBuf)
+    // Extract and upscale — no tinting server-side (consistent with working profile page)
+    const spritePng = await sharp(sheetBuf)
       .extract({ left: 0, top: SPRITE_ROW_PY, width: FRAME_SIZE, height: FRAME_SIZE })
       .resize(spriteOut, spriteOut, { kernel: "nearest" })
-      .ensureAlpha()
-      .raw()
+      .png()
       .toBuffer();
-
-    // Apply selective armour tint to the raw RGBA buffer
-    applyArmourTint(rawBuf as unknown as Uint8ClampedArray, RANK_TINT_RGB[rankName]);
-
-    // Re-encode to PNG
-    const spritePng = await sharp(rawBuf, {
-      raw: { width: spriteOut, height: spriteOut, channels: 4 },
-    }).png().toBuffer();
 
     // Background: pixel-paper cropped/resized to box dimensions
     const paperResized = await sharp(paperBuf)
@@ -152,7 +141,7 @@ export async function GET(
     fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
-    buildSpriteBox(sheetPath, profile.rank.name, BOX_W, BOX_H),
+    buildSpriteBox(sheetPath, BOX_W, BOX_H),
   ]);
 
   return new ImageResponse(
