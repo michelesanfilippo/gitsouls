@@ -156,7 +156,11 @@ function Fighter({
           bio={profile.bio}
           className={profile.bossClass.name}
           rankName={profile.rank.name}
-          mode={defeated ? "duel-death" : "duel-idle"}
+          mode={
+            !resolved ? "duel-idle"
+            : outcome === "won" ? "duel-victory"
+            : "duel-death"
+          }
           displaySize={96}
           minHeight={140}
           spriteRight="right-[18%]"

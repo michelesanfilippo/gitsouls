@@ -72,6 +72,15 @@ export const DUEL_DEATH_SEQUENCE: AnimPhase[] = [
 ];
 
 /**
+ * Victory sequence: sit-down (same row as profile), then freeze on frame 0.
+ */
+export const DUEL_VICTORY_SEQUENCE: AnimPhase[] = [
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1 },
+  // Freeze seated
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 1, fps: 0.001, repeats: 1 },
+];
+
+/**
  * Apply rank tint selectively on metal/armour pixels only.
  *
  * Works on a raw RGBA Uint8ClampedArray (from ctx.getImageData) or a plain

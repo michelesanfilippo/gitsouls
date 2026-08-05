@@ -7,7 +7,7 @@ export default function SwordCursor() {
       weapon="sword"
       src="/img/sword.png"
       intrinsic={300}
-      sizeClass="w-16 sm:w-20"
+      sizeClass="w-14 sm:w-16"
       animClass="animate-sword"
       auraColor="rgba(220,38,38,0.22)"
       auraHover="rgba(220,38,38,0.60)"

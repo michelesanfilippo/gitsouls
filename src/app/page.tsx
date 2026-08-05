@@ -13,7 +13,7 @@ export default function Home() {
     <div className="flex min-h-dvh flex-col">
       <TopBar hideHowItWorks />
       <main className="relative flex flex-1 flex-col items-center justify-center px-4 pt-10 text-center sm:pt-0">
-        {/* Floating OctoSouls, left at title height */}
+        {/* Floating OctoSouls, left at title height — desktop only */}
         <div className="animate-float-slow pointer-events-none absolute left-[4%] top-[38%] hidden -translate-y-1/2 lg:block xl:left-[9%]">
           <Image
             src="/img/octoSouls-nobg.png"
@@ -22,45 +22,6 @@ export default function Home() {
             height={504}
             priority
             className="h-auto w-80 opacity-90 xl:w-[25rem]"
-          />
-        </div>
-
-        {/* Bow — below the status line */}
-        <div className="absolute right-[1%] top-[64%] hidden -translate-y-1/2 lg:block xl:right-[7%]">
-          <WeaponDecoration
-            weapon="bow"
-            src="/img/bow.png"
-            intrinsic={400}
-            sizeClass="w-16 sm:w-20"
-            animClass="animate-bow"
-            auraColor="rgba(59,130,246,0.20)"
-            auraHover="rgba(59,130,246,0.55)"
-            label="Take the bow in hand"
-            hoverTitle="Nock an arrow"
-            hoverSub="Distance is just another kind of aim"
-            wieldedMsg="The bow is strung."
-          />
-        </div>
-
-        {/* Sword */}
-        <div className="absolute right-[7%] top-[78%] hidden -translate-y-1/2 lg:block xl:right-[13%]">
-          <SwordCursor />
-        </div>
-
-        {/* Magic wand */}
-        <div className="absolute right-[0%] top-[90%] hidden -translate-y-1/2 lg:block xl:right-[6%]">
-          <WeaponDecoration
-            weapon="wand"
-            src="/img/wand.png"
-            intrinsic={256}
-            sizeClass="w-16 sm:w-20"
-            animClass="animate-wand"
-            auraColor="rgba(34,197,94,0.20)"
-            auraHover="rgba(34,197,94,0.55)"
-            label="Take the wand in hand"
-            hoverTitle="Channel the arcane"
-            hoverSub="The spell begins where the cursor ends"
-            wieldedMsg="The wand chooses the coder."
           />
         </div>
 
@@ -90,12 +51,41 @@ export default function Home() {
         <div className="mt-10 flex w-full flex-col items-center">
           <ScoutForm />
           <LandingStatus />
+
+          {/* Three weapons centred below the status line, evenly spaced */}
+          <div className="mt-8 flex items-center justify-center gap-12 lg:gap-20">
+            <WeaponDecoration
+              weapon="bow"
+              src="/img/bow.png"
+              intrinsic={400}
+              sizeClass="w-14 sm:w-16"
+              animClass="animate-bow"
+              auraColor="rgba(59,130,246,0.20)"
+              auraHover="rgba(59,130,246,0.55)"
+              label="Take the bow in hand"
+              hoverTitle="Nock an arrow"
+              hoverSub="Distance is just another kind of aim"
+              wieldedMsg="The bow is strung."
+            />
+            <SwordCursor />
+            <WeaponDecoration
+              weapon="wand"
+              src="/img/wand.png"
+              intrinsic={256}
+              sizeClass="w-14 sm:w-16"
+              animClass="animate-wand"
+              auraColor="rgba(34,197,94,0.20)"
+              auraHover="rgba(34,197,94,0.55)"
+              label="Take the wand in hand"
+              hoverTitle="Channel the arcane"
+              hoverSub="The spell begins where the cursor ends"
+              wieldedMsg="The wand chooses the coder."
+            />
+          </div>
         </div>
       </main>
       <Footer />
 
-      {/* Fixed so it holds the bottom-right corner regardless of page height.
-          Hidden on small screens, where it would crowd the footer. */}
       <div className="pointer-events-none fixed bottom-5 right-5 z-30 block">
         <div className="pointer-events-auto">
           <SupportButton />

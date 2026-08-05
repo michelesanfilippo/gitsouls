@@ -8,8 +8,8 @@ interface PixelBossBoxProps {
   bio: string | null;
   className: ClassName;
   rankName: RankName;
-  /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death anim */
-  mode?: "profile" | "duel-idle" | "duel-death";
+  /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death; "duel-victory" = sit+freeze */
+  mode?: "profile" | "duel-idle" | "duel-death" | "duel-victory";
   displaySize?: number;
   /** box minimum height in px (default 170) */
   minHeight?: number;
@@ -56,7 +56,7 @@ export default function PixelBossBox({
             bio={bio}
             className={className}
             rankName={rankName}
-            mode={mode === "duel-death" ? "death" : "idle"}
+            mode={mode === "duel-death" ? "death" : mode === "duel-victory" ? "victory" : "idle"}
             displaySize={displaySize ?? 118}
           />
         )}
