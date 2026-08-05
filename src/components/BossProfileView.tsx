@@ -10,6 +10,7 @@ import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
 import PixelBoss from "./PixelBoss";
+import SpriteFX from "./SpriteFX";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];
 const RIGHT: StatKey[] = ["DEX", "FAI", "SOP"];
@@ -167,14 +168,16 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/30 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/20" />
             <div className="absolute bottom-2 right-10 pb-1">
-              <PixelBoss
-                bio={profile.bio}
-                name={profile.name}
-                pronouns={profile.pronouns}
-                className={profile.bossClass.name}
-                rankName={profile.rank.name}
-                displaySize={118}
-              />
+              <SpriteFX rankName={profile.rank.name} skills={profile.skills} size={118}>
+                <PixelBoss
+                  bio={profile.bio}
+                  name={profile.name}
+                  pronouns={profile.pronouns}
+                  className={profile.bossClass.name}
+                  rankName={profile.rank.name}
+                  displaySize={118}
+                />
+              </SpriteFX>
             </div>
           </div>
         </div>

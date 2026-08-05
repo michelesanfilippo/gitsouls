@@ -155,6 +155,7 @@ function Fighter({
           bio={profile.bio}
           name={profile.name}
           pronouns={profile.pronouns}
+          skills={profile.skills}
           className={profile.bossClass.name}
           rankName={profile.rank.name}
           mode={

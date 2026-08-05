@@ -1,13 +1,16 @@
 "use client";
 
 import type { ClassName, RankName } from "@/lib/scoring/types";
+import type { Skill } from "@/lib/scoring/skills";
 import PixelBoss from "./PixelBoss";
 import PixelDuelist from "./PixelDuelist";
+import SpriteFX from "./SpriteFX";
 
 interface PixelBossBoxProps {
   bio: string | null;
   name?: string | null;
   pronouns?: string | null;
+  skills?: Skill[];
   className: ClassName;
   rankName: RankName;
   /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death; "duel-victory" = sit+freeze */
@@ -20,7 +23,7 @@ interface PixelBossBoxProps {
 }
 
 export default function PixelBossBox({
-  bio, name, pronouns, className, rankName,
+  bio, name, pronouns, skills = [], className, rankName,
   mode = "profile",
   displaySize,
   minHeight = 170,
@@ -46,24 +49,26 @@ export default function PixelBossBox({
 
       {/* Sprite anchor */}
       <div className={`absolute bottom-0 pb-1 ${spriteRight}`}>
-        {mode === "profile" ? (
-          <PixelBoss
-            bio={bio}
-            className={className}
-            rankName={rankName}
-            displaySize={displaySize ?? 118}
-          />
-        ) : (
-          <PixelDuelist
-            bio={bio}
-            name={name}
-            pronouns={pronouns}
-            className={className}
-            rankName={rankName}
-            mode={mode === "duel-death" ? "death" : mode === "duel-victory" ? "victory" : "idle"}
-            displaySize={displaySize ?? 118}
-          />
-        )}
+        <SpriteFX rankName={rankName} skills={skills} size={displaySize ?? 118}>
+          {mode === "profile" ? (
+            <PixelBoss
+              bio={bio}
+              className={className}
+              rankName={rankName}
+              displaySize={displaySize ?? 118}
+            />
+          ) : (
+            <PixelDuelist
+              bio={bio}
+              name={name}
+              pronouns={pronouns}
+              className={className}
+              rankName={rankName}
+              mode={mode === "duel-death" ? "death" : mode === "duel-victory" ? "victory" : "idle"}
+              displaySize={displaySize ?? 118}
+            />
+          )}
+        </SpriteFX>
       </div>
     </div>
   );

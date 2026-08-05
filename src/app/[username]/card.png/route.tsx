@@ -145,41 +145,35 @@ export async function GET(
           ) : null}
         </div>
 
-        {/* Pixel art box — paper bg + sprite, built as satori JSX */}
+        {/* Pixel art box — paper bg via img, sprite bottom-centre */}
         <div style={{
           display: "flex",
+          position: "relative",
           marginTop: "32px",
           width: "920px",
-          height: "280px",
+          height: "360px",
           borderRadius: "20px",
           border: "2px solid rgba(212,175,55,0.18)",
           overflow: "hidden",
-          backgroundImage: paperDataUri ? `url(${paperDataUri})` : undefined,
-          backgroundSize: "cover",
-          backgroundPosition: "center bottom",
-          backgroundColor: "#110a1a",
-          alignItems: "flex-end",
-          justifyContent: "center",
-          paddingBottom: "0px",
+          backgroundColor: "#0d0b14",
         }}>
+          {/* Background: pixel-paper as a regular img stretched to fill */}
+          {paperDataUri && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={paperDataUri} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"center bottom" }} />
+          )}
+          {/* Dark vignette */}
+          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to bottom, rgba(11,7,16,0.72) 0%, rgba(11,7,16,0.20) 48%, rgba(11,7,16,0.10) 100%)" }} />
+          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to right, rgba(11,7,16,0.55) 0%, transparent 40%)" }} />
+          {/* Sprite — centred, pinned to bottom */}
           {spriteDataUri && (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={spriteDataUri}
-              alt=""
-              width={SPRITE_DISPLAY}
-              height={SPRITE_DISPLAY}
-              style={{
-                width: `${SPRITE_DISPLAY}px`,
-                height: `${SPRITE_DISPLAY}px`,
-                imageRendering: "pixelated",
-              }}
-            />
+            <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
           )}
         </div>
 
-        {/* Stats — immediately below the pixel art box, larger text */}
-        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"32px", gap:"20px" }}>
+        {/* Stats — pushed to bottom with auto margin */}
+        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"auto", gap:"20px" }}>
           {STAT_KEYS.map((k) => (
             <div key={k} style={{ display:"flex", flexDirection:"column", width:"100%" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", width:"100%" }}>
