@@ -150,13 +150,32 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           </div>
 
           {/* Pixel boss sprite — below facts, inside the central column */}
-          <div className="glass-soft mt-5 flex w-full items-center justify-center rounded-2xl px-6 py-6">
-            <PixelBoss
-              bio={profile.bio}
-              className={profile.bossClass.name}
-              rankName={profile.rank.name}
-              displaySize={128}
+          <div
+            className="relative mt-5 w-full overflow-hidden rounded-2xl border border-gold/10"
+            style={{ minHeight: "140px" }}
+          >
+            {/* Pixel-paper background with fade effect */}
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: "url('/img/pixel-paper.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                opacity: 0.18,
+              }}
             />
+            {/* Gradient overlay so the paper fades into the box colour */}
+            <div className="absolute inset-0 bg-gradient-to-b from-void-2/60 via-transparent to-void-2/70" />
+
+            {/* Sprite shifted right of centre */}
+            <div className="relative flex h-full w-full items-center justify-end pr-6 py-4">
+              <PixelBoss
+                bio={profile.bio}
+                className={profile.bossClass.name}
+                rankName={profile.rank.name}
+                displaySize={90}
+              />
+            </div>
           </div>
         </div>
 

@@ -1,53 +1,57 @@
 import type { ClassName, RankName } from "./scoring/types";
 
-export const FRAME_SIZE = 64;
-
 /**
- * LPC direction offsets within each 4-row group.
- * Standard order: 0=North(back) 1=West(left) 2=South(front) 3=East(right)
- */
-export type Dir = 0 | 1 | 2 | 3;
-export const DIR: Record<"S" | "E" | "N" | "W", Dir> = {
-  S: 2, // South / front-facing (default)
-  E: 3,
-  N: 0,
-  W: 1,
-};
-/** Click cycles through these directions in order. */
-export const DIR_CYCLE: Dir[] = [2, 3, 0, 1]; // S → E → N → W → S
-
-/**
- * One phase in the auto-play story sequence.
- * rowGroup is the first of the 4 direction rows (+ Dir offset = actual row).
+ * The sheet has TWO grids:
+ *   ZONE A (rows 0-53 in 64px): standard LPC 64×64 frames
+ *   ZONE B (from pixel-y 3456 onward): 96×96 frames for attack animations
+ *
+ * To unify them in the renderer we describe each phase with the pixel
+ * coordinates of its top-left frame (sx0, sy0) and its frame dimensions.
  */
 export interface AnimPhase {
-  rowGroup: number;
+  /** pixel Y of the first row of this animation */
+  sy0: number;
+  /** pixel X of the first frame (always 0) */
+  sx0: number;
+  frameW: number;
+  frameH: number;
   frameCount: number;
   fps: number;
-  /** how many full loops of frameCount before advancing to the next phase */
+  /** how many full loops before advancing */
   repeats: number;
-  /** play frames in reverse (e.g. stand-up = sit-down reversed) */
+  /** play frames reversed (stand-up = sit-down backward) */
   backward?: boolean;
 }
 
 /**
- * The automatic sequence played on loop. Rows are 0-indexed.
- * Confirmed by pixel-scanning the male-sword spritesheet:
- *   row 32 = sit/stand (3 frames)  — user's "row 33"
- *   row 10 = walk with weapon (9 frames) — user's "row 11"
- *   row 60 = sword attack (12 frames)    — user's "row 61"
+ * Confirmed from pixel-scanning male-sword-spritesheet.png:
  *
- * All animations are played front-facing only (no direction cycle).
- * The sprite is NOT clickable.
+ *   64px zone:
+ *     row 32 (py 2048): sit-down  — 3 frames, 64×64
+ *     row 10 (py  640): walk      — 9 frames, 64×64
+ *
+ *   96px zone (starts at py 3456):
+ *     96px-row 38 (py 3456 + 2×96 = 3648): South-facing slash — 8 frames, 96×96
+ *
+ * Sequence: sit → stand → walk → attack → walk → sit → loop
  */
 export const STORY_SEQUENCE: AnimPhase[] = [
-  { rowGroup: 32, frameCount: 3, fps: 5,  repeats: 3 },                    // sit idle (hold)
-  { rowGroup: 32, frameCount: 3, fps: 7,  repeats: 1, backward: true },    // stand up (reversed)
-  { rowGroup: 10, frameCount: 9, fps: 9,  repeats: 2 },                    // walk with weapon
-  { rowGroup: 60, frameCount: 12, fps: 9, repeats: 1 },                    // sword attack
-  { rowGroup: 10, frameCount: 9, fps: 9,  repeats: 2 },                    // walk back
-  { rowGroup: 32, frameCount: 3, fps: 7,  repeats: 1 },                    // sit down
+  // sit idle (hold a moment)
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 3,  repeats: 2 },
+  // stand up (sit reversed)
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 5,  repeats: 1, backward: true },
+  // walk with weapon (slow)
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, frameCount: 9, fps: 6,  repeats: 2 },
+  // sword attack (96px, South = 96px-row 38 = py 3648)
+  { sy0: 3648, sx0: 0, frameW: 96, frameH: 96, frameCount: 8, fps: 7,  repeats: 1 },
+  // walk back (slow)
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, frameCount: 9, fps: 6,  repeats: 2 },
+  // sit down
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, frameCount: 3, fps: 5,  repeats: 1 },
 ];
+
+/** Canonical display size for rendering — the canvas clips to this. */
+export const DISPLAY_FRAME = 96; // all phases render into a 96×96 canvas
 
 // ── Sprite file mapping ──────────────────────────────────────────────────────
 
