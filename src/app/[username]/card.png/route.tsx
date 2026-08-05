@@ -6,21 +6,16 @@ import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { deviconUrl } from "@/lib/devicon";
 import { fetchImageDataUri, loadFonts, readPublicImage } from "@/lib/og";
-import { type RankName } from "@/lib/scoring/types";
 import {
   spritesheetPath, detectGender,
-  RANK_TINT_RGB, RANK_GLOW_COLOR, applyArmourTint,
+  RANK_GLOW_COLOR,
 } from "@/lib/sprite";
 
 export const runtime = "nodejs";
 
-/**
- * Extract one sprite frame, apply armour tint, return as PNG data URI.
- * Uses sharp.raw() — no naturalWidth timing issue, runs server-side.
- */
+/** Extract one sprite frame as a PNG data URI using sharp. */
 async function extractSpriteDataUri(
   spritePath: string,
-  rankName: RankName,
   outSize: number,
 ): Promise<string | null> {
   try {
@@ -28,22 +23,11 @@ async function extractSpriteDataUri(
     const file  = path.join(process.cwd(), "public", spritePath.replace(/^\//, ""));
     const buf   = await readFile(file);
     // Row 10 (0-indexed, py=640), frame 4 — walk with weapon (upright stance)
-    const { data, info } = await sharp(buf)
+    const png = await sharp(buf)
       .extract({ left: 4 * 64, top: 640, width: 64, height: 64 })
       .resize(outSize, outSize, { kernel: "nearest" })
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-
-    // applyArmourTint works on any RGBA buffer — same as the readme GIFs
-    const tint = RANK_TINT_RGB[rankName];
-    const rgba = new Uint8ClampedArray(data.buffer);
-    applyArmourTint(rgba, tint);
-
-    const png = await sharp(Buffer.from(rgba.buffer), {
-      raw: { width: info.width, height: info.height, channels: 4 },
-    }).png().toBuffer();
-
+      .png()
+      .toBuffer();
     return `data:image/png;base64,${png.toString("base64")}`;
   } catch {
     return null;
@@ -95,7 +79,7 @@ export async function GET(
     fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
-    extractSpriteDataUri(sheetPath, profile.rank.name, SPRITE_DISPLAY),
+    extractSpriteDataUri(sheetPath, SPRITE_DISPLAY),
     readPublicImage("img/pixel-paper.png"),
   ]);
 
@@ -182,19 +166,13 @@ export async function GET(
           {/* Dark vignette */}
           <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to bottom, rgba(11,7,16,0.72) 0%, rgba(11,7,16,0.20) 48%, rgba(11,7,16,0.10) 100%)" }} />
           <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to right, rgba(11,7,16,0.55) 0%, transparent 40%)" }} />
-          {/* Sprite with rank glow ring (static, satori has no animation) */}
+          {/* Sprite + rank glow */}
           {spriteDataUri && (
-            <div style={{
-              position: "absolute",
-              bottom: 0,
-              left: "58%",
-              transform: "translateX(-50%)",
-              borderRadius: "50%",
-              boxShadow: `0 0 0 3px ${RANK_GLOW_COLOR[rank.name]}, 0 0 22px 8px ${RANK_GLOW_COLOR[rank.name]}`,
-              lineHeight: 0,
-            }}>
+            <div style={{ position:"absolute", bottom:0, left:"58%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center" }}>
+              {/* Glow halo */}
+              <div style={{ position:"absolute", inset:"-10px", borderRadius:"50%", background:`radial-gradient(circle, ${RANK_GLOW_COLOR[rank.name]} 0%, transparent 70%)`, pointerEvents:"none" }} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={spriteDataUri} alt="" style={{ width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated", display:"block" }} />
+              <img src={spriteDataUri} alt="" style={{ width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
             </div>
           )}
         </div>
