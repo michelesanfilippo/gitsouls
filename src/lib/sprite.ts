@@ -43,13 +43,13 @@ export interface AnimPhase {
  */
 export const STORY_SEQUENCE: AnimPhase[] = [
   // stand up (sit-down reversed)
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1, backward: true },
+  { sy0: 2048, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,   repeats: 1, backward: true },
   // walk with weapon x3
-  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6, repeats: 3 },
+  { sy0:  640, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,   repeats: 3 },
   // sit down
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1 },
-  // sit idle 5 s — at 2 fps, 10 frames ≈ 5 s of the 3-frame sit loop
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 2, repeats: 4 },
+  { sy0: 2048, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,   repeats: 1 },
+  // freeze on last sit frame for 5 s (sx0=128 = frame index 2, the fully-seated pose)
+  { sy0: 2048, sx0: 128, frameW: 64, frameH: 64, destY: 33, frameCount: 1, fps: 0.2, repeats: 1 },
 ];
 
 /** Canonical display size for rendering — the canvas clips to this. */
