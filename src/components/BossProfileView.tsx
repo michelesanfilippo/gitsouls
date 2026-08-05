@@ -7,6 +7,7 @@ import SkillsBox from "./SkillsBox";
 import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
+import PixelBoss from "./PixelBoss";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];
 const RIGHT: StatKey[] = ["DEX", "FAI", "SOP"];
@@ -38,12 +39,18 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               value={stats[k]}
             />
           ))}
-          {/* Share + duel: visible only on md+, nested here so they sit under
-              the left stats. On mobile they are rendered in the separate block
-              below (order-6) which places them after skills. */}
+          {/* Share + duel + pixel boss: visible only on md+ */}
           <div className="hidden md:flex md:flex-col md:gap-6">
             <ShareBox login={profile.login} name={profile.name ?? profile.login} />
             <DuelBox login={profile.login} />
+            <div className="glass-soft flex items-center justify-center rounded-2xl p-4">
+              <PixelBoss
+                login={profile.login}
+                className={profile.bossClass.name}
+                rankName={profile.rank.name}
+                displaySize={192}
+              />
+            </div>
           </div>
         </div>
 
@@ -168,11 +175,18 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <SkillsBox skills={profile.skills} />
         </div>
 
-        {/* Mobile-only: share + duel below skills. Hidden on md+ where they
-            live inside the left column. */}
+        {/* Mobile-only: share + duel + pixel boss below skills. */}
         <div className="order-4 flex w-full flex-col gap-6 md:hidden">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
           <DuelBox login={profile.login} />
+          <div className="glass-soft flex items-center justify-center rounded-2xl p-4">
+            <PixelBoss
+              login={profile.login}
+              className={profile.bossClass.name}
+              rankName={profile.rank.name}
+              displaySize={160}
+            />
+          </div>
         </div>
       </div>
 
