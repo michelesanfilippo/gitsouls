@@ -7,7 +7,6 @@ import SkillsBox from "./SkillsBox";
 import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
-import PixelBoss from "./PixelBoss";
 import PixelBossBox from "./PixelBossBox";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];

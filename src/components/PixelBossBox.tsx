@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import type { ClassName, RankName } from "@/lib/scoring/types";
 import PixelBoss from "./PixelBoss";
 import PixelDuelist from "./PixelDuelist";
@@ -7,9 +8,11 @@ interface PixelBossBoxProps {
   bio: string | null;
   className: ClassName;
   rankName: RankName;
-  /** "profile" plays the full sit/walk/stand sequence; "duel-idle" loops the walk-with-weapon; "duel-death" plays the death anim */
+  /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death anim */
   mode?: "profile" | "duel-idle" | "duel-death";
   displaySize?: number;
+  /** override the box minimum height (default 170px) */
+  minHeight?: number;
 }
 
 /**
@@ -21,11 +24,12 @@ export default function PixelBossBox({
   bio, className, rankName,
   mode = "profile",
   displaySize,
+  minHeight = 170,
 }: PixelBossBoxProps) {
   return (
     <div
       className="relative w-full overflow-hidden rounded-2xl border border-gold/15"
-      style={{ minHeight: "170px" }}
+      style={{ minHeight: `${minHeight}px` }}
     >
       {/* Pixel-paper background scene */}
       <div
