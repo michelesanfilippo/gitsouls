@@ -181,7 +181,6 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <DuelBox login={profile.login} />
           <div className="glass-soft flex items-center justify-center rounded-2xl p-4">
             <PixelBoss
-              login={profile.login}
               bio={profile.bio}
               className={profile.bossClass.name}
               rankName={profile.rank.name}
