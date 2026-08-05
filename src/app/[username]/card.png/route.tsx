@@ -5,95 +5,34 @@ import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { deviconUrl } from "@/lib/devicon";
-import { fetchImageDataUri, loadFonts } from "@/lib/og";
+import { fetchImageDataUri, loadFonts, readPublicImage } from "@/lib/og";
 import {
   spritesheetPath, detectGender,
 } from "@/lib/sprite";
 
 export const runtime = "nodejs";
 
-/**
- * Build the pixel-art box that mirrors what the profile page shows:
- *   - pixel-paper.png as background, darkened at the edges
- *   - standing-with-weapon frame (row 12, py=768, 64×64) tinted by rank
- *
- * Everything is composited server-side with sharp so satori gets a flat PNG.
- * Returns a PNG data URI or null on failure.
- */
-async function buildSpriteBox(
+/** Extract one sprite frame as a PNG data URI using sharp. */
+async function extractSpriteDataUri(
   spritePath: string,
-  boxW: number,
-  boxH: number,
+  outSize: number,
 ): Promise<string | null> {
   try {
     const sharp = (await import("sharp")).default;
-    const root  = process.cwd();
-
-    const [sheetBuf, paperBuf] = await Promise.all([
-      readFile(path.join(root, "public", spritePath.replace(/^\//, ""))),
-      readFile(path.join(root, "public", "img", "pixel-paper.png")),
-    ]);
-
-    // Sprite: row 11 (0-indexed), py=704, frame 0, 64×64 → nearest-neighbour upscale
-    const FRAME_SIZE = 64;
-    const SPRITE_ROW_PY = 704;
-    const spriteOut = Math.round(boxH * 0.62);
-
-    // Extract and upscale — no tinting server-side (consistent with working profile page)
-    const spritePng = await sharp(sheetBuf)
-      .extract({ left: 0, top: SPRITE_ROW_PY, width: FRAME_SIZE, height: FRAME_SIZE })
-      .resize(spriteOut, spriteOut, { kernel: "nearest" })
+    const file  = path.join(process.cwd(), "public", spritePath.replace(/^\//, ""));
+    const buf   = await readFile(file);
+    // Row 11 (0-indexed, py=704), frame 0 — standing with weapon
+    const png = await sharp(buf)
+      .extract({ left: 0, top: 704, width: 64, height: 64 })
+      .resize(outSize, outSize, { kernel: "nearest" })
       .png()
       .toBuffer();
-
-    // Background: pixel-paper cropped/resized to box dimensions
-    const paperResized = await sharp(paperBuf)
-      .resize(boxW, boxH, { fit: "cover", position: "centre bottom" })
-      .toBuffer();
-
-    // Compose: darken paper edges with a semi-transparent overlay, then sprite centred-right
-    const spriteLeft = Math.round(boxW * 0.55 - spriteOut / 2);
-    const spriteTop  = Math.round((boxH - spriteOut) / 2);
-
-    const composited = await sharp(paperResized)
-      // Top vignette
-      .composite([
-        {
-          input: Buffer.from(
-            `<svg width="${boxW}" height="${boxH}">
-              <defs>
-                <linearGradient id="vt" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#0b0710" stop-opacity="0.72"/>
-                  <stop offset="50%" stop-color="#0b0710" stop-opacity="0.18"/>
-                  <stop offset="100%" stop-color="#0b0710" stop-opacity="0.55"/>
-                </linearGradient>
-                <linearGradient id="vl" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#0b0710" stop-opacity="0.65"/>
-                  <stop offset="45%" stop-color="#0b0710" stop-opacity="0.0"/>
-                </linearGradient>
-              </defs>
-              <rect width="${boxW}" height="${boxH}" fill="url(#vt)"/>
-              <rect width="${boxW}" height="${boxH}" fill="url(#vl)"/>
-            </svg>`,
-          ),
-          blend: "over",
-        },
-        // Sprite
-        {
-          input: spritePng,
-          top: spriteTop,
-          left: spriteLeft,
-          blend: "over",
-        },
-      ])
-      .png()
-      .toBuffer();
-
-    return `data:image/png;base64,${composited.toString("base64")}`;
+    return `data:image/png;base64,${png.toString("base64")}`;
   } catch {
     return null;
   }
 }
+
 
 /** Devicon SVG as a data URI — satori can't fetch remote SVGs reliably. */
 async function fetchLanguageIcon(language: string): Promise<string | null> {
@@ -133,15 +72,14 @@ export async function GET(
   const gender    = detectGender(profile.bio, profile.name, profile.pronouns);
   const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
-  // Sprite box: 920px wide × 340px tall (matches the card width minus padding)
-  const BOX_W = 920;
-  const BOX_H = 340;
+  const SPRITE_DISPLAY = 210; // upscaled sprite size in the card
 
-  const [avatar, langIcon, { fonts, fontFamily }, spriteBox] = await Promise.all([
+  const [avatar, langIcon, { fonts, fontFamily }, spriteDataUri, paperDataUri] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
-    buildSpriteBox(sheetPath, BOX_W, BOX_H),
+    extractSpriteDataUri(sheetPath, SPRITE_DISPLAY),
+    readPublicImage("img/pixel-paper.png"),
   ]);
 
   return new ImageResponse(
@@ -207,13 +145,43 @@ export async function GET(
           ) : null}
         </div>
 
-        {/* Pixel art box — matches the profile page box (pixel-paper bg + sprite) */}
-        {spriteBox && (
-          <div style={{ display:"flex", marginTop:"32px", width:"100%", borderRadius:"20px", border:"2px solid rgba(212,175,55,0.18)", overflow:"hidden" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={spriteBox} alt="" width={BOX_W} height={BOX_H} style={{ width:`${BOX_W}px`, height:`${BOX_H}px` }} />
-          </div>
-        )}
+        {/* Pixel art box between class and stats — pure JSX, no sharp compositing */}
+        <div style={{
+          display: "flex",
+          marginTop: "32px",
+          width: "100%",
+          height: "280px",
+          borderRadius: "20px",
+          border: "2px solid rgba(212,175,55,0.18)",
+          overflow: "hidden",
+          position: "relative",
+          backgroundImage: paperDataUri ? `url(${paperDataUri})` : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center bottom",
+          backgroundColor: "#0b0710",
+        }}>
+          {/* Vignette overlays */}
+          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to bottom, rgba(11,7,16,0.70) 0%, rgba(11,7,16,0.18) 50%, transparent 100%)" }} />
+          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to right, rgba(11,7,16,0.60) 0%, transparent 45%)" }} />
+          {/* Sprite bottom-right */}
+          {spriteDataUri && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={spriteDataUri}
+              alt=""
+              width={SPRITE_DISPLAY}
+              height={SPRITE_DISPLAY}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 60,
+                width: `${SPRITE_DISPLAY}px`,
+                height: `${SPRITE_DISPLAY}px`,
+                imageRendering: "pixelated",
+              }}
+            />
+          )}
+        </div>
 
         {/* Stats pushed to the bottom */}
         <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"auto", gap:"16px" }}>

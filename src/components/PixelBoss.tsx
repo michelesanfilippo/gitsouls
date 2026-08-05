@@ -92,6 +92,14 @@ export default function PixelBoss({
       const destX = (DISPLAY_FRAME - ph.frameW) / 2;
       ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
+      // Multiply tint: affects only pixels already drawn (opaque sprite pixels).
+      // Canvas multiply compositing darkens dark pixels (metal) while light
+      // pixels (skin near 255) multiply by ~1 and remain nearly unchanged.
+      ctx.globalCompositeOperation = "multiply";
+      ctx.fillStyle = tintColor;
+      ctx.fillRect(destX, ph.destY, ph.frameW, ph.frameH);
+      ctx.globalCompositeOperation = "source-over";
+
       rafRef.current = requestAnimationFrame(tick);
     };
 
@@ -108,36 +116,16 @@ export default function PixelBoss({
         className="pointer-events-none absolute inset-0 rounded-full blur-xl opacity-40"
         style={{ background: `radial-gradient(circle, ${glow}, transparent 70%)` }}
       />
-      {/* Wrapper with overflow:hidden clips the overlay to the sprite only */}
-      <div
+      <canvas
+        ref={canvasRef}
+        width={DISPLAY_FRAME}
+        height={DISPLAY_FRAME}
         style={{
-          width: DISPLAY_FRAME,
-          height: DISPLAY_FRAME,
+          imageRendering: "pixelated",
           transform: `scale(${scale})`,
           transformOrigin: "top left",
-          position: "relative",
-          display: "inline-block",
-          isolation: "isolate",
         }}
-      >
-        <canvas
-          ref={canvasRef}
-          width={DISPLAY_FRAME}
-          height={DISPLAY_FRAME}
-          style={{ imageRendering: "pixelated", display: "block" }}
-        />
-        {/* multiply overlay tints dark (metal) pixels while leaving light (skin) near-white */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: tintColor,
-            mixBlendMode: "multiply",
-            pointerEvents: "none",
-          }}
-        />
-      </div>
+      />
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           Summoning…

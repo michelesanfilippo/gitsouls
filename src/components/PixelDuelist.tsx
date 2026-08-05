@@ -32,6 +32,7 @@ function runSequence(
   sequence: AnimPhase[],
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
+  tintColor: string,
   rafRef: React.MutableRefObject<number>,
 ) {
   const s = { phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 };
@@ -61,6 +62,11 @@ function runSequence(
     ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
     const destX = (DISPLAY_FRAME - ph.frameW) / 2;
     ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
+
+    ctx.globalCompositeOperation = "multiply";
+    ctx.fillStyle = tintColor;
+    ctx.fillRect(destX, ph.destY, ph.frameW, ph.frameH);
+    ctx.globalCompositeOperation = "source-over";
 
     rafRef.current = requestAnimationFrame(tick);
   };
@@ -104,7 +110,7 @@ export default function PixelDuelist({
     const seq = mode === "death" ? DUEL_DEATH_SEQUENCE
               : mode === "victory" ? DUEL_VICTORY_SEQUENCE
               : DUEL_IDLE_SEQUENCE;
-    runSequence(seq, ctx, img, rafRef);
+    runSequence(seq, ctx, img, tintColor, rafRef);
     return () => cancelAnimationFrame(rafRef.current);
   }, [loaded, mode]);
 
@@ -117,15 +123,16 @@ export default function PixelDuelist({
         className="pointer-events-none absolute inset-0 rounded-full blur-xl opacity-35"
         style={{ background: `radial-gradient(circle, ${glow}, transparent 70%)` }}
       />
-      <div style={{ width: DISPLAY_FRAME, height: DISPLAY_FRAME, transform: `scale(${scale})`, transformOrigin: "top left", position: "relative", display: "inline-block", isolation: "isolate" }}>
-        <canvas
-          ref={canvasRef}
-          width={DISPLAY_FRAME}
-          height={DISPLAY_FRAME}
-          style={{ imageRendering: "pixelated", display: "block" }}
-        />
-        <div aria-hidden style={{ position: "absolute", inset: 0, background: tintColor, mixBlendMode: "multiply", pointerEvents: "none" }} />
-      </div>
+      <canvas
+        ref={canvasRef}
+        width={DISPLAY_FRAME}
+        height={DISPLAY_FRAME}
+        style={{
+          imageRendering: "pixelated",
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      />
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           …
