@@ -114,6 +114,7 @@ export default function PixelBoss({
         ref={canvasRef}
         width={DISPLAY_FRAME}
         height={DISPLAY_FRAME}
+        data-pixel-boss="true"
         style={{
           imageRendering: "pixelated",
           transform: `scale(${scale})`,

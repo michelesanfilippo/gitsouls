@@ -34,6 +34,31 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
   const shareText = `${name} is a Souls-like boss on GitSouls ⚔️`;
   const cardUrl = `/${login}/card.png`;
 
+  const downloadCard = async () => {
+    setMenuOpen(false);
+    // Capture the live pixel art canvas frame
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-pixel-boss="true"]');
+    const spriteDataUri = canvas ? canvas.toDataURL("image/png") : "";
+    try {
+      const res = await fetch(cardUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sprite: spriteDataUri }),
+      });
+      if (!res.ok) throw new Error("card generation failed");
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `${login}-gitsouls.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // Fallback: open GET route in new tab
+      window.open(cardUrl, "_blank");
+    }
+  };
+
   const shareX = () =>
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -120,14 +145,12 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
           </button>
           {menuOpen && (
             <div className="glass animate-fade-up absolute bottom-full left-0 z-20 mb-2 w-52 overflow-hidden rounded-xl">
-              <a
-                href={cardUrl}
-                download={`${login}-gitsouls.png`}
-                onClick={() => setMenuOpen(false)}
-                className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm text-parchment/85 transition-colors hover:bg-white/5 hover:text-gold"
+              <button
+                onClick={downloadCard}
+                className="flex w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm text-parchment/85 transition-colors hover:bg-white/5 hover:text-gold"
               >
                 <Icon name="image" /> Download story card
-              </a>
+              </button>
               <button
                 onClick={copyLink}
                 className="flex w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm text-parchment/85 transition-colors hover:bg-white/5 hover:text-gold"

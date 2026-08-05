@@ -52,13 +52,10 @@ async function fetchLanguageIcon(language: string): Promise<string | null> {
   }
 }
 
-/** Downloadable 1080×1920 story-style boss card rendered with next/og. */
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ username: string }> },
-) {
-  const { username } = await params;
-
+async function buildCard(
+  username: string,
+  clientSprite: string | null,
+): Promise<Response> {
   let profile: Awaited<ReturnType<typeof getBossProfile>>;
   try {
     profile = await getBossProfile(username);
@@ -73,15 +70,19 @@ export async function GET(
   const gender    = detectGender(profile.bio, profile.name, profile.pronouns);
   const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
-  const SPRITE_DISPLAY = 170; // upscaled sprite size in the card
+  const SPRITE_DISPLAY = 170;
 
-  const [avatar, langIcon, { fonts, fontFamily }, spriteDataUri, paperDataUri] = await Promise.all([
+  const [avatar, langIcon, { fonts, fontFamily }, serverSprite, paperDataUri] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
-    extractSpriteDataUri(sheetPath, SPRITE_DISPLAY),
+    // Only extract server-side if client didn't send one
+    clientSprite ? Promise.resolve(null) : extractSpriteDataUri(sheetPath, SPRITE_DISPLAY),
     readPublicImage("img/pixel-paper.png"),
   ]);
+
+  // Client sprite (already tinted, exact frame) takes priority
+  const spriteDataUri = clientSprite || serverSprite;
 
   return new ImageResponse(
     (
@@ -166,13 +167,13 @@ export async function GET(
           {/* Dark vignette */}
           <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to bottom, rgba(11,7,16,0.72) 0%, rgba(11,7,16,0.20) 48%, rgba(11,7,16,0.10) 100%)" }} />
           <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to right, rgba(11,7,16,0.55) 0%, transparent 40%)" }} />
-          {/* Sprite + rank glow */}
+          {/* Sprite — right-aligned to avoid clipping, with rank glow underneath */}
           {spriteDataUri && (
-            <div style={{ position:"absolute", bottom:0, left:"58%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center" }}>
-              {/* Glow halo */}
-              <div style={{ position:"absolute", inset:"-10px", borderRadius:"50%", background:`radial-gradient(circle, ${RANK_GLOW_COLOR[rank.name]} 0%, transparent 70%)`, pointerEvents:"none" }} />
+            <div style={{ position:"absolute", bottom:0, right:"200px", display:"flex", alignItems:"flex-end", justifyContent:"center", width:`${SPRITE_DISPLAY + 60}px`, height:`${SPRITE_DISPLAY + 60}px` }}>
+              {/* Rank glow circle behind sprite */}
+              <div style={{ position:"absolute", bottom:"10px", left:"50%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, borderRadius:"50%", background:`radial-gradient(circle, ${RANK_GLOW_COLOR[rank.name]}, transparent 70%)` }} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={spriteDataUri} alt="" style={{ width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
+              <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
             </div>
           )}
         </div>
@@ -210,4 +211,27 @@ export async function GET(
       },
     },
   );
+}
+
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ username: string }> },
+) {
+  const { username } = await params;
+  return buildCard(username, null);
+}
+
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ username: string }> },
+) {
+  const { username } = await params;
+  let clientSprite: string | null = null;
+  try {
+    const body = await req.json() as { sprite?: string };
+    if (body.sprite && body.sprite.startsWith("data:image/png")) {
+      clientSprite = body.sprite;
+    }
+  } catch { /* ignore parse errors */ }
+  return buildCard(username, clientSprite);
 }
