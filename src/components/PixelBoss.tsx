@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { ClassName, RankName } from "@/lib/scoring/types";
 import {
-  FRAME_SIZE, FRAME_COUNT, ANIM_FPS, animRowY, spritesheetPath, loginGender,
+  FRAME_SIZE, FRAME_COUNT, ANIM_FPS, animRowY, spritesheetPath, detectGender,
   RANK_FILTER, RANK_GLOW_COLOR, DEFAULT_ANIM,
   type AnimName,
 } from "@/lib/sprite";
 
 interface PixelBossProps {
-  login: string;
+  bio: string | null;
   className: ClassName;
   rankName: RankName;
   /** display size in CSS pixels; sprite is scaled up from 64×64 */
@@ -27,7 +27,7 @@ const ANIMS_CYCLE: AnimName[] = ["idle", "walk", "slash", "spellcast", "thrust",
  * degrades gracefully: if the image hasn't loaded, nothing is drawn.
  */
 export default function PixelBoss({
-  login,
+  bio,
   className,
   rankName,
   displaySize = 192,
@@ -38,7 +38,7 @@ export default function PixelBoss({
   const frameRef  = useRef(0);
   const lastRef   = useRef(0);
 
-  const gender   = loginGender(login);
+  const gender   = detectGender(bio);
   const src      = spritesheetPath(className, gender);
   const filter   = RANK_FILTER[rankName];
   const glowColor = RANK_GLOW_COLOR[rankName];

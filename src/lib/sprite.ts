@@ -66,24 +66,35 @@ export function animRowY(anim: AnimName): number {
 
 // ── Sprite file mapping ──────────────────────────────────────────────────────
 
-/** Map class name to spritesheet filename stem. */
-const CLASS_STEM: Record<ClassName, string> = {
-  Sorcerer:       "sorcerer",
-  Saint:          "saint",
-  "Blade Dancer": "sword",         // male-sword-spritesheet.png
-  Vanguard:       "vanguard",
-  Juggernaut:     "juggernaut",
-  Soulkeeper:     "soulkeeper",
+/**
+ * Map class name to spritesheet filename stem.
+ * Note: the female Blade Dancer sheet has the suffix "-character" in its name;
+ * both male and female are normalised through `spritesheetPath` below.
+ */
+const CLASS_STEM: Record<ClassName, { male: string; female: string }> = {
+  Sorcerer:       { male: "sorcerer",          female: "sorcerer" },
+  Saint:          { male: "saint",              female: "saint" },
+  "Blade Dancer": { male: "sword",              female: "sword-character" },
+  Vanguard:       { male: "vanguard",           female: "vanguard" },
+  Juggernaut:     { male: "juggernaut",         female: "juggernaut" },
+  Soulkeeper:     { male: "soulkeeper",         female: "soulkeeper" },
 };
 
 export function spritesheetPath(cls: ClassName, gender: "male" | "female"): string {
-  const stem = CLASS_STEM[cls];
+  const stem = CLASS_STEM[cls][gender];
   return `/sprites/${gender}-${stem}-spritesheet.png`;
 }
 
-/** Deterministic gender from the GitHub login (same output every time). */
-export function loginGender(login: string): "male" | "female" {
-  return login.charCodeAt(0) % 2 === 0 ? "male" : "female";
+/**
+ * Derive gender from the GitHub bio.
+ * Looks for "she/her" or "he/him" (case-insensitive). Falls back to "male".
+ */
+export function detectGender(bio: string | null): "male" | "female" {
+  if (!bio) return "male";
+  const b = bio.toLowerCase();
+  if (b.includes("she/her") || b.includes("she / her")) return "female";
+  if (b.includes("he/him") || b.includes("he / him")) return "male";
+  return "male";
 }
 
 // ── Rank colour filters ───────────────────────────────────────────────────────
