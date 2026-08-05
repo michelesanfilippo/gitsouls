@@ -54,11 +54,11 @@ export const STORY_SEQUENCE: AnimPhase[] = [
 ];
 
 /**
- * Duel idle sequence: row 12 (0-indexed, py=768), 64×64, 6 frames.
- * Personaggio in posa con arma. Content y=14-63 → destY=32.
+ * Duel idle sequence: row 11 (0-indexed = user's "row 12"), py=704, 64×64, 9 frames.
+ * Personaggio che cammina con arma. Content y→destY=33.
  */
 export const DUEL_IDLE_SEQUENCE: AnimPhase[] = [
-  { sy0: 768, sx0: 0, frameW: 64, frameH: 64, destY: 32, frameCount: 6, fps: 7, repeats: 9999 },
+  { sy0: 704, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 8, repeats: 9999 },
 ];
 
 /**

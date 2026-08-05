@@ -8,6 +8,7 @@ import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
 import PixelBoss from "./PixelBoss";
+import PixelBossBox from "./PixelBossBox";
 
 const LEFT: StatKey[] = ["VIT", "END", "INT"];
 const RIGHT: StatKey[] = ["DEX", "FAI", "SOP"];
@@ -149,34 +150,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             </span>
           </div>
 
-          {/* Pixel boss sprite — below facts, inside the central column */}
-          <div
-            className="relative mt-5 w-full overflow-hidden rounded-2xl border border-gold/15"
-            style={{ minHeight: "170px" }}
-          >
-            {/* Background scene — full opacity so colours show */}
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: "url('/img/pixel-paper.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center bottom",
-              }}
+          {/* Pixel boss sprite box */}
+          <div className="mt-5">
+            <PixelBossBox
+              bio={profile.bio}
+              className={profile.bossClass.name}
+              rankName={profile.rank.name}
+              mode="profile"
             />
-            {/* Subtle dark vignette so it blends with the page */}
-            <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/30 to-transparent" />
-            {/* Side fades */}
-            <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/20" />
-
-            {/* Sprite pinned: slightly up from bottom, a bit left of right edge */}
-            <div className="absolute bottom-2 right-10 pb-1">
-              <PixelBoss
-                bio={profile.bio}
-                className={profile.bossClass.name}
-                rankName={profile.rank.name}
-                displaySize={118}
-              />
-            </div>
           </div>
         </div>
 

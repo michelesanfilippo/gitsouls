@@ -6,34 +6,101 @@ import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { deviconUrl } from "@/lib/devicon";
 import { fetchImageDataUri, loadFonts } from "@/lib/og";
-import { spritesheetPath, detectGender } from "@/lib/sprite";
+import {
+  spritesheetPath, detectGender,
+  RANK_TINT_RGB, applyArmourTint,
+} from "@/lib/sprite";
 
 export const runtime = "nodejs";
 
 /**
- * Extract a single frame from an LPC spritesheet using sharp.
- * Walk south, frame 0: row 10 (py=640), col 0 (px=0), 64×64.
- * Upscaled to 192×192 with nearest-neighbour so pixel art stays crisp.
- * Returns a PNG data URI or null on any failure.
+ * Build the pixel-art box that mirrors what the profile page shows:
+ *   - pixel-paper.png as background, darkened at the edges
+ *   - standing-with-weapon frame (row 12, py=768, 64×64) tinted by rank
+ *
+ * Everything is composited server-side with sharp so satori gets a flat PNG.
+ * Returns a PNG data URI or null on failure.
  */
-async function extractSpriteFrame(
+async function buildSpriteBox(
   spritePath: string,
-  sx: number,
-  sy: number,
-  fw: number,
-  fh: number,
-  outSize: number,
+  rankName: keyof typeof RANK_TINT_RGB,
+  boxW: number,
+  boxH: number,
 ): Promise<string | null> {
   try {
     const sharp = (await import("sharp")).default;
-    const file  = path.join(process.cwd(), "public", spritePath.replace(/^\//, ""));
-    const buf   = await readFile(file);
-    const png   = await sharp(buf)
-      .extract({ left: sx, top: sy, width: fw, height: fh })
-      .resize(outSize, outSize, { kernel: "nearest" })
+    const root  = process.cwd();
+
+    const [sheetBuf, paperBuf] = await Promise.all([
+      readFile(path.join(root, "public", spritePath.replace(/^\//, ""))),
+      readFile(path.join(root, "public", "img", "pixel-paper.png")),
+    ]);
+
+    // Sprite: row 11 0-indexed (user's "row 12", py=704), frame 0, 64×64
+    // → walk-with-weapon pose (same row as DUEL_IDLE_SEQUENCE)
+    const FRAME_SIZE = 64;
+    const SPRITE_ROW_PY = 704; // row 11 (0-indexed) = walk/stand with weapon
+    const spriteOut = Math.round(boxH * 0.62);
+
+    const rawBuf = await sharp(sheetBuf)
+      .extract({ left: 0, top: SPRITE_ROW_PY, width: FRAME_SIZE, height: FRAME_SIZE })
+      .resize(spriteOut, spriteOut, { kernel: "nearest" })
+      .ensureAlpha()
+      .raw()
+      .toBuffer();
+
+    // Apply selective armour tint to the raw RGBA buffer
+    applyArmourTint(rawBuf as unknown as Uint8ClampedArray, RANK_TINT_RGB[rankName]);
+
+    // Re-encode to PNG
+    const spritePng = await sharp(rawBuf, {
+      raw: { width: spriteOut, height: spriteOut, channels: 4 },
+    }).png().toBuffer();
+
+    // Background: pixel-paper cropped/resized to box dimensions
+    const paperResized = await sharp(paperBuf)
+      .resize(boxW, boxH, { fit: "cover", position: "centre bottom" })
+      .toBuffer();
+
+    // Compose: darken paper edges with a semi-transparent overlay, then sprite centred-right
+    const spriteLeft = Math.round(boxW * 0.55 - spriteOut / 2);
+    const spriteTop  = Math.round((boxH - spriteOut) / 2);
+
+    const composited = await sharp(paperResized)
+      // Top vignette
+      .composite([
+        {
+          input: Buffer.from(
+            `<svg width="${boxW}" height="${boxH}">
+              <defs>
+                <linearGradient id="vt" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0b0710" stop-opacity="0.72"/>
+                  <stop offset="50%" stop-color="#0b0710" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#0b0710" stop-opacity="0.55"/>
+                </linearGradient>
+                <linearGradient id="vl" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#0b0710" stop-opacity="0.65"/>
+                  <stop offset="45%" stop-color="#0b0710" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <rect width="${boxW}" height="${boxH}" fill="url(#vt)"/>
+              <rect width="${boxW}" height="${boxH}" fill="url(#vl)"/>
+            </svg>`,
+          ),
+          blend: "over",
+        },
+        // Sprite
+        {
+          input: spritePng,
+          top: spriteTop,
+          left: spriteLeft,
+          blend: "over",
+        },
+      ])
       .png()
       .toBuffer();
-    return `data:image/png;base64,${png.toString("base64")}`;
+
+    return `data:image/png;base64,${composited.toString("base64")}`;
   } catch {
     return null;
   }
@@ -67,7 +134,6 @@ export async function GET(
   try {
     profile = await getBossProfile(username);
   } catch (err) {
-    // Distinguish the two failures rather than calling everything a 404.
     if (err instanceof GitHubError && err.kind === "rate_limited") {
       return new Response("Rate limited — try again shortly", { status: 429 });
     }
@@ -75,19 +141,18 @@ export async function GET(
   }
 
   const { rank, bossClass } = profile;
+  const gender    = detectGender(profile.bio);
+  const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
-  const gender       = detectGender(profile.bio);
-  const sheetPath    = spritesheetPath(profile.bossClass.name, gender);
-  // Walk south, frame 0 (row 10 = py 640, col 0 = px 0), 64×64 → upscale to 192
-  const WALK_ROW_PY  = 640;
+  // Sprite box: 920px wide × 340px tall (matches the card width minus padding)
+  const BOX_W = 920;
+  const BOX_H = 340;
 
-  const [avatar, langIcon, { fonts, fontFamily }, spriteFrame] = await Promise.all([
+  const [avatar, langIcon, { fonts, fontFamily }, spriteBox] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
-    profile.topLanguage
-      ? fetchLanguageIcon(profile.topLanguage)
-      : Promise.resolve(null),
+    profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
-    extractSpriteFrame(sheetPath, 0, WALK_ROW_PY, 64, 64, 192),
+    buildSpriteBox(sheetPath, profile.rank.name, BOX_W, BOX_H),
   ]);
 
   return new ImageResponse(
@@ -99,12 +164,9 @@ export async function GET(
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          // Separate properties: satori's multi-layer `background` shorthand
-          // parsing is its least reliable path.
           backgroundColor: "#0b0710",
           backgroundImage:
-            // Last two layers are the drifting fog banks.
-            "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%), radial-gradient(1100px 520px at 22% 74%, rgba(178,178,205,0.16), transparent 68%), radial-gradient(950px 460px at 82% 34%, rgba(158,158,190,0.12), transparent 66%)",
+            "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%)",
           color: "#e8e0cf",
           fontFamily,
           padding: "110px 80px 44px",
@@ -142,7 +204,7 @@ export async function GET(
         </div>
 
         {/* Class chip + language */}
-        <div style={{ display:"flex", alignItems:"center", gap:"16px", marginTop:"28px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"16px", marginTop:"24px" }}>
           <div style={{ display:"flex", borderRadius:"16px", border:`3px solid ${bossClass.color}`, backgroundColor:`${bossClass.color}26`, boxShadow:`0 0 22px ${bossClass.color}4d`, padding:"8px 22px", fontSize:"26px", fontWeight:700, letterSpacing:"4px", textTransform:"uppercase", color:bossClass.color }}>
             {bossClass.name}
           </div>
@@ -156,16 +218,16 @@ export async function GET(
           ) : null}
         </div>
 
-        {/* Pixel art — walk frame upscaled from spritesheet */}
-        {spriteFrame && (
-          <div style={{ display:"flex", marginTop:"28px", borderRadius:"16px", border:`2px solid rgba(212,175,55,0.25)`, backgroundColor:"rgba(20,12,30,0.55)", padding:"12px 24px" }}>
+        {/* Pixel art box — matches the profile page box (pixel-paper bg + sprite) */}
+        {spriteBox && (
+          <div style={{ display:"flex", marginTop:"32px", width:"100%", borderRadius:"20px", border:"2px solid rgba(212,175,55,0.18)", overflow:"hidden" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={spriteFrame} alt="" width={192} height={192} style={{ width:"192px", height:"192px", imageRendering:"pixelated" }} />
+            <img src={spriteBox} alt="" width={BOX_W} height={BOX_H} style={{ width:`${BOX_W}px`, height:`${BOX_H}px` }} />
           </div>
         )}
 
-        {/* Stats */}
-        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"32px", gap:"18px" }}>
+        {/* Stats pushed to the bottom */}
+        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"auto", gap:"16px" }}>
           {STAT_KEYS.map((k) => (
             <div key={k} style={{ display:"flex", flexDirection:"column", width:"100%" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", width:"100%" }}>
@@ -183,7 +245,7 @@ export async function GET(
         </div>
 
         {/* Footer */}
-        <div style={{ display:"flex", marginTop:"auto", paddingTop:"28px", fontSize:"22px", letterSpacing:"2px", color:"#8a8172" }}>
+        <div style={{ display:"flex", paddingTop:"24px", fontSize:"22px", letterSpacing:"2px", color:"#8a8172" }}>
           gitsouls.com/{profile.login}
         </div>
       </div>
@@ -193,8 +255,6 @@ export async function GET(
       height: 1920,
       ...(fonts.length > 0 ? { fonts } : {}),
       headers: {
-        // Force a save dialog: the <a download> attribute alone is ignored by
-        // iOS Safari and in-app webviews, which just display the image instead.
         "Content-Disposition": `attachment; filename="${profile.login}-gitsouls.png"`,
       },
     },

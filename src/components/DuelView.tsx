@@ -9,6 +9,7 @@ import StatHexagon from "./StatHexagon";
 import DuelShare from "./DuelShare";
 import LanguageIcon from "./LanguageIcon";
 import PixelDuelist from "./PixelDuelist";
+import PixelBossBox from "./PixelBossBox";
 
 /** ms between each stat row being revealed */
 const STEP_MS = 460;
@@ -149,14 +150,13 @@ function Fighter({
         )}
       </div>
 
-      {/* Pixel duelist — idle when alive, death animation when defeated */}
-      <div className="mt-4 glass-soft rounded-2xl p-3">
-        <PixelDuelist
+      {/* Pixel art box — identical to the profile page, animation varies */}
+      <div className="mt-4 w-full">
+        <PixelBossBox
           bio={profile.bio}
           className={profile.bossClass.name}
           rankName={profile.rank.name}
-          mode={defeated ? "death" : "idle"}
-          displaySize={88}
+          mode={defeated ? "duel-death" : "duel-idle"}
         />
       </div>
 
