@@ -70,7 +70,7 @@ async function buildCard(
   const gender    = detectGender(profile.bio, profile.name, profile.pronouns);
   const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
-  const SPRITE_DISPLAY = 360; // matches the upscaled size from the client
+  const SPRITE_DISPLAY = 288;
 
   const [avatar, langIcon, { fonts, fontFamily }, serverSprite, paperDataUri] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
@@ -171,9 +171,9 @@ async function buildCard(
           {spriteDataUri && (
             <div style={{ position:"absolute", bottom:0, right:"200px", display:"flex", alignItems:"flex-end", justifyContent:"center", width:`${SPRITE_DISPLAY + 60}px`, height:`${SPRITE_DISPLAY + 60}px` }}>
               {/* Rank glow circle behind sprite */}
-              <div style={{ position:"absolute", bottom:"10px", left:"50%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, borderRadius:"50%", background:`radial-gradient(circle, ${RANK_GLOW_COLOR[rank.name]}, transparent 70%)` }} />
+                <div style={{ position:"absolute", bottom:0, right:"60px", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, borderRadius:"50%", background:`radial-gradient(circle, ${RANK_GLOW_COLOR[rank.name]}, transparent 70%)` }} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated", maxWidth:"100%", maxHeight:"100%" }} />
+              <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, right:"60px", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
             </div>
           )}
         </div>

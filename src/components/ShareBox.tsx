@@ -42,7 +42,7 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
     if (canvas) {
       // The canvas is 96×96 internally but displayed at ~118px via CSS scale.
       // We upscale with nearest-neighbour to match the visual size on screen.
-      const TARGET = 360; // match the card box height
+      const TARGET = 288; // 20% smaller than before
       const off = document.createElement("canvas");
       off.width  = TARGET;
       off.height = TARGET;
