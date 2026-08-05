@@ -5,7 +5,7 @@ import type { ClassName, RankName } from "@/lib/scoring/types";
 import {
   DISPLAY_FRAME, STORY_SEQUENCE,
   spritesheetPath, detectGender,
-  RANK_GLOW_COLOR,
+  RANK_TINT_RGB, RANK_GLOW_COLOR, applyArmourTint,
 } from "@/lib/sprite";
 
 interface PixelBossProps {
@@ -17,52 +17,54 @@ interface PixelBossProps {
   displaySize?: number;
 }
 
-/**
- * Rank colour as an rgba string for the multiply-blend overlay.
- * multiply blend mode: result = base * overlay / 255.
- * Dark metal pixels (low value) get fully tinted; bright skin pixels
- * (high value, near white) are multiplied by near-white → stay bright.
- * This preserves skin tones while colouring armour/weapons.
- */
-const RANK_TINT_COLOR: Record<RankName, string> = {
-  "Hollow":         "rgba(80, 80, 100, 0.85)",
-  "Undead":         "rgba(60, 90, 60,  0.85)",
-  "Knight":         "rgba(40, 80, 220, 0.80)",
-  "Abyss Walker":   "rgba(110, 30, 210, 0.80)",
-  "Lord":           "rgba(200, 160, 20, 0.80)",
-  "Soul of Cinder": "rgba(210, 50, 10,  0.85)",
-};
-
 export default function PixelBoss({
   bio, name, pronouns, className, rankName, displaySize = 118,
 }: PixelBossProps) {
+  // offRef holds an offscreen canvas with the full spritesheet already tinted.
+  // It is created inside img.onload where naturalWidth is guaranteed non-zero.
+  const offRef    = useRef<HTMLCanvasElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imgRef    = useRef<HTMLImageElement | null>(null);
   const rafRef    = useRef<number>(0);
   const stateRef  = useRef({ phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 });
 
   const gender = detectGender(bio, name, pronouns);
   const src    = spritesheetPath(className, gender);
+  const tint   = RANK_TINT_RGB[rankName];
   const glow   = RANK_GLOW_COLOR[rankName];
-  const tintColor = RANK_TINT_COLOR[rankName];
 
-  const [loaded, setLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    imgRef.current = null;
+    offRef.current = null;
+
     const img = new window.Image();
-    img.onload  = () => { if (!cancelled) { imgRef.current = img; setLoaded(true); } };
+    img.onload = () => {
+      if (cancelled) return;
+      // naturalWidth is guaranteed valid here — this is the only safe place.
+      const off = document.createElement("canvas");
+      off.width  = img.naturalWidth;
+      off.height = img.naturalHeight;
+      const ctx  = off.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      // applyArmourTint: colours only low-saturation (metal/grey) pixels.
+      const id = ctx.getImageData(0, 0, off.width, off.height);
+      applyArmourTint(id.data, tint);
+      ctx.putImageData(id, 0, 0);
+      offRef.current = off;
+      setReady(true);
+    };
     img.onerror = () => {};
     img.src = src;
-    return () => { cancelled = true; setLoaded(false); };
-  }, [src]);
+    return () => { cancelled = true; setReady(false); };
+  }, [src, tint]);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!ready) return;
     const canvas = canvasRef.current;
-    const img    = imgRef.current;
-    if (!canvas || !img) return;
+    const off    = offRef.current;
+    if (!canvas || !off) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -84,27 +86,20 @@ export default function PixelBoss({
         }
       }
 
-      const ph = STORY_SEQUENCE[s.phaseIdx];
-      const fi = ph.backward ? ph.frameCount - 1 - s.frame : s.frame;
-      const sx = ph.sx0 + fi * ph.frameW;
+      const ph    = STORY_SEQUENCE[s.phaseIdx];
+      const fi    = ph.backward ? ph.frameCount - 1 - s.frame : s.frame;
+      const sx    = ph.sx0 + fi * ph.frameW;
+      const destX = (DISPLAY_FRAME - ph.frameW) / 2;
 
       ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
-      const destX = (DISPLAY_FRAME - ph.frameW) / 2;
-      ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
-
-      // source-atop: fills only where sprite pixels exist (alpha>0).
-      // Transparent canvas areas are completely unaffected — no rectangle.
-      ctx.globalCompositeOperation = "source-atop";
-      ctx.fillStyle = tintColor;
-      ctx.fillRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
-      ctx.globalCompositeOperation = "source-over";
+      ctx.drawImage(off, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
       rafRef.current = requestAnimationFrame(tick);
     };
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [loaded]);
+  }, [ready]);
 
   const scale = displaySize / DISPLAY_FRAME;
 
@@ -125,7 +120,7 @@ export default function PixelBoss({
           transformOrigin: "top left",
         }}
       />
-      {!loaded && (
+      {!ready && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           Summoning…
         </div>

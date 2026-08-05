@@ -5,7 +5,7 @@ import type { ClassName, RankName } from "@/lib/scoring/types";
 import {
   DISPLAY_FRAME, DUEL_IDLE_SEQUENCE, DUEL_DEATH_SEQUENCE, DUEL_VICTORY_SEQUENCE,
   spritesheetPath, detectGender,
-  RANK_GLOW_COLOR,
+  RANK_TINT_RGB, RANK_GLOW_COLOR, applyArmourTint,
   type AnimPhase,
 } from "@/lib/sprite";
 
@@ -19,20 +19,10 @@ interface PixelDuelistProps {
   displaySize?: number;
 }
 
-const RANK_TINT_COLOR: Record<RankName, string> = {
-  "Hollow":         "rgba(80, 80, 100, 0.85)",
-  "Undead":         "rgba(60, 90, 60,  0.85)",
-  "Knight":         "rgba(40, 80, 220, 0.80)",
-  "Abyss Walker":   "rgba(110, 30, 210, 0.80)",
-  "Lord":           "rgba(200, 160, 20, 0.80)",
-  "Soul of Cinder": "rgba(210, 50, 10,  0.85)",
-};
-
 function runSequence(
   sequence: AnimPhase[],
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  tintColor: string,
+  off: HTMLCanvasElement,
   rafRef: React.MutableRefObject<number>,
 ) {
   const s = { phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 };
@@ -45,28 +35,22 @@ function runSequence(
       if (s.frame >= phase.frameCount) {
         s.frame = 0;
         s.repeat++;
-        const nextPhase = s.phaseIdx + 1;
-        if (s.repeat >= phase.repeats && nextPhase < sequence.length) {
-          s.repeat   = 0;
-          s.phaseIdx = nextPhase;
+        const next = s.phaseIdx + 1;
+        if (s.repeat >= phase.repeats && next < sequence.length) {
+          s.repeat = 0; s.phaseIdx = next;
         } else if (s.repeat >= phase.repeats) {
           s.frame = phase.frameCount - 1;
         }
       }
     }
 
-    const ph = sequence[s.phaseIdx];
-    const fi = ph.backward ? ph.frameCount - 1 - s.frame : s.frame;
-    const sx = ph.sx0 + fi * ph.frameW;
+    const ph    = sequence[s.phaseIdx];
+    const fi    = ph.backward ? ph.frameCount - 1 - s.frame : s.frame;
+    const sx    = ph.sx0 + fi * ph.frameW;
+    const destX = (DISPLAY_FRAME - ph.frameW) / 2;
 
     ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
-    const destX = (DISPLAY_FRAME - ph.frameW) / 2;
-    ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
-
-    ctx.globalCompositeOperation = "source-atop";
-    ctx.fillStyle = tintColor;
-    ctx.fillRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
-    ctx.globalCompositeOperation = "source-over";
+    ctx.drawImage(off, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
     rafRef.current = requestAnimationFrame(tick);
   };
@@ -77,32 +61,46 @@ function runSequence(
 export default function PixelDuelist({
   bio, name, pronouns, className, rankName, mode, displaySize = 96,
 }: PixelDuelistProps) {
+  const offRef    = useRef<HTMLCanvasElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imgRef    = useRef<HTMLImageElement | null>(null);
   const rafRef    = useRef<number>(0);
 
   const gender = detectGender(bio, name, pronouns);
   const src    = spritesheetPath(className, gender);
+  const tint   = RANK_TINT_RGB[rankName];
   const glow   = RANK_GLOW_COLOR[rankName];
-  const tintColor = RANK_TINT_COLOR[rankName];
 
-  const [loaded, setLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    imgRef.current = null;
+    offRef.current = null;
+
     const img = new window.Image();
-    img.onload  = () => { if (!cancelled) { imgRef.current = img; setLoaded(true); } };
+    img.onload = () => {
+      if (cancelled) return;
+      const off = document.createElement("canvas");
+      off.width  = img.naturalWidth;
+      off.height = img.naturalHeight;
+      const ctx  = off.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      const id = ctx.getImageData(0, 0, off.width, off.height);
+      applyArmourTint(id.data, tint);
+      ctx.putImageData(id, 0, 0);
+      offRef.current = off;
+      setReady(true);
+    };
     img.onerror = () => {};
     img.src = src;
-    return () => { cancelled = true; setLoaded(false); };
-  }, [src]);
+    return () => { cancelled = true; setReady(false); };
+  }, [src, tint]);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!ready) return;
     const canvas = canvasRef.current;
-    const img    = imgRef.current;
-    if (!canvas || !img) return;
+    const off    = offRef.current;
+    if (!canvas || !off) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -110,9 +108,9 @@ export default function PixelDuelist({
     const seq = mode === "death" ? DUEL_DEATH_SEQUENCE
               : mode === "victory" ? DUEL_VICTORY_SEQUENCE
               : DUEL_IDLE_SEQUENCE;
-    runSequence(seq, ctx, img, tintColor, rafRef);
+    runSequence(seq, ctx, off, rafRef);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [loaded, mode]);
+  }, [ready, mode]);
 
   const scale = displaySize / DISPLAY_FRAME;
 
@@ -133,7 +131,7 @@ export default function PixelDuelist({
           transformOrigin: "top left",
         }}
       />
-      {!loaded && (
+      {!ready && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           …
         </div>

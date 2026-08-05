@@ -21,9 +21,9 @@ async function extractSpriteDataUri(
     const sharp = (await import("sharp")).default;
     const file  = path.join(process.cwd(), "public", spritePath.replace(/^\//, ""));
     const buf   = await readFile(file);
-    // Row 11 (0-indexed, py=704), frame 0 — standing with weapon
+    // Row 10 (0-indexed, py=640), frame 4 — walk with weapon (upright stance)
     const png = await sharp(buf)
-      .extract({ left: 0, top: 704, width: 64, height: 64 })
+      .extract({ left: 4 * 64, top: 640, width: 64, height: 64 })
       .resize(outSize, outSize, { kernel: "nearest" })
       .png()
       .toBuffer();
@@ -100,25 +100,25 @@ export async function GET(
         }}
       >
         {/* Rank */}
-        <div style={{ display:"flex", fontSize:"28px", letterSpacing:"12px", textTransform:"uppercase", color:rank.color, textShadow:`0 0 20px ${rank.glow}` }}>
+        <div style={{ display:"flex", fontSize:"34px", letterSpacing:"14px", textTransform:"uppercase", color:rank.color, textShadow:`0 0 24px ${rank.glow}` }}>
           {rank.name}
         </div>
 
-        {/* Avatar */}
-        <div style={{ display:"flex", position:"relative", marginTop:"36px", borderRadius:"9999px", border:`7px solid ${rank.color}`, boxShadow:`0 0 60px ${rank.glow}` }}>
+        {/* Avatar — slightly larger */}
+        <div style={{ display:"flex", position:"relative", marginTop:"36px", borderRadius:"9999px", border:`8px solid ${rank.color}`, boxShadow:`0 0 70px ${rank.glow}` }}>
           {avatar ? (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={avatar} alt="" width={280} height={280} style={{ width:"280px", height:"280px", objectFit:"cover", borderRadius:"9999px" }} />
+            <img src={avatar} alt="" width={320} height={320} style={{ width:"320px", height:"320px", objectFit:"cover", borderRadius:"9999px" }} />
           ) : (
-            <div style={{ display:"flex", width:"280px", height:"280px", alignItems:"center", justifyContent:"center", borderRadius:"9999px", backgroundColor:"#1a102a", fontSize:"110px", color:rank.color }}>
+            <div style={{ display:"flex", width:"320px", height:"320px", alignItems:"center", justifyContent:"center", borderRadius:"9999px", backgroundColor:"#1a102a", fontSize:"128px", color:rank.color }}>
               {(profile.name ?? profile.login).slice(0,1).toUpperCase()}
             </div>
           )}
-          <div style={{ display:"flex", position:"absolute", top:0, left:0, width:"280px", height:"280px", borderRadius:"9999px", backgroundImage:"radial-gradient(circle at 30% 72%, rgba(205,205,225,0.30), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)" }} />
+          <div style={{ display:"flex", position:"absolute", top:0, left:0, width:"320px", height:"320px", borderRadius:"9999px", backgroundImage:"radial-gradient(circle at 30% 72%, rgba(205,205,225,0.30), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)" }} />
         </div>
 
         {/* LV badge */}
-        <div style={{ display:"flex", marginTop:"-22px", borderRadius:"9999px", border:`3px solid ${rank.color}`, backgroundColor:"#0b0710", padding:"5px 22px", fontSize:"24px", color:rank.color }}>
+        <div style={{ display:"flex", marginTop:"-24px", borderRadius:"9999px", border:`3px solid ${rank.color}`, backgroundColor:"#0b0710", padding:"6px 26px", fontSize:"26px", color:rank.color }}>
           LV {profile.level}
         </div>
 
@@ -159,8 +159,7 @@ export async function GET(
           backgroundPosition: "center bottom",
           backgroundColor: "#110a1a",
           alignItems: "flex-end",
-          justifyContent: "flex-end",
-          paddingRight: "40px",
+          justifyContent: "center",
           paddingBottom: "0px",
         }}>
           {spriteDataUri && (
@@ -179,19 +178,19 @@ export async function GET(
           )}
         </div>
 
-        {/* Stats pushed to the bottom */}
-        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"auto", gap:"16px" }}>
+        {/* Stats — immediately below the pixel art box, larger text */}
+        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"32px", gap:"20px" }}>
           {STAT_KEYS.map((k) => (
             <div key={k} style={{ display:"flex", flexDirection:"column", width:"100%" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", width:"100%" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
-                  <span style={{ fontSize:"26px", letterSpacing:"4px", color:"#dc2626" }}>{k}</span>
-                  <span style={{ fontSize:"19px", color:"#8a8172" }}>{STAT_LABELS[k].toUpperCase()}</span>
+                <div style={{ display:"flex", alignItems:"center", gap:"14px" }}>
+                  <span style={{ fontSize:"30px", letterSpacing:"5px", color:"#dc2626" }}>{k}</span>
+                  <span style={{ fontSize:"22px", color:"#8a8172" }}>{STAT_LABELS[k].toUpperCase()}</span>
                 </div>
-                <span style={{ fontSize:"32px", fontWeight:700 }}>{profile.stats[k]}</span>
+                <span style={{ fontSize:"36px", fontWeight:700 }}>{profile.stats[k]}</span>
               </div>
-              <div style={{ display:"flex", width:"100%", height:"10px", marginTop:"8px", borderRadius:"9999px", backgroundColor:"rgba(0,0,0,0.45)" }}>
-                <div style={{ display:"flex", width:`${profile.stats[k]}%`, height:"10px", borderRadius:"9999px", backgroundColor:"#d4af37" }} />
+              <div style={{ display:"flex", width:"100%", height:"12px", marginTop:"10px", borderRadius:"9999px", backgroundColor:"rgba(0,0,0,0.45)" }}>
+                <div style={{ display:"flex", width:`${profile.stats[k]}%`, height:"12px", borderRadius:"9999px", backgroundColor:"#d4af37" }} />
               </div>
             </div>
           ))}
