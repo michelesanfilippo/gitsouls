@@ -36,9 +36,23 @@ export default function ShareBox({ login, name }: ShareBoxProps) {
 
   const downloadCard = async () => {
     setMenuOpen(false);
-    // Capture the live pixel art canvas frame
+    // Capture the live pixel art canvas, upscale to display size
     const canvas = document.querySelector<HTMLCanvasElement>('[data-pixel-boss="true"]');
-    const spriteDataUri = canvas ? canvas.toDataURL("image/png") : "";
+    let spriteDataUri = "";
+    if (canvas) {
+      // The canvas is 96×96 internally but displayed at ~118px via CSS scale.
+      // We upscale with nearest-neighbour to match the visual size on screen.
+      const TARGET = 360; // match the card box height
+      const off = document.createElement("canvas");
+      off.width  = TARGET;
+      off.height = TARGET;
+      const ctx = off.getContext("2d");
+      if (ctx) {
+        ctx.imageSmoothingEnabled = false; // pixelated upscale
+        ctx.drawImage(canvas, 0, 0, TARGET, TARGET);
+        spriteDataUri = off.toDataURL("image/png");
+      }
+    }
     try {
       const res = await fetch(cardUrl, {
         method: "POST",
