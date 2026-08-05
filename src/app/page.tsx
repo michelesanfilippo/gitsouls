@@ -52,8 +52,8 @@ export default function Home() {
           <ScoutForm />
           <LandingStatus />
 
-          {/* Three weapons centred below the status line, evenly spaced */}
-          <div className="mt-8 flex items-center justify-center gap-12 lg:gap-20">
+          {/* Three weapons centred, below the status line */}
+          <div className="mt-16 flex items-center justify-center gap-12 lg:gap-20">
             <WeaponDecoration
               weapon="bow"
               src="/img/bow.png"

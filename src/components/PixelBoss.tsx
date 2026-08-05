@@ -5,8 +5,7 @@ import type { ClassName, RankName } from "@/lib/scoring/types";
 import {
   DISPLAY_FRAME, STORY_SEQUENCE,
   spritesheetPath, detectGender,
-  RANK_TINT_RGB, RANK_GLOW_COLOR,
-  applyArmourTint,
+  RANK_GLOW_COLOR,
 } from "@/lib/sprite";
 
 interface PixelBossProps {
@@ -16,58 +15,52 @@ interface PixelBossProps {
   displaySize?: number;
 }
 
+/**
+ * CSS filters that tint armour/metal without touching skin tones too much.
+ * Using sepia+hue-rotate rather than per-pixel getImageData avoids all
+ * canvas readback issues (willReadFrequently, naturalWidth timing, etc.)
+ * The sepia base desaturates first, then hue-rotate pushes to the rank colour,
+ * and saturate amplifies it. Skin tones shift slightly but remain recognisable.
+ */
+const RANK_CSS_FILTER: Record<RankName, string> = {
+  "Hollow":         "grayscale(0.85) brightness(0.70)",
+  "Undead":         "sepia(0.5) hue-rotate(80deg) brightness(0.75)",
+  "Knight":         "sepia(0.4) hue-rotate(180deg) saturate(3) brightness(0.92)",
+  "Abyss Walker":   "sepia(0.4) hue-rotate(250deg) saturate(4) brightness(0.88)",
+  "Lord":           "sepia(0.6) saturate(4) brightness(1.05)",
+  "Soul of Cinder": "sepia(0.5) hue-rotate(320deg) saturate(6) brightness(1.10)",
+};
+
 export default function PixelBoss({
   bio, className, rankName, displaySize = 118,
 }: PixelBossProps) {
-  // tintedImg holds a pre-tinted offscreen canvas — tinting happens once on
-  // load, not every frame, avoiding repeated getImageData in the render loop.
-  const tintedRef  = useRef<HTMLCanvasElement | null>(null);
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
-  const rafRef     = useRef<number>(0);
-  const stateRef   = useRef({ phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef    = useRef<HTMLImageElement | null>(null);
+  const rafRef    = useRef<number>(0);
+  const stateRef  = useRef({ phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 });
 
   const gender = detectGender(bio);
   const src    = spritesheetPath(className, gender);
-  const tint   = RANK_TINT_RGB[rankName];
   const glow   = RANK_GLOW_COLOR[rankName];
+  const filter = RANK_CSS_FILTER[rankName];
 
-  const [ready, setReady] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  // Build the pre-tinted offscreen canvas once per src/tint change.
-  // setReady(false) lives only in the cleanup, never synchronously in the
-  // effect body — doing so in strict mode causes a double-mount cycle where
-  // the second mount sees cancelled=true and never resolves ready.
   useEffect(() => {
     let cancelled = false;
-    tintedRef.current = null;
-
+    imgRef.current = null;
     const img = new window.Image();
-    img.onload = () => {
-      if (cancelled) return;
-      const off = document.createElement("canvas");
-      off.width  = img.naturalWidth;
-      off.height = img.naturalHeight;
-      const ctx = off.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      const id = ctx.getImageData(0, 0, off.width, off.height);
-      applyArmourTint(id.data, tint);
-      ctx.putImageData(id, 0, 0);
-      tintedRef.current = off;
-      setReady(true);
-    };
+    img.onload  = () => { if (!cancelled) { imgRef.current = img; setLoaded(true); } };
     img.onerror = () => {};
     img.src = src;
-    return () => { cancelled = true; setReady(false); };
-  }, [src, tint]);
+    return () => { cancelled = true; setLoaded(false); };
+  }, [src]);
 
-  // Animation loop — reads from the pre-tinted offscreen canvas, no
-  // getImageData needed on every frame.
   useEffect(() => {
-    if (!ready) return;
+    if (!loaded) return;
     const canvas = canvasRef.current;
-    const off    = tintedRef.current;
-    if (!canvas || !off) return;
+    const img    = imgRef.current;
+    if (!canvas || !img) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -95,14 +88,14 @@ export default function PixelBoss({
 
       ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
       const destX = (DISPLAY_FRAME - ph.frameW) / 2;
-      ctx.drawImage(off, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
+      ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
       rafRef.current = requestAnimationFrame(tick);
     };
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [ready]);
+  }, [loaded]);
 
   const scale = displaySize / DISPLAY_FRAME;
 
@@ -121,9 +114,10 @@ export default function PixelBoss({
           imageRendering: "pixelated",
           transform: `scale(${scale})`,
           transformOrigin: "top left",
+          filter,
         }}
       />
-      {!ready && (
+      {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center font-display text-[9px] uppercase tracking-widest text-muted">
           Summoning…
         </div>

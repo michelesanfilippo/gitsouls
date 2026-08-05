@@ -8,11 +8,10 @@ import { resolveDuel, skillPower } from "@/lib/lore/duel";
 import StatHexagon from "./StatHexagon";
 import DuelShare from "./DuelShare";
 import LanguageIcon from "./LanguageIcon";
-import PixelDuelist from "./PixelDuelist";
 import PixelBossBox from "./PixelBossBox";
 
 /** ms between each stat row being revealed */
-const STEP_MS = 460;
+const STEP_MS = 750;
 
 function toSide(p: BossProfile) {
   return {
