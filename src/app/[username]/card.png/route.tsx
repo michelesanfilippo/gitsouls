@@ -72,7 +72,7 @@ export async function GET(
   const gender    = detectGender(profile.bio, profile.name, profile.pronouns);
   const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
-  const SPRITE_DISPLAY = 210; // upscaled sprite size in the card
+  const SPRITE_DISPLAY = 170; // upscaled sprite size in the card
 
   const [avatar, langIcon, { fonts, fontFamily }, spriteDataUri, paperDataUri] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
@@ -168,7 +168,7 @@ export async function GET(
           {/* Sprite — centred, pinned to bottom */}
           {spriteDataUri && (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, left:"62%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
+            <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, right:"60px", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
           )}
         </div>
 
