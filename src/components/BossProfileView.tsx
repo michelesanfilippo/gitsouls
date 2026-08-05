@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";

@@ -150,15 +150,16 @@ function Fighter({
         )}
       </div>
 
-      {/* Pixel art box — identical to the profile page, smaller on duel */}
-      <div className="mt-4 w-full">
+      {/* Pixel art box — same style as profile, narrower on duel */}
+      <div className="mt-4 w-full max-w-[260px]">
         <PixelBossBox
           bio={profile.bio}
           className={profile.bossClass.name}
           rankName={profile.rank.name}
           mode={defeated ? "duel-death" : "duel-idle"}
-          displaySize={72}
-          minHeight={110}
+          displaySize={96}
+          minHeight={140}
+          spriteRight="right-1/4"
         />
       </div>
 

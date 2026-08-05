@@ -11,27 +11,25 @@ interface PixelBossBoxProps {
   /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death anim */
   mode?: "profile" | "duel-idle" | "duel-death";
   displaySize?: number;
-  /** override the box minimum height (default 170px) */
+  /** box minimum height in px (default 170) */
   minHeight?: number;
+  /** horizontal position of the sprite anchor, default "right-10" */
+  spriteRight?: string;
 }
 
-/**
- * The pixel art box shown on both the profile page and the duel page.
- * Identical styling: pixel-paper background with dark vignette overlays,
- * sprite anchored bottom-right so it aligns with the bonfire in the scene.
- */
 export default function PixelBossBox({
   bio, className, rankName,
   mode = "profile",
   displaySize,
   minHeight = 170,
+  spriteRight = "right-10",
 }: PixelBossBoxProps) {
   return (
     <div
       className="relative w-full overflow-hidden rounded-2xl border border-gold/15"
       style={{ minHeight: `${minHeight}px` }}
     >
-      {/* Pixel-paper background scene */}
+      {/* Pixel-paper background */}
       <div
         className="absolute inset-0"
         style={{
@@ -40,13 +38,12 @@ export default function PixelBossBox({
           backgroundPosition: "center bottom",
         }}
       />
-      {/* Top/bottom dark vignette */}
+      {/* Vignettes */}
       <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/30 to-transparent" />
-      {/* Left-side fade */}
       <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/20" />
 
-      {/* Sprite — bottom-right, aligned with the bonfire */}
-      <div className="absolute bottom-0 right-10 pb-1">
+      {/* Sprite anchor */}
+      <div className={`absolute bottom-0 pb-1 ${spriteRight}`}>
         {mode === "profile" ? (
           <PixelBoss
             bio={bio}
