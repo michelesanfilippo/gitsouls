@@ -39,17 +39,12 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
               value={stats[k]}
             />
           ))}
-          {/* Share + duel + pixel boss: visible only on md+ */}
+          {/* Share + duel + where you rank: visible only on md+ */}
           <div className="hidden md:flex md:flex-col md:gap-6">
             <ShareBox login={profile.login} name={profile.name ?? profile.login} />
             <DuelBox login={profile.login} />
-            <div className="glass-soft flex items-center justify-center rounded-2xl p-4">
-              <PixelBoss
-                bio={profile.bio}
-                className={profile.bossClass.name}
-                rankName={profile.rank.name}
-                displaySize={192}
-              />
+            <div className="w-full max-w-[22rem]">
+              <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
             </div>
           </div>
         </div>
@@ -156,8 +151,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             </span>
           </div>
 
-          <div className="mt-5 w-full max-w-[22rem]">
-            <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
+          {/* Pixel boss sprite — below facts, inside the central column */}
+          <div className="glass-soft mt-5 flex items-center justify-center rounded-2xl p-4">
+            <PixelBoss
+              bio={profile.bio}
+              className={profile.bossClass.name}
+              rankName={profile.rank.name}
+              displaySize={112}
+            />
           </div>
         </div>
 
@@ -175,18 +176,11 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
           <SkillsBox skills={profile.skills} />
         </div>
 
-        {/* Mobile-only: share + duel + pixel boss below skills. */}
+        {/* Mobile-only: share + duel + where you rank below skills. */}
         <div className="order-4 flex w-full flex-col gap-6 md:hidden">
           <ShareBox login={profile.login} name={profile.name ?? profile.login} />
           <DuelBox login={profile.login} />
-          <div className="glass-soft flex items-center justify-center rounded-2xl p-4">
-            <PixelBoss
-              bio={profile.bio}
-              className={profile.bossClass.name}
-              rankName={profile.rank.name}
-              displaySize={160}
-            />
-          </div>
+          <PercentileBox rankInfo={profile.rankInfo} color={rank.color} />
         </div>
       </div>
 

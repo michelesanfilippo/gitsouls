@@ -1,76 +1,59 @@
 import type { ClassName, RankName } from "./scoring/types";
 
-/**
- * LPC spritesheet layout.
- *
- * Every row group is 4 consecutive rows (one per direction: N W S E).
- * We always render the South-facing direction (row offset +2) for the
- * profile display. Frame size is 64x64 px throughout.
- */
 export const FRAME_SIZE = 64;
 
-export type AnimName =
-  | "spellcast"   // 7 frames
-  | "thrust"      // 8 frames
-  | "walk"        // 9 frames
-  | "slash"       // 6 frames
-  | "shoot"       // 13 frames
-  | "hurt"        // 6 frames
-  | "idle";       // synthesised — first frame of walk
+/**
+ * LPC direction offsets within each 4-row group.
+ * Standard order: 0=North(back) 1=West(left) 2=South(front) 3=East(right)
+ */
+export type Dir = 0 | 1 | 2 | 3;
+export const DIR: Record<"S" | "E" | "N" | "W", Dir> = {
+  S: 2, // South / front-facing (default)
+  E: 3,
+  N: 0,
+  W: 1,
+};
+/** Click cycles through these directions in order. */
+export const DIR_CYCLE: Dir[] = [2, 3, 0, 1]; // S → E → N → W → S
 
 /**
- * Row groups in the LPC standard sheet (zero-indexed, each group = 4 rows).
- * Confirmed from the spritesheet inspection above.
+ * One phase in the auto-play story sequence.
+ * rowGroup is the first of the 4 direction rows (+ Dir offset = actual row).
  */
-const ROW_GROUPS: Record<AnimName, number> = {
-  spellcast: 0,   // rows 0-3
-  thrust:    4,   // rows 4-7  (mapped to what we see, may vary by export)
-  walk:      8,   // rows 8-11
-  slash:     12,  // rows 12-15
-  shoot:     16,  // rows 16-19
-  hurt:      20,  // rows 20-23
-  idle:      8,   // same group as walk, frame 0 only
-};
-
-/**
- * Frame counts per animation (LPC defaults — confirmed for sword sheet).
- */
-export const FRAME_COUNT: Record<AnimName, number> = {
-  spellcast: 7,
-  thrust:    8,
-  walk:      9,
-  slash:     6,
-  shoot:     13,
-  hurt:      6,
-  idle:      1,
-};
-
-/** Frame-per-second for each animation. */
-export const ANIM_FPS: Record<AnimName, number> = {
-  spellcast: 9,
-  thrust:    9,
-  walk:      9,
-  slash:     9,
-  shoot:     9,
-  hurt:      6,
-  idle:      1,
-};
-
-/** South-facing direction is offset +2 within each group. */
-const SOUTH_OFFSET = 2;
-
-/** Pixel Y of the first south-facing frame for an animation. */
-export function animRowY(anim: AnimName): number {
-  return (ROW_GROUPS[anim] + SOUTH_OFFSET) * FRAME_SIZE;
+export interface AnimPhase {
+  rowGroup: number;
+  frameCount: number;
+  fps: number;
+  /** how many full loops of frameCount before advancing to the next phase */
+  repeats: number;
+  /** play frames in reverse (e.g. stand-up = sit-down reversed) */
+  backward?: boolean;
 }
+
+/**
+ * The automatic sequence played on loop:
+ *   sitting → stand up → walk → attack × 2 → walk → sit down → …
+ *
+ * Row groups confirmed from spritesheet inspection:
+ *   8  = walk         (9 frames)
+ *   12 = slash        (6 frames, sword trail)
+ *   32 = sit-down     (3 frames)
+ *   36 = sit-idle     (3 frames)
+ *
+ * All other groups visible in the sheet (spellcast/thrust/shoot/hurt) are
+ * available for future use but are not in the default sequence.
+ */
+export const STORY_SEQUENCE: AnimPhase[] = [
+  { rowGroup: 36, frameCount: 3, fps: 2,  repeats: 3 },                    // sit idle (hold)
+  { rowGroup: 32, frameCount: 3, fps: 8,  repeats: 1, backward: true },    // stand up (sit reversed)
+  { rowGroup:  8, frameCount: 9, fps: 9,  repeats: 2 },                    // walk
+  { rowGroup: 12, frameCount: 6, fps: 9,  repeats: 2 },                    // slash attack ×2
+  { rowGroup:  8, frameCount: 9, fps: 9,  repeats: 2 },                    // walk back
+  { rowGroup: 32, frameCount: 3, fps: 8,  repeats: 1 },                    // sit down
+];
 
 // ── Sprite file mapping ──────────────────────────────────────────────────────
 
-/**
- * Map class name to spritesheet filename stem.
- * Note: the female Blade Dancer sheet has the suffix "-character" in its name;
- * both male and female are normalised through `spritesheetPath` below.
- */
 const CLASS_STEM: Record<ClassName, { male: string; female: string }> = {
   Sorcerer:       { male: "sorcerer",          female: "sorcerer" },
   Saint:          { male: "saint",              female: "saint" },
@@ -86,28 +69,18 @@ export function spritesheetPath(cls: ClassName, gender: "male" | "female"): stri
 }
 
 /**
- * Derive gender from the GitHub bio.
- * Looks for "she/her" or "he/him" (case-insensitive). Falls back to "male".
+ * Detect gender from the GitHub bio.
+ * "she/her" → female; everything else (including absent bio) → male.
  */
 export function detectGender(bio: string | null): "male" | "female" {
   if (!bio) return "male";
   const b = bio.toLowerCase();
   if (b.includes("she/her") || b.includes("she / her")) return "female";
-  if (b.includes("he/him") || b.includes("he / him")) return "male";
   return "male";
 }
 
 // ── Rank colour filters ───────────────────────────────────────────────────────
 
-/**
- * CSS filter chain applied to the entire canvas element.
- * Starts from the silver/grey base sprite from LPC and shifts hue/saturation
- * to match the boss rank colour palette already used on the profile border.
- *
- * All are calibrated so the skin tones stay roughly intact while metal and
- * cloth change significantly. The orange trim visible in the sprite is
- * intentionally kept — it reads as ember/magical energy at higher ranks.
- */
 export const RANK_FILTER: Record<RankName, string> = {
   "Hollow":          "grayscale(1) brightness(0.65)",
   "Undead":          "grayscale(0.6) sepia(0.3) brightness(0.75)",
@@ -117,30 +90,11 @@ export const RANK_FILTER: Record<RankName, string> = {
   "Soul of Cinder":  "sepia(1) saturate(8) hue-rotate(330deg) brightness(1.2)",
 };
 
-/**
- * Glow color behind the sprite, matching the rank palette.
- * Kept as rgba so it can be used in box-shadow / radial-gradient.
- */
 export const RANK_GLOW_COLOR: Record<RankName, string> = {
-  "Hollow":          "rgba(100,100,110,0.4)",
-  "Undead":          "rgba(80,100,80,0.45)",
-  "Knight":          "rgba(59,130,246,0.45)",
-  "Abyss Walker":    "rgba(168,85,247,0.5)",
-  "Lord":            "rgba(212,175,55,0.55)",
-  "Soul of Cinder":  "rgba(220,38,38,0.6)",
-};
-
-// ── Idle sequence per class ───────────────────────────────────────────────────
-
-/**
- * Which animation plays by default on the profile card.
- * Aggressive classes show a quick slash; casters show spellcast; others walk.
- */
-export const DEFAULT_ANIM: Record<ClassName, AnimName> = {
-  Sorcerer:       "spellcast",
-  Saint:          "spellcast",
-  "Blade Dancer": "slash",
-  Vanguard:       "thrust",
-  Juggernaut:     "slash",
-  Soulkeeper:     "slash",
+  "Hollow":          "rgba(100,100,110,0.35)",
+  "Undead":          "rgba(80,100,80,0.40)",
+  "Knight":          "rgba(59,130,246,0.40)",
+  "Abyss Walker":    "rgba(168,85,247,0.45)",
+  "Lord":            "rgba(212,175,55,0.50)",
+  "Soul of Cinder":  "rgba(220,38,38,0.55)",
 };
