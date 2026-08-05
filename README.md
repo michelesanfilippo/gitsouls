@@ -1,10 +1,12 @@
 <h1 align="center"><a href="https://gitsouls.com">GitSouls</a></h1>
 
+> Turn your profile into a Souls-like boss.
+
 <p align="center">
   <img src="public/img/octoSouls-nobg.png" width="200px" alt="OctoSouls" />
-  <br/>
-  <em>Summon your pixel-ego</em>
 </p>
+
+> Summon your pixel-ego
 
 <p align="center">
   <img src="public/sprites/readme/sorcerer_m.gif"    width="80" title="Sorcerer" alt="Sorcerer" />

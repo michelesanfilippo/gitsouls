@@ -62,13 +62,36 @@ function applyArmourTint(rgba, tint, satThreshold = 0.22, strength = 0.72) {
   }
 }
 
+// GitHub README dark mode background — use this as the GIF background so
+// sprites appear to float without a box in dark mode. Light mode users see
+// a dark rectangle, which is acceptable for pixel art.
+const GH_BG = { r: 13, g: 17, b: 23 }; // #0d1117
+
 async function extractFrame(sheetBuf, frameIdx) {
+  // Flatten onto the GitHub dark background so transparent pixels become
+  // #0d1117 instead of black. GIF colour-key transparency would require an
+  // exact match, and LPC sprites have many semi-transparent anti-aliased
+  // pixels that would leave fringe artefacts — a solid BG avoids all that.
   return sharp(sheetBuf)
     .extract({ left: frameIdx * FRAME_SIZE, top: WALK_PY, width: FRAME_SIZE, height: FRAME_SIZE })
     .resize(OUT_SIZE, OUT_SIZE, { kernel: "nearest" })
-    .ensureAlpha()
+    .flatten({ background: GH_BG })
     .raw()
-    .toBuffer();
+    .toBuffer({ resolveWithObject: false });
+  // Note: after flatten the image is RGB (no alpha channel).
+  // gif-encoder-2 needs RGBA, so we re-add the alpha channel below.
+}
+
+/** Convert RGB buffer (no alpha) to RGBA (alpha=255 for all pixels). */
+function rgbToRgba(rgb, pixelCount) {
+  const rgba = Buffer.allocUnsafe(pixelCount * 4);
+  for (let i = 0; i < pixelCount; i++) {
+    rgba[i * 4]     = rgb[i * 3];
+    rgba[i * 4 + 1] = rgb[i * 3 + 1];
+    rgba[i * 4 + 2] = rgb[i * 3 + 2];
+    rgba[i * 4 + 3] = 255;
+  }
+  return rgba;
 }
 
 async function main() {
@@ -87,10 +110,12 @@ async function main() {
 
       // Extract + tint all frames
       const frames = [];
+      const PIXEL_COUNT = OUT_SIZE * OUT_SIZE;
       for (let f = 0; f < FRAMES; f++) {
-        const buf = await extractFrame(sheetBuf, f);
-        applyArmourTint(buf, cls.tint);
-        frames.push(buf);
+        const rgb  = await extractFrame(sheetBuf, f);
+        const rgba = rgbToRgba(rgb, PIXEL_COUNT);
+        applyArmourTint(rgba, cls.tint);
+        frames.push(rgba);
       }
 
       // Build GIF synchronously via gif-encoder-2's internal output buffer

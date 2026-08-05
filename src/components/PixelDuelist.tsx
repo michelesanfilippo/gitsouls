@@ -102,7 +102,7 @@ export default function PixelDuelist({
     const seq = mode === "death" ? DUEL_DEATH_SEQUENCE : DUEL_IDLE_SEQUENCE;
     runSequence(seq, ctx, img, tint, rafRef);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [loaded, mode, overlay]);
+  }, [loaded, mode, tint]);
 
   const scale = displaySize / DISPLAY_FRAME;
 
