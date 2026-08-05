@@ -1,9 +1,37 @@
 <h1 align="center"><a href="https://gitsouls.com">GitSouls</a></h1>
 
-> Turn your profile into a Souls-like boss.
+<p align="center">
+  <img src="public/img/octoSouls-nobg.png" width="200px" alt="OctoSouls" />
+  <br/>
+  <em>Summon your pixel-ego</em>
+</p>
 
 <p align="center">
-  <img src="public/img/octoSouls-nobg.png" width="380px" height="380px" alt="OctoSouls" />
+  <img src="public/sprites/readme/sorcerer_m.gif"    width="80" title="Sorcerer" alt="Sorcerer" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/bladedancer_m.gif" width="80" title="Blade Dancer" alt="Blade Dancer" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/saint_m.gif"       width="80" title="Saint" alt="Saint" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/juggernaut_m.gif"  width="80" title="Juggernaut" alt="Juggernaut" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/vanguard_m.gif"    width="80" title="Vanguard" alt="Vanguard" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/soulkeeper_m.gif"  width="80" title="Soulkeeper" alt="Soulkeeper" />
+</p>
+
+<p align="center">
+  <img src="public/sprites/readme/sorcerer_f.gif"    width="80" title="Sorcerer" alt="Sorcerer" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/bladedancer_f.gif" width="80" title="Blade Dancer" alt="Blade Dancer" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/saint_f.gif"       width="80" title="Saint" alt="Saint" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/juggernaut_f.gif"  width="80" title="Juggernaut" alt="Juggernaut" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/vanguard_f.gif"    width="80" title="Vanguard" alt="Vanguard" />
+  &nbsp;&nbsp;
+  <img src="public/sprites/readme/soulkeeper_f.gif"  width="80" title="Soulkeeper" alt="Soulkeeper" />
 </p>
 
 

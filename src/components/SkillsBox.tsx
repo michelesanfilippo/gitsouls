@@ -2,16 +2,15 @@ import type { Skill } from "@/lib/scoring";
 import Tooltip from "./Tooltip";
 import Icon from "./Icon";
 
-/** Max skills per column before spilling into another one. */
+/** Show at most 8 skills (the most relevant by power), in 2 fixed columns of 4. */
+const MAX_SKILLS = 8;
 const PER_COLUMN = 4;
 
-/** Split into columns of at most PER_COLUMN, so a long list grows sideways. */
 function toColumns(skills: Skill[]): Skill[][] {
-  const columns: Skill[][] = [];
-  for (let i = 0; i < skills.length; i += PER_COLUMN) {
-    columns.push(skills.slice(i, i + PER_COLUMN));
-  }
-  return columns;
+  const top = [...skills].sort((a, b) => b.power - a.power).slice(0, MAX_SKILLS);
+  const cols: Skill[][] = [];
+  for (let i = 0; i < top.length; i += PER_COLUMN) cols.push(top.slice(i, i + PER_COLUMN));
+  return cols;
 }
 
 /** Box listing the boss's unlocked skills, each explaining how it was earned. */

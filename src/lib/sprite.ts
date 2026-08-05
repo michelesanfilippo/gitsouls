@@ -43,14 +43,74 @@ export interface AnimPhase {
  */
 export const STORY_SEQUENCE: AnimPhase[] = [
   // stand up (sit-down reversed)
-  { sy0: 2048, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,   repeats: 1, backward: true },
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1, backward: true },
   // walk with weapon x3
-  { sy0:  640, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,   repeats: 3 },
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6, repeats: 3 },
   // sit down
-  { sy0: 2048, sx0:   0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,   repeats: 1 },
-  // freeze on last sit frame for 5 s (sx0=128 = frame index 2, the fully-seated pose)
-  { sy0: 2048, sx0: 128, frameW: 64, frameH: 64, destY: 33, frameCount: 1, fps: 0.2, repeats: 1 },
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1 },
+  // freeze on frame 0 of sit (first/most-upright seated pose) for 3 s
+  // 1 frame × fps 0.333 → advance after 3000 ms
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 1, fps: 0.333, repeats: 1 },
 ];
+
+/**
+ * Duel idle sequence: row 12 (0-indexed, py=768), 64×64, 6 frames.
+ * Personaggio in posa con arma. Content y=14-63 → destY=32.
+ */
+export const DUEL_IDLE_SEQUENCE: AnimPhase[] = [
+  { sy0: 768, sx0: 0, frameW: 64, frameH: 64, destY: 32, frameCount: 6, fps: 7, repeats: 9999 },
+];
+
+/**
+ * Death sequence: play row 20 (64px, 6 frames, hurt/die) then freeze on last frame.
+ * Content y=13-63 → destY = 96 - 1 - 63 = 32.
+ */
+export const DUEL_DEATH_SEQUENCE: AnimPhase[] = [
+  { sy0: 1280, sx0: 0, frameW: 64, frameH: 64, destY: 32, frameCount: 6, fps: 6, repeats: 1 },
+  // Freeze on last frame (sx0 = 5*64 = 320)
+  { sy0: 1280, sx0: 320, frameW: 64, frameH: 64, destY: 32, frameCount: 1, fps: 0.001, repeats: 1 },
+];
+
+/**
+ * Apply rank tint selectively on metal/armour pixels only.
+ *
+ * Works on a raw RGBA Uint8ClampedArray (from ctx.getImageData) or a plain
+ * Buffer with the same layout. Pixels are tinted only when their saturation
+ * is below `satThreshold` (0-1) — grey metals pass, warm skin tones don't.
+ *
+ * Algorithm per qualifying pixel:
+ *   result = lerp(original, tintTarget, strength × (1 - saturation))
+ * Pixels with low saturation (metal) get almost full tint; anything with even
+ * slight colour (skin, hair, accent) is left mostly alone.
+ */
+export function applyArmourTint(
+  data: Uint8ClampedArray | Buffer,
+  tint: [number, number, number],
+  satThreshold = 0.22,
+  strength = 0.72,
+): void {
+  const [tr, tg, tb] = tint;
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3];
+    if (a < 10) continue; // transparent — skip
+
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+
+    // HSL saturation in [0,1]
+    const max = Math.max(r, g, b) / 255;
+    const min = Math.min(r, g, b) / 255;
+    const sat = max === 0 ? 0 : (max - min) / max;
+
+    if (sat >= satThreshold) continue; // coloured pixel — leave untouched
+
+    // Blend amount: stronger for near-grey, softer as saturation approaches threshold
+    const t = strength * (1 - sat / satThreshold);
+
+    data[i]     = Math.round(r + (tr - r) * t);
+    data[i + 1] = Math.round(g + (tg - g) * t);
+    data[i + 2] = Math.round(b + (tb - b) * t);
+  }
+}
 
 /** Canonical display size for rendering — the canvas clips to this. */
 export const DISPLAY_FRAME = 96; // all phases render into a 96×96 canvas
@@ -73,24 +133,58 @@ export function spritesheetPath(cls: ClassName, gender: "male" | "female"): stri
 
 /**
  * Detect gender from the GitHub bio.
- * "she/her" → female; everything else (including absent bio) → male.
+ * Looks for common "she/her" patterns (with or without spaces, with emoji
+ * separators, or standalone). Falls back to "male" when absent or unclear.
+ *
+ * Note: GitHub added a dedicated pronouns field in the UI but does NOT expose
+ * it in the public REST API — bio is the only text field available here.
  */
 export function detectGender(bio: string | null): "male" | "female" {
   if (!bio) return "male";
-  const b = bio.toLowerCase();
-  if (b.includes("she/her") || b.includes("she / her")) return "female";
+  const b = bio.toLowerCase().replace(/[|·•–—]/g, "/");
+  // Match "she/her", "she / her", "she|her", "she·her", or just "she/her" anywhere
+  if (/\bshe\s*\/\s*her\b/.test(b)) return "female";
+  if (/\bshe\/her\b/.test(b)) return "female";
   return "male";
 }
 
 // ── Rank colour filters ───────────────────────────────────────────────────────
 
+/**
+ * Target RGB for the rank's armour tint.
+ * Applied only to low-saturation (metallic/grey) pixels so skin tones,
+ * hair and warm-coloured details stay unchanged.
+ */
+export const RANK_TINT_RGB: Record<RankName, [number, number, number]> = {
+  "Hollow":         [100, 100, 115],
+  "Undead":         [ 80, 110,  80],
+  "Knight":         [ 60, 100, 210],
+  "Abyss Walker":   [130,  50, 230],
+  "Lord":           [200, 165,  30],
+  "Soul of Cinder": [220,  55,  20],
+};
+
+/**
+ * Kept for compatibility — no longer drives the per-pixel tint,
+ * only used for the ambient glow behind the sprite.
+ */
 export const RANK_FILTER: Record<RankName, string> = {
-  "Hollow":          "grayscale(1) brightness(0.65)",
-  "Undead":          "grayscale(0.6) sepia(0.3) brightness(0.75)",
-  "Knight":          "sepia(0.2) saturate(3) hue-rotate(190deg) brightness(0.95)",
-  "Abyss Walker":    "sepia(0.3) saturate(4) hue-rotate(255deg) brightness(0.9)",
-  "Lord":            "sepia(0.8) saturate(5) brightness(1.1)",
-  "Soul of Cinder":  "sepia(1) saturate(8) hue-rotate(330deg) brightness(1.2)",
+  "Hollow":         "none",
+  "Undead":         "none",
+  "Knight":         "none",
+  "Abyss Walker":   "none",
+  "Lord":           "none",
+  "Soul of Cinder": "none",
+};
+
+// RANK_OVERLAY kept for back-compat, not used by the new renderer
+export const RANK_OVERLAY: Record<RankName, string> = {
+  "Hollow":         "rgba(0,0,0,0)",
+  "Undead":         "rgba(0,0,0,0)",
+  "Knight":         "rgba(0,0,0,0)",
+  "Abyss Walker":   "rgba(0,0,0,0)",
+  "Lord":           "rgba(0,0,0,0)",
+  "Soul of Cinder": "rgba(0,0,0,0)",
 };
 
 export const RANK_GLOW_COLOR: Record<RankName, string> = {

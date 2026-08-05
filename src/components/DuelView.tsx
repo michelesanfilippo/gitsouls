@@ -8,6 +8,7 @@ import { resolveDuel, skillPower } from "@/lib/lore/duel";
 import StatHexagon from "./StatHexagon";
 import DuelShare from "./DuelShare";
 import LanguageIcon from "./LanguageIcon";
+import PixelDuelist from "./PixelDuelist";
 
 /** ms between each stat row being revealed */
 const STEP_MS = 460;
@@ -146,6 +147,17 @@ function Fighter({
         {profile.topLanguage && (
           <LanguageIcon language={profile.topLanguage} color={rank.color} />
         )}
+      </div>
+
+      {/* Pixel duelist — idle when alive, death animation when defeated */}
+      <div className="mt-4 glass-soft rounded-2xl p-3">
+        <PixelDuelist
+          bio={profile.bio}
+          className={profile.bossClass.name}
+          rankName={profile.rank.name}
+          mode={defeated ? "death" : "idle"}
+          displaySize={88}
+        />
       </div>
 
       {outcome === "won" && (

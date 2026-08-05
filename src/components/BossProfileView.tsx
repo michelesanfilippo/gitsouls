@@ -168,13 +168,13 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             {/* Side fades */}
             <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/20" />
 
-            {/* Sprite pinned to bottom-right, aligned with the bonfire */}
-            <div className="absolute bottom-0 right-8 pb-1">
+            {/* Sprite pinned: slightly up from bottom, a bit left of right edge */}
+            <div className="absolute bottom-2 right-10 pb-1">
               <PixelBoss
                 bio={profile.bio}
                 className={profile.bossClass.name}
                 rankName={profile.rank.name}
-                displaySize={106}
+                displaySize={118}
               />
             </div>
           </div>

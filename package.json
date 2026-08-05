@@ -20,10 +20,16 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "canvas": "^3.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "gif-encoder-2": "^1.0.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "gif-encoder-2@1.0.5": true
   }
 }

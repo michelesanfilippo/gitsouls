@@ -5,7 +5,8 @@ import type { ClassName, RankName } from "@/lib/scoring/types";
 import {
   DISPLAY_FRAME, STORY_SEQUENCE,
   spritesheetPath, detectGender,
-  RANK_FILTER, RANK_GLOW_COLOR,
+  RANK_TINT_RGB, RANK_GLOW_COLOR,
+  applyArmourTint,
 } from "@/lib/sprite";
 
 interface PixelBossProps {
@@ -20,7 +21,7 @@ interface PixelBossProps {
 }
 
 export default function PixelBoss({
-  bio, className, rankName, displaySize = 106,
+  bio, className, rankName, displaySize = 118,
 }: PixelBossProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef    = useRef<HTMLImageElement | null>(null);
@@ -29,7 +30,7 @@ export default function PixelBoss({
 
   const gender = detectGender(bio);
   const src    = spritesheetPath(className, gender);
-  const filter = RANK_FILTER[rankName];
+  const tint   = RANK_TINT_RGB[rankName];
   const glow   = RANK_GLOW_COLOR[rankName];
 
   const [loaded, setLoaded] = useState(false);
@@ -76,11 +77,13 @@ export default function PixelBoss({
       const sy = ph.sy0;
 
       ctx.clearRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
-
-      // destY bottom-aligns the character in the canvas so feet stay at the
-      // same pixel regardless of whether the frame is 64px or 96px.
-      const destX = (DISPLAY_FRAME - ph.frameW) / 2; // always centre horizontally
+      const destX = (DISPLAY_FRAME - ph.frameW) / 2;
       ctx.drawImage(img, sx, sy, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
+
+      // Selective armour tint — only low-saturation (metal) pixels are shifted.
+      const id = ctx.getImageData(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
+      applyArmourTint(id.data, tint);
+      ctx.putImageData(id, 0, 0);
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -109,7 +112,6 @@ export default function PixelBoss({
           imageRendering: "pixelated",
           transform: `scale(${scale})`,
           transformOrigin: "top left",
-          filter,
         }}
       />
       {!loaded && (
