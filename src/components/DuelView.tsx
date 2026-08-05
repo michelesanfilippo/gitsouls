@@ -159,7 +159,7 @@ function Fighter({
           mode={defeated ? "duel-death" : "duel-idle"}
           displaySize={96}
           minHeight={140}
-          spriteRight="right-1/4"
+          spriteRight="right-[18%]"
         />
       </div>
 

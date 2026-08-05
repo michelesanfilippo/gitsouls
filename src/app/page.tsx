@@ -25,13 +25,13 @@ export default function Home() {
           />
         </div>
 
-        {/* Bow — above the sword, a bit further right */}
-        <div className="absolute right-[1%] top-[26%] hidden -translate-y-1/2 lg:block xl:right-[7%]">
+        {/* Bow — below the status line */}
+        <div className="absolute right-[1%] top-[64%] hidden -translate-y-1/2 lg:block xl:right-[7%]">
           <WeaponDecoration
             weapon="bow"
             src="/img/bow.png"
             intrinsic={400}
-            sizeClass="w-24 sm:w-32"
+            sizeClass="w-16 sm:w-20"
             animClass="animate-bow"
             auraColor="rgba(59,130,246,0.20)"
             auraHover="rgba(59,130,246,0.55)"
@@ -42,18 +42,18 @@ export default function Home() {
           />
         </div>
 
-        {/* Sword — centre-right */}
-        <div className="absolute right-[7%] top-[50%] hidden -translate-y-1/2 lg:block xl:right-[13%]">
+        {/* Sword */}
+        <div className="absolute right-[7%] top-[78%] hidden -translate-y-1/2 lg:block xl:right-[13%]">
           <SwordCursor />
         </div>
 
-        {/* Magic wand — below the sword, slightly further right */}
-        <div className="absolute right-[0%] top-[72%] hidden -translate-y-1/2 lg:block xl:right-[6%]">
+        {/* Magic wand */}
+        <div className="absolute right-[0%] top-[90%] hidden -translate-y-1/2 lg:block xl:right-[6%]">
           <WeaponDecoration
             weapon="wand"
             src="/img/wand.png"
             intrinsic={256}
-            sizeClass="w-24 sm:w-32"
+            sizeClass="w-16 sm:w-20"
             animClass="animate-wand"
             auraColor="rgba(34,197,94,0.20)"
             auraHover="rgba(34,197,94,0.55)"

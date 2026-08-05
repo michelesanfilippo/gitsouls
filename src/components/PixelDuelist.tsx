@@ -95,7 +95,7 @@ export default function PixelDuelist({
     const canvas = canvasRef.current;
     const img    = imgRef.current;
     if (!canvas || !img) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
     cancelAnimationFrame(rafRef.current);
