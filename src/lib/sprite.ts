@@ -42,16 +42,14 @@ export interface AnimPhase {
  *   96px frames (attack):   maxY = 32 → destY = 96 - 1 - 32 = 63
  */
 export const STORY_SEQUENCE: AnimPhase[] = [
-  // stand up (sit-down reversed) — start sequence here, no idle loop
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,  repeats: 1, backward: true },
-  // walk with weapon (slow)
-  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,  repeats: 2 },
-  // sword attack (South, 96×96)
-  { sy0: 3648, sx0: 0, frameW: 96, frameH: 96, destY: 63, frameCount: 8, fps: 7,  repeats: 1 },
-  // walk back (slow)
-  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6,  repeats: 2 },
+  // stand up (sit-down reversed)
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1, backward: true },
+  // walk with weapon x3
+  { sy0:  640, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 9, fps: 6, repeats: 3 },
   // sit down
-  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5,  repeats: 1 },
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 5, repeats: 1 },
+  // sit idle 5 s — at 2 fps, 10 frames ≈ 5 s of the 3-frame sit loop
+  { sy0: 2048, sx0: 0, frameW: 64, frameH: 64, destY: 33, frameCount: 3, fps: 2, repeats: 4 },
 ];
 
 /** Canonical display size for rendering — the canvas clips to this. */
