@@ -363,14 +363,14 @@ body {
 
 /* Ring glows — box-shadow pulsing, no filter */
 @keyframes fxRingPulse {
-  0%, 100% { box-shadow: 0 0 0 2px var(--fx-color, transparent); }
-  50%       { box-shadow: 0 0 0 6px var(--fx-color, transparent),
-                          0 0 20px 4px var(--fx-color, transparent); }
+  0%, 100% { box-shadow: 0 0 0 1px var(--fx-color, transparent); }
+  50%       { box-shadow: 0 0 0 4px var(--fx-color, transparent),
+                          0 0 12px 2px var(--fx-color, transparent); }
 }
-.fx-ring-knight  { --fx-color: rgba(80,140,255,0.55);  animation: fxRingPulse 1.4s ease-in-out infinite; }
-.fx-ring-abyss   { --fx-color: rgba(190,60,255,0.60);  animation: fxRingPulse 1.2s ease-in-out infinite; }
-.fx-ring-lord    { --fx-color: rgba(220,180,20,0.65);  animation: fxRingPulse 1.5s ease-in-out infinite; }
-.fx-ring-cinder  { --fx-color: rgba(255,80,10,0.70);   animation: fxRingPulse 0.8s ease-in-out infinite; }
+.fx-ring-knight  { --fx-color: rgba(80,140,255,0.12);  animation: fxRingPulse 1.4s ease-in-out infinite; }
+.fx-ring-abyss   { --fx-color: rgba(190,60,255,0.13);  animation: fxRingPulse 1.2s ease-in-out infinite; }
+.fx-ring-lord    { --fx-color: rgba(220,180,20,0.14);  animation: fxRingPulse 1.5s ease-in-out infinite; }
+.fx-ring-cinder  { --fx-color: rgba(255,80,10,0.15);   animation: fxRingPulse 0.8s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-ember,

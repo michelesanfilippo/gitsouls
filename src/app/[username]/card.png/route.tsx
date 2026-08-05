@@ -151,7 +151,7 @@ export async function GET(
           position: "relative",
           marginTop: "32px",
           width: "920px",
-          height: "360px",
+          height: "420px",
           borderRadius: "20px",
           border: "2px solid rgba(212,175,55,0.18)",
           overflow: "hidden",
@@ -168,7 +168,7 @@ export async function GET(
           {/* Sprite — centred, pinned to bottom */}
           {spriteDataUri && (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
+            <img src={spriteDataUri} alt="" style={{ position:"absolute", bottom:0, left:"62%", transform:"translateX(-50%)", width:`${SPRITE_DISPLAY}px`, height:`${SPRITE_DISPLAY}px`, imageRendering:"pixelated" }} />
           )}
         </div>
 
