@@ -26,7 +26,7 @@ export default function Home() {
         </div>
 
         {/* Bow — above the sword, a bit further right */}
-        <div className="absolute right-[3%] top-[36%] hidden -translate-y-1/2 lg:block xl:right-[9%]">
+        <div className="absolute right-[1%] top-[26%] hidden -translate-y-1/2 lg:block xl:right-[7%]">
           <WeaponDecoration
             weapon="bow"
             src="/img/bow.png"
@@ -43,12 +43,12 @@ export default function Home() {
         </div>
 
         {/* Sword — centre-right */}
-        <div className="absolute right-[6%] top-[60%] hidden -translate-y-1/2 lg:block xl:right-[12%]">
+        <div className="absolute right-[7%] top-[50%] hidden -translate-y-1/2 lg:block xl:right-[13%]">
           <SwordCursor />
         </div>
 
         {/* Magic wand — below the sword, slightly further right */}
-        <div className="absolute right-[2%] top-[82%] hidden -translate-y-1/2 lg:block xl:right-[8%]">
+        <div className="absolute right-[0%] top-[72%] hidden -translate-y-1/2 lg:block xl:right-[6%]">
           <WeaponDecoration
             weapon="wand"
             src="/img/wand.png"
