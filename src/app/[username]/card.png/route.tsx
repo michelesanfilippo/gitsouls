@@ -145,25 +145,24 @@ export async function GET(
           ) : null}
         </div>
 
-        {/* Pixel art box between class and stats — pure JSX, no sharp compositing */}
+        {/* Pixel art box — paper bg + sprite, built as satori JSX */}
         <div style={{
           display: "flex",
           marginTop: "32px",
-          width: "100%",
+          width: "920px",
           height: "280px",
           borderRadius: "20px",
           border: "2px solid rgba(212,175,55,0.18)",
           overflow: "hidden",
-          position: "relative",
-          backgroundImage: paperDataUri ? `url(${paperDataUri})` : "none",
+          backgroundImage: paperDataUri ? `url(${paperDataUri})` : undefined,
           backgroundSize: "cover",
           backgroundPosition: "center bottom",
-          backgroundColor: "#0b0710",
+          backgroundColor: "#110a1a",
+          alignItems: "flex-end",
+          justifyContent: "flex-end",
+          paddingRight: "40px",
+          paddingBottom: "0px",
         }}>
-          {/* Vignette overlays */}
-          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to bottom, rgba(11,7,16,0.70) 0%, rgba(11,7,16,0.18) 50%, transparent 100%)" }} />
-          <div style={{ position:"absolute", inset:0, display:"flex", background:"linear-gradient(to right, rgba(11,7,16,0.60) 0%, transparent 45%)" }} />
-          {/* Sprite bottom-right */}
           {spriteDataUri && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -172,9 +171,6 @@ export async function GET(
               width={SPRITE_DISPLAY}
               height={SPRITE_DISPLAY}
               style={{
-                position: "absolute",
-                bottom: 0,
-                right: 60,
                 width: `${SPRITE_DISPLAY}px`,
                 height: `${SPRITE_DISPLAY}px`,
                 imageRendering: "pixelated",

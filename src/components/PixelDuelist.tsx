@@ -63,9 +63,9 @@ function runSequence(
     const destX = (DISPLAY_FRAME - ph.frameW) / 2;
     ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
-    ctx.globalCompositeOperation = "multiply";
+    ctx.globalCompositeOperation = "source-atop";
     ctx.fillStyle = tintColor;
-    ctx.fillRect(destX, ph.destY, ph.frameW, ph.frameH);
+    ctx.fillRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
     ctx.globalCompositeOperation = "source-over";
 
     rafRef.current = requestAnimationFrame(tick);

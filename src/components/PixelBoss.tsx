@@ -92,12 +92,11 @@ export default function PixelBoss({
       const destX = (DISPLAY_FRAME - ph.frameW) / 2;
       ctx.drawImage(img, sx, ph.sy0, ph.frameW, ph.frameH, destX, ph.destY, ph.frameW, ph.frameH);
 
-      // Multiply tint: affects only pixels already drawn (opaque sprite pixels).
-      // Canvas multiply compositing darkens dark pixels (metal) while light
-      // pixels (skin near 255) multiply by ~1 and remain nearly unchanged.
-      ctx.globalCompositeOperation = "multiply";
+      // source-atop: fills only where sprite pixels exist (alpha>0).
+      // Transparent canvas areas are completely unaffected — no rectangle.
+      ctx.globalCompositeOperation = "source-atop";
       ctx.fillStyle = tintColor;
-      ctx.fillRect(destX, ph.destY, ph.frameW, ph.frameH);
+      ctx.fillRect(0, 0, DISPLAY_FRAME, DISPLAY_FRAME);
       ctx.globalCompositeOperation = "source-over";
 
       rafRef.current = requestAnimationFrame(tick);
