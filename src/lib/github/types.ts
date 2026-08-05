@@ -34,4 +34,6 @@ export interface ContributionData {
   pullRequestContributions: number;
   longestStreak: number;
   activeMonths: number;
+  /** The user's self-declared pronouns from their GitHub profile, or null. */
+  pronouns: string | null;
 }

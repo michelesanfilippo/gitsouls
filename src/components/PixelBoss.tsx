@@ -10,6 +10,8 @@ import {
 
 interface PixelBossProps {
   bio: string | null;
+  name?: string | null;
+  pronouns?: string | null;
   className: ClassName;
   rankName: RankName;
   displaySize?: number;
@@ -32,14 +34,14 @@ const RANK_TINT_COLOR: Record<RankName, string> = {
 };
 
 export default function PixelBoss({
-  bio, className, rankName, displaySize = 118,
+  bio, name, pronouns, className, rankName, displaySize = 118,
 }: PixelBossProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef    = useRef<HTMLImageElement | null>(null);
   const rafRef    = useRef<number>(0);
   const stateRef  = useRef({ phaseIdx: 0, frame: 0, repeat: 0, lastTs: 0 });
 
-  const gender = detectGender(bio);
+  const gender = detectGender(bio, name, pronouns);
   const src    = spritesheetPath(className, gender);
   const glow   = RANK_GLOW_COLOR[rankName];
   const tintColor = RANK_TINT_COLOR[rankName];
@@ -115,6 +117,7 @@ export default function PixelBoss({
           transformOrigin: "top left",
           position: "relative",
           display: "inline-block",
+          isolation: "isolate",
         }}
       >
         <canvas

@@ -141,19 +141,37 @@ export function spritesheetPath(cls: ClassName, gender: "male" | "female"): stri
 }
 
 /**
- * Detect gender from the GitHub bio.
- * Looks for common "she/her" patterns (with or without spaces, with emoji
- * separators, or standalone). Falls back to "male" when absent or unclear.
+ * Detect gender from the GitHub bio and/or name.
+ * Searches for "she/her" (and many variant separators) in both fields.
+ * Falls back to "male" when absent or unclear.
  *
- * Note: GitHub added a dedicated pronouns field in the UI but does NOT expose
- * it in the public REST API — bio is the only text field available here.
+ * Note: GitHub added a dedicated pronouns field in the UI but it is NOT
+ * exposed in the public REST API — bio and name are the only text fields.
  */
-export function detectGender(bio: string | null): "male" | "female" {
-  if (!bio) return "male";
-  const b = bio.toLowerCase().replace(/[|·•–—]/g, "/");
-  // Match "she/her", "she / her", "she|her", "she·her", or just "she/her" anywhere
-  if (/\bshe\s*\/\s*her\b/.test(b)) return "female";
-  if (/\bshe\/her\b/.test(b)) return "female";
+/**
+ * Sources checked in order: pronouns field (most reliable, from GraphQL),
+ * bio, display name. Falls back to "male".
+ */
+export function detectGender(
+  bio: string | null,
+  name?: string | null,
+  pronouns?: string | null,
+): "male" | "female" {
+  // GitHub's dedicated pronouns field — exact match is enough
+  if (pronouns) {
+    const p = pronouns.toLowerCase();
+    if (p.includes("she") || p.includes("her")) return "female";
+  }
+
+  const haystack = [bio, name]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .replace(/[\s]*[|·•✨🌸💙⭐🏳️‍🌈,；;–—]+[\s]*/g, "/");
+
+  if (/\bshe\s*[/\\]\s*her\b/.test(haystack)) return "female";
+  if (/she\/her/.test(haystack)) return "female";
+
   return "male";
 }
 

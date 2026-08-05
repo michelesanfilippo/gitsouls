@@ -6,6 +6,8 @@ import PixelDuelist from "./PixelDuelist";
 
 interface PixelBossBoxProps {
   bio: string | null;
+  name?: string | null;
+  pronouns?: string | null;
   className: ClassName;
   rankName: RankName;
   /** "profile" = full sequence; "duel-idle" = walk loop; "duel-death" = death; "duel-victory" = sit+freeze */
@@ -18,7 +20,7 @@ interface PixelBossBoxProps {
 }
 
 export default function PixelBossBox({
-  bio, className, rankName,
+  bio, name, pronouns, className, rankName,
   mode = "profile",
   displaySize,
   minHeight = 170,
@@ -54,6 +56,8 @@ export default function PixelBossBox({
         ) : (
           <PixelDuelist
             bio={bio}
+            name={name}
+            pronouns={pronouns}
             className={className}
             rankName={rankName}
             mode={mode === "duel-death" ? "death" : mode === "duel-victory" ? "victory" : "idle"}

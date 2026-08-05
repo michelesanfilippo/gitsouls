@@ -153,6 +153,8 @@ function Fighter({
       <div className="mt-4 w-full max-w-[260px]">
         <PixelBossBox
           bio={profile.bio}
+          name={profile.name}
+          pronouns={profile.pronouns}
           className={profile.bossClass.name}
           rankName={profile.rank.name}
           mode={

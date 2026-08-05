@@ -169,6 +169,8 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             <div className="absolute bottom-2 right-10 pb-1">
               <PixelBoss
                 bio={profile.bio}
+                name={profile.name}
+                pronouns={profile.pronouns}
                 className={profile.bossClass.name}
                 rankName={profile.rank.name}
                 displaySize={118}

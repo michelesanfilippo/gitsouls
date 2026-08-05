@@ -96,6 +96,7 @@ export async function fetchRepos(username: string): Promise<GitHubRepo[]> {
 const CONTRIBUTIONS_QUERY = `
   query ($login: String!) {
     user(login: $login) {
+      pronouns
       contributionsCollection {
         totalCommitContributions
         totalPullRequestContributions
@@ -148,6 +149,7 @@ export async function fetchContributions(
   const json = (await res.json()) as {
     data?: {
       user?: {
+        pronouns?: string | null;
         contributionsCollection?: {
           totalCommitContributions: number;
           totalPullRequestContributions: number;
@@ -170,5 +172,6 @@ export async function fetchContributions(
     pullRequestContributions: cc.totalPullRequestContributions,
     longestStreak: longestStreak(weeks),
     activeMonths: activeMonths(weeks),
+    pronouns: json.data?.user?.pronouns ?? null,
   };
 }

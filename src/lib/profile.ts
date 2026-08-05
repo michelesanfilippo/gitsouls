@@ -24,6 +24,7 @@ export interface BossProfile {
   avatarUrl: string;
   htmlUrl: string;
   bio: string | null;
+  pronouns: string | null;
   location: string | null;
   company: string | null;
   followers: number;
@@ -111,6 +112,7 @@ export async function getBossProfile(username: string): Promise<BossProfile> {
     avatarUrl: user.avatar_url,
     htmlUrl: user.html_url,
     bio: user.bio,
+    pronouns: contrib?.pronouns ?? null,
     location: user.location,
     company: user.company,
     followers: user.followers,

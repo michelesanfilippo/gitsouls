@@ -130,7 +130,7 @@ export async function GET(
   }
 
   const { rank, bossClass } = profile;
-  const gender    = detectGender(profile.bio);
+  const gender    = detectGender(profile.bio, profile.name, profile.pronouns);
   const sheetPath = spritesheetPath(profile.bossClass.name, gender);
 
   // Sprite box: 920px wide × 340px tall (matches the card width minus padding)

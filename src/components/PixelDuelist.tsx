@@ -11,6 +11,8 @@ import {
 
 interface PixelDuelistProps {
   bio: string | null;
+  name?: string | null;
+  pronouns?: string | null;
   className: ClassName;
   rankName: RankName;
   mode: "idle" | "death" | "victory";
@@ -67,13 +69,13 @@ function runSequence(
 }
 
 export default function PixelDuelist({
-  bio, className, rankName, mode, displaySize = 96,
+  bio, name, pronouns, className, rankName, mode, displaySize = 96,
 }: PixelDuelistProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef    = useRef<HTMLImageElement | null>(null);
   const rafRef    = useRef<number>(0);
 
-  const gender = detectGender(bio);
+  const gender = detectGender(bio, name, pronouns);
   const src    = spritesheetPath(className, gender);
   const glow   = RANK_GLOW_COLOR[rankName];
   const tintColor = RANK_TINT_COLOR[rankName];
@@ -115,7 +117,7 @@ export default function PixelDuelist({
         className="pointer-events-none absolute inset-0 rounded-full blur-xl opacity-35"
         style={{ background: `radial-gradient(circle, ${glow}, transparent 70%)` }}
       />
-      <div style={{ width: DISPLAY_FRAME, height: DISPLAY_FRAME, transform: `scale(${scale})`, transformOrigin: "top left", position: "relative", display: "inline-block" }}>
+      <div style={{ width: DISPLAY_FRAME, height: DISPLAY_FRAME, transform: `scale(${scale})`, transformOrigin: "top left", position: "relative", display: "inline-block", isolation: "isolate" }}>
         <canvas
           ref={canvasRef}
           width={DISPLAY_FRAME}
