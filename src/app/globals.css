@@ -241,6 +241,25 @@ body {
   border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
+/*
+ * Portrait medallion sizing. The two sizes arrive as inline custom properties
+ * because they are per-rank, per-context data and Tailwind cannot compile class
+ * names assembled at runtime. The breakpoint swap has to live here rather than
+ * inline for the same reason — and --medallion itself is only ever set in this
+ * rule, since an inline value would outrank the media query.
+ */
+.medallion {
+  --medallion: var(--m-base);
+  width: var(--medallion);
+  height: var(--medallion);
+}
+
+@media (min-width: 40rem) {
+  .medallion {
+    --medallion: var(--m-sm);
+  }
+}
+
 /* Boss avatar fog: mist breathing over the portrait (opacity only) */
 @keyframes fogDrift {
   0%,

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
@@ -8,6 +7,7 @@ import { resolveDuel, skillPower } from "@/lib/lore/duel";
 import StatHexagon from "./StatHexagon";
 import DuelShare from "./DuelShare";
 import LanguageIcon from "./LanguageIcon";
+import RankAvatar from "./RankAvatar";
 import PixelBossBox from "./PixelBossBox";
 
 /** ms between each stat row being revealed */
@@ -85,41 +85,23 @@ function Fighter({
         {rank.name}
       </span>
 
+      {/* Greyscale stays on the wrapper: it drains the ring art along with the
+          portrait, which is exactly what a fallen boss should look like. */}
       <div
-        className="relative transition-all duration-1000"
+        className="transition-all duration-1000"
         style={{ filter: defeated ? "grayscale(1) brightness(0.5)" : "none" }}
       >
-        <div
-          className="relative overflow-hidden rounded-full"
-          style={{
-            border: `6px solid ${defeated ? "#4b5563" : rank.color}`,
-            boxShadow: defeated
-              ? "inset 0 0 25px rgba(0,0,0,0.8)"
-              : `0 0 80px ${rank.glow}, 0 0 30px ${rank.color}, inset 0 0 25px rgba(0,0,0,0.7)`,
-          }}
-        >
-          <Image
-            src={profile.avatarUrl}
-            alt={`${profile.login} avatar`}
-            width={240}
-            height={240}
-            priority
-            className="h-44 w-44 object-cover sm:h-52 sm:w-52"
-          />
-        </div>
-
-        <span
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border bg-void px-3 py-0.5 font-display text-sm font-bold"
-          style={{
-            borderColor: defeated ? "#4b5563" : rank.color,
-            color: defeated ? "#9ca3af" : rank.color,
-          }}
-        >
-          LV {profile.level}
-        </span>
+        <RankAvatar
+          avatarUrl={profile.avatarUrl}
+          login={profile.login}
+          level={profile.level}
+          rank={rank}
+          variant="duel"
+          defeated={defeated}
+        />
       </div>
 
-      <span className="mt-7 font-display text-2xl font-bold text-parchment sm:text-3xl">
+      <span className="mt-8 font-display text-2xl font-bold text-parchment sm:text-3xl">
         {profile.name ?? profile.login}
       </span>
       <a

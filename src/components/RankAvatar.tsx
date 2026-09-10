@@ -1,14 +1,23 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { Rank } from "@/lib/scoring/types";
-import { RANK_RING } from "@/lib/rank-ring";
+import { MEDALLION_SIZE, RANK_RING, type MedallionVariant } from "@/lib/rank-ring";
+
+/** Colour a defeated fighter is drained to, matching the duel's HP bar. */
+const ASH = "#4b5563";
+const ASH_TEXT = "#9ca3af";
 
 interface RankAvatarProps {
   avatarUrl: string;
   login: string;
   level: number;
   rank: Rank;
+  /** Which size set to use — the duel gives its portraits more room. */
+  variant?: MedallionVariant;
+  /** Duel loser: drained of colour, no glow. */
+  defeated?: boolean;
 }
 
 /**
@@ -27,17 +36,33 @@ export default function RankAvatar({
   login,
   level,
   rank,
+  variant = "profile",
+  defeated = false,
 }: RankAvatarProps) {
   const ring = RANK_RING[rank.name];
+  const size = MEDALLION_SIZE[variant][ring ? "ring" : "portrait"];
+
+  // Both sizes go out as custom properties; globals.css picks between them at
+  // the sm breakpoint. Tailwind can't compile a class name built from data.
+  const box = {
+    "--m-base": `${size.base}px`,
+    "--m-sm": `${size.sm}px`,
+  } as CSSProperties;
+
+  const accent = defeated ? ASH : rank.color;
 
   const badge = (
     <span
       className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2 translate-y-1/2 rounded-full border-2 bg-void/95 px-4 py-1 font-display text-base font-bold tracking-wider sm:text-lg"
       style={{
-        borderColor: rank.color,
-        color: rank.color,
-        boxShadow: `0 0 14px ${rank.color}, 0 0 34px ${rank.glow}`,
-        textShadow: `0 0 10px ${rank.glow}`,
+        borderColor: accent,
+        color: defeated ? ASH_TEXT : rank.color,
+        ...(defeated
+          ? {}
+          : {
+              boxShadow: `0 0 14px ${rank.color}, 0 0 34px ${rank.glow}`,
+              textShadow: `0 0 10px ${rank.glow}`,
+            }),
       }}
     >
       LV {level}
@@ -68,14 +93,20 @@ export default function RankAvatar({
     </>
   );
 
+  const portraitGlow = defeated
+    ? "inset 0 0 25px rgba(0,0,0,0.8)"
+    : `0 0 80px ${rank.glow}, inset 0 0 25px rgba(0,0,0,0.7)`;
+
   if (!ring) {
     return (
-      <div className="relative">
+      <div className="medallion relative" style={box}>
         <div
-          className="relative h-40 w-40 overflow-hidden rounded-full sm:h-44 sm:w-44"
+          className="relative h-full w-full overflow-hidden rounded-full"
           style={{
-            border: `6px solid ${rank.color}`,
-            boxShadow: `0 0 80px ${rank.glow}, 0 0 30px ${rank.color}, inset 0 0 25px rgba(0,0,0,0.7)`,
+            border: `6px solid ${accent}`,
+            boxShadow: defeated
+              ? portraitGlow
+              : `0 0 80px ${rank.glow}, 0 0 30px ${rank.color}, inset 0 0 25px rgba(0,0,0,0.7)`,
           }}
         >
           {portrait}
@@ -85,19 +116,14 @@ export default function RankAvatar({
     );
   }
 
-  // --medallion is the outer box, identical for every ranked ring so the column does
-  // not reflow between a thin band and a fat one; the portrait is what varies.
   return (
-    <div
-      className="relative [--medallion:260px] sm:[--medallion:300px]"
-      style={{ width: "var(--medallion)", height: "var(--medallion)" }}
-    >
+    <div className="medallion relative" style={box}>
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full"
         style={{
           width: `calc(var(--medallion) * ${ring.innerRatio})`,
           height: `calc(var(--medallion) * ${ring.innerRatio})`,
-          boxShadow: `0 0 80px ${rank.glow}, inset 0 0 25px rgba(0,0,0,0.7)`,
+          boxShadow: portraitGlow,
         }}
       >
         {portrait}

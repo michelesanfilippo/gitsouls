@@ -31,12 +31,22 @@ export const RANK_RING: Record<RankName, RankRing | null> = {
 };
 
 /**
- * Outer size of the ring box. Fixed across ranks so the page doesn't reflow
- * between a thin ring and a fat one; the avatar inside is what varies.
+ * Medallion box size, mobile and sm-up.
+ *
+ * `ring` is the outer box for a rank with art — fixed across ranks so a column
+ * does not reflow between a thin band and a fat one; the portrait inside varies
+ * instead. `portrait` is the plain circle Hollow gets, which has no outer art to
+ * reserve space for and so keeps the size it has always had in each context.
  */
-export const RING_SIZE = { base: 260, sm: 300 } as const;
+export const MEDALLION_SIZE = {
+  profile: {
+    ring: { base: 260, sm: 300 },
+    portrait: { base: 160, sm: 176 },
+  },
+  duel: {
+    ring: { base: 260, sm: 300 },
+    portrait: { base: 176, sm: 208 },
+  },
+} as const;
 
-/** Avatar diameter that fills a ring of `ringSize`. */
-export function avatarSize(ring: RankRing, ringSize: number): number {
-  return Math.round(ringSize * ring.innerRatio);
-}
+export type MedallionVariant = keyof typeof MEDALLION_SIZE;
