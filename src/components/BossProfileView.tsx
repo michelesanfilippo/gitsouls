@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { BossProfile } from "@/lib/profile";
 import { STAT_LABELS, type StatKey } from "@/lib/scoring/types";
 import StatBar from "./StatBar";
@@ -9,6 +8,7 @@ import SkillsBox from "./SkillsBox";
 import DuelBox from "./DuelBox";
 import PercentileBox from "./PercentileBox";
 import LanguageIcon from "./LanguageIcon";
+import RankAvatar from "./RankAvatar";
 import PixelBoss from "./PixelBoss";
 import SpriteFX from "./SpriteFX";
 
@@ -62,44 +62,14 @@ export default function BossProfileView({ profile }: { profile: BossProfile }) {
             {rank.name}
           </span>
 
-          <div className="relative">
-            <div
-              className="relative overflow-hidden rounded-full"
-              style={{
-                border: `6px solid ${rank.color}`,
-                boxShadow: `0 0 80px ${rank.glow}, 0 0 30px ${rank.color}, inset 0 0 25px rgba(0,0,0,0.7)`,
-              }}
-            >
-              <Image
-                src={profile.avatarUrl}
-                alt={`${profile.login} avatar`}
-                width={220}
-                height={220}
-                priority
-                className="h-40 w-40 object-cover sm:h-44 sm:w-44"
-              />
-              {/* Fog over the portrait. No mix-blend-mode and no animated
-                  transform: blending forces the portrait beneath to be
-                  re-composited every frame. Opacity alone is free. */}
-              <div
-                className="animate-fog pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(circle at 30% 70%, rgba(216,216,236,0.30), transparent 55%), radial-gradient(circle at 70% 40%, rgba(196,196,220,0.22), transparent 50%)",
-                }}
-              />
-              <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_-30px_50px_rgba(0,0,0,0.75)]" />
-            </div>
+          <RankAvatar
+            avatarUrl={profile.avatarUrl}
+            login={profile.login}
+            level={profile.level}
+            rank={rank}
+          />
 
-            <span
-              className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border bg-void px-3 py-0.5 font-display text-sm font-bold"
-              style={{ borderColor: rank.color, color: rank.color }}
-            >
-              LV {profile.level}
-            </span>
-          </div>
-
-          <h1 className="mt-6 text-center font-display text-2xl font-bold text-parchment sm:text-3xl">
+          <h1 className="mt-8 text-center font-display text-2xl font-bold text-parchment sm:text-3xl">
             {profile.name ?? profile.login}
           </h1>
           <a

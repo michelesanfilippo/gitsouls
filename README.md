@@ -43,11 +43,20 @@ Drop it in your profile README, your portfolio, blog, community.
 
 ```[![My GitSouls card](https://gitsouls.com/YOUR_USERNAME/card.png)](https://gitsouls.com/YOUR_USERNAME)```
 
+Or embed the **animated pixel-ego** — your boss panel, sprite and all, as a single self-contained SVG:
+
+```[![My pixel-ego](https://gitsouls.com/YOUR_USERNAME/pixel.svg)](https://gitsouls.com/YOUR_USERNAME)```
+
 | Resource | Description |
 |---|---|
 | ```gitsouls.com/<username>``` | boss profile |
+| ```gitsouls.com/<username>/pixel.svg``` | embeddable pixel-ego panel, 480×180, animated sprite |
 | ```gitsouls.com/<username>/card.png``` | shareable boss card, 1080×1920 (story format) |
 | ```gitsouls.com/<username>/vs/<opponent>``` | duel between two bosses |
+
+The pixel-ego inlines its own font, background and spritesheet, so it renders the
+same wherever an `<img>` goes — GitHub, GitLab, a blog, a docs site. Nothing is
+fetched at display time. It refreshes about every 30 minutes.
 
 
 ---

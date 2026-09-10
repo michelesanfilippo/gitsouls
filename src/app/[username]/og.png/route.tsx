@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getBossProfile } from "@/lib/profile";
 import { STAT_KEYS } from "@/lib/scoring/types";
-import { fetchImageDataUri, loadFonts, readPublicImage } from "@/lib/og";
+import { fetchImageDataUri, loadFonts, readPublicImage, readRankRing } from "@/lib/og";
 
 export const runtime = "nodejs";
 
@@ -30,9 +30,10 @@ export async function GET(
     profile = null;
   }
 
-  const [avatar, mascot] = await Promise.all([
+  const [avatar, mascot, ring] = await Promise.all([
     profile ? fetchImageDataUri(profile.avatarUrl) : Promise.resolve(null),
     readPublicImage("img/octoSouls-nobg.png"),
+    profile ? readRankRing(profile.rank.name) : Promise.resolve(null),
   ]);
 
   const shell = {
@@ -92,6 +93,12 @@ export async function GET(
 
   const { rank, bossClass } = profile;
 
+  // Same medallion geometry as the site and the story card: fixed outer box,
+  // portrait sized to that ring's hole, Hollow keeping its plain border.
+  const MEDALLION = ring ? 300 : 276;
+  const PORTRAIT  = ring ? Math.round(MEDALLION * ring.innerRatio) : 260;
+  const inset     = Math.round((MEDALLION - PORTRAIT) / 2);
+
   return new ImageResponse(
     (
       <div style={{ ...shell, flexDirection: "column", padding: "56px 64px" }}>
@@ -132,7 +139,7 @@ export async function GET(
             display: "flex",
             flex: 1,
             alignItems: "center",
-            gap: "52px",
+            gap: "44px",
             marginTop: "8px",
           }}
         >
@@ -140,56 +147,114 @@ export async function GET(
             style={{
               display: "flex",
               position: "relative",
-              borderRadius: "9999px",
-              border: `8px solid ${rank.color}`,
-              boxShadow: `0 0 70px ${rank.glow}`,
+              width: `${MEDALLION}px`,
+              height: `${MEDALLION}px`,
+              flexShrink: 0,
             }}
           >
-            {avatar ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={avatar}
-                alt=""
-                width={260}
-                height={260}
-                style={{
-                  width: "260px",
-                  height: "260px",
-                  objectFit: "cover",
-                  borderRadius: "9999px",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  width: "260px",
-                  height: "260px",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "9999px",
-                  backgroundColor: "#1a102a",
-                  fontSize: "110px",
-                  color: rank.color,
-                }}
-              >
-                {(profile.name ?? profile.login).slice(0, 1).toUpperCase()}
-              </div>
-            )}
-            {/* Fog over the portrait, echoing the site */}
             <div
               style={{
                 display: "flex",
                 position: "absolute",
-                top: 0,
-                left: 0,
-                width: "260px",
-                height: "260px",
+                top: `${inset}px`,
+                left: `${inset}px`,
+                width: `${PORTRAIT}px`,
+                height: `${PORTRAIT}px`,
                 borderRadius: "9999px",
-                backgroundImage:
-                  "radial-gradient(circle at 30% 72%, rgba(205,205,225,0.32), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)",
+                boxShadow: `0 0 70px ${rank.glow}`,
+                ...(ring ? {} : { border: `8px solid ${rank.color}` }),
               }}
-            />
+            >
+              {avatar ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={avatar}
+                  alt=""
+                  width={PORTRAIT}
+                  height={PORTRAIT}
+                  style={{
+                    width: `${PORTRAIT}px`,
+                    height: `${PORTRAIT}px`,
+                    objectFit: "cover",
+                    borderRadius: "9999px",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    width: `${PORTRAIT}px`,
+                    height: `${PORTRAIT}px`,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "9999px",
+                    backgroundColor: "#1a102a",
+                    fontSize: "110px",
+                    color: rank.color,
+                  }}
+                >
+                  {(profile.name ?? profile.login).slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              {/* Fog over the portrait, echoing the site */}
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: `${PORTRAIT}px`,
+                  height: `${PORTRAIT}px`,
+                  borderRadius: "9999px",
+                  backgroundImage:
+                    "radial-gradient(circle at 30% 72%, rgba(205,205,225,0.32), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)",
+                }}
+              />
+            </div>
+            {ring && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={ring.dataUri}
+                alt=""
+                width={MEDALLION}
+                height={MEDALLION}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: `${MEDALLION}px`,
+                  height: `${MEDALLION}px`,
+                }}
+              />
+            )}
+            {/* LV badge on the bottom edge — a full-width flex row centres it,
+                since satori has no reliable percentage transform here. */}
+            <div
+              style={{
+                display: "flex",
+                position: "absolute",
+                left: 0,
+                bottom: "-18px",
+                width: `${MEDALLION}px`,
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  borderRadius: "9999px",
+                  border: `3px solid ${rank.color}`,
+                  backgroundColor: "#0b0710",
+                  boxShadow: `0 0 14px ${rank.color}, 0 0 34px ${rank.glow}`,
+                  padding: "5px 22px",
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color: rank.color,
+                }}
+              >
+                LV {profile.level}
+              </div>
+            </div>
           </div>
 
           <div
@@ -208,7 +273,7 @@ export async function GET(
             <div
               style={{ display: "flex", fontSize: "28px", color: "#8a8172" }}
             >
-              @{profile.login} · LV {profile.level}
+              @{profile.login}
             </div>
             <div
               style={{
@@ -264,12 +329,13 @@ export async function GET(
               }}
             >
               <div
-                style={{ fontSize: "44px", fontWeight: 700, color: "#d4af37" }}
+                style={{ display: "flex", fontSize: "44px", fontWeight: 700, color: "#d4af37" }}
               >
                 {profile.stats[k]}
               </div>
               <div
                 style={{
+                  display: "flex",
                   fontSize: "20px",
                   letterSpacing: "4px",
                   color: "#dc2626",

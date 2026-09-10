@@ -5,7 +5,7 @@ import { getBossProfile } from "@/lib/profile";
 import { GitHubError } from "@/lib/github/client";
 import { STAT_KEYS, STAT_LABELS } from "@/lib/scoring/types";
 import { deviconUrl } from "@/lib/devicon";
-import { fetchImageDataUri, loadFonts, readPublicImage } from "@/lib/og";
+import { fetchImageDataUri, loadFonts, readPublicImage, readRankRing } from "@/lib/og";
 import {
   spritesheetPath, detectGender,
   RANK_GLOW_COLOR,
@@ -72,17 +72,25 @@ async function buildCard(
 
   const SPRITE_DISPLAY = 288;
 
-  const [avatar, langIcon, { fonts, fontFamily }, serverSprite, paperDataUri] = await Promise.all([
+  const [avatar, langIcon, { fonts, fontFamily }, serverSprite, paperDataUri, ring] = await Promise.all([
     fetchImageDataUri(profile.avatarUrl),
     profile.topLanguage ? fetchLanguageIcon(profile.topLanguage) : Promise.resolve(null),
     loadFonts(),
     // Only extract server-side if client didn't send one
     clientSprite ? Promise.resolve(null) : extractSpriteDataUri(sheetPath, SPRITE_DISPLAY),
     readPublicImage("img/pixel-paper.png"),
+    readRankRing(rank.name),
   ]);
 
   // Client sprite (already tinted, exact frame) takes priority
   const spriteDataUri = clientSprite || serverSprite;
+
+  // Medallion geometry. With ring art the outer box is fixed and the portrait is
+  // sized to that ring's hole; without it (Hollow) the portrait keeps its old
+  // size and the box is just the portrait plus its border.
+  const MEDALLION = ring ? 500 : 336;
+  const PORTRAIT  = ring ? Math.round(MEDALLION * ring.innerRatio) : 320;
+  const inset     = Math.round((MEDALLION - PORTRAIT) / 2);
 
   return new ImageResponse(
     (
@@ -98,7 +106,7 @@ async function buildCard(
             "radial-gradient(1000px 900px at 50% 0%, rgba(220,38,38,0.20), transparent 65%), radial-gradient(900px 800px at 50% 100%, rgba(212,175,55,0.12), transparent 65%)",
           color: "#e8e0cf",
           fontFamily,
-          padding: "110px 80px 44px",
+          padding: "80px 80px 44px",
         }}
       >
         {/* Rank */}
@@ -106,26 +114,56 @@ async function buildCard(
           {rank.name}
         </div>
 
-        {/* Avatar — slightly larger */}
-        <div style={{ display:"flex", position:"relative", marginTop:"36px", borderRadius:"9999px", border:`8px solid ${rank.color}`, boxShadow:`0 0 70px ${rank.glow}` }}>
-          {avatar ? (
+        {/* Medallion — portrait, rank ring, level */}
+        <div style={{ display:"flex", position:"relative", marginTop:"36px", width:`${MEDALLION}px`, height:`${MEDALLION}px` }}>
+          <div style={{
+            display: "flex",
+            position: "absolute",
+            top: `${inset}px`,
+            left: `${inset}px`,
+            width: `${PORTRAIT}px`,
+            height: `${PORTRAIT}px`,
+            borderRadius: "9999px",
+            boxShadow: `0 0 70px ${rank.glow}`,
+            ...(ring ? {} : { border: `8px solid ${rank.color}` }),
+          }}>
+            {avatar ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={avatar} alt="" width={PORTRAIT} height={PORTRAIT} style={{ width:`${PORTRAIT}px`, height:`${PORTRAIT}px`, objectFit:"cover", borderRadius:"9999px" }} />
+            ) : (
+              <div style={{ display:"flex", width:`${PORTRAIT}px`, height:`${PORTRAIT}px`, alignItems:"center", justifyContent:"center", borderRadius:"9999px", backgroundColor:"#1a102a", fontSize:"128px", color:rank.color }}>
+                {(profile.name ?? profile.login).slice(0,1).toUpperCase()}
+              </div>
+            )}
+            <div style={{ display:"flex", position:"absolute", top:0, left:0, width:`${PORTRAIT}px`, height:`${PORTRAIT}px`, borderRadius:"9999px", backgroundImage:"radial-gradient(circle at 30% 72%, rgba(205,205,225,0.30), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)" }} />
+          </div>
+          {/* Ring art over the portrait, so its ornaments overlap the face */}
+          {ring && (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={avatar} alt="" width={320} height={320} style={{ width:"320px", height:"320px", objectFit:"cover", borderRadius:"9999px" }} />
-          ) : (
-            <div style={{ display:"flex", width:"320px", height:"320px", alignItems:"center", justifyContent:"center", borderRadius:"9999px", backgroundColor:"#1a102a", fontSize:"128px", color:rank.color }}>
-              {(profile.name ?? profile.login).slice(0,1).toUpperCase()}
-            </div>
+            <img src={ring.dataUri} alt="" width={MEDALLION} height={MEDALLION} style={{ position:"absolute", top:0, left:0, width:`${MEDALLION}px`, height:`${MEDALLION}px` }} />
           )}
-          <div style={{ display:"flex", position:"absolute", top:0, left:0, width:"320px", height:"320px", borderRadius:"9999px", backgroundImage:"radial-gradient(circle at 30% 72%, rgba(205,205,225,0.30), transparent 56%), linear-gradient(to top, rgba(0,0,0,0.55), transparent 46%)" }} />
-        </div>
-
-        {/* LV badge */}
-        <div style={{ display:"flex", marginTop:"-24px", borderRadius:"9999px", border:`3px solid ${rank.color}`, backgroundColor:"#0b0710", padding:"6px 26px", fontSize:"26px", color:rank.color }}>
-          LV {profile.level}
+          {/* LV badge, centred on the medallion's bottom edge. A full-width flex
+              row does the centring: satori has no reliable percentage transform
+              on a shrink-to-fit element. */}
+          <div style={{ display:"flex", position:"absolute", left:0, bottom:"-26px", width:`${MEDALLION}px`, justifyContent:"center" }}>
+            <div style={{
+              display: "flex",
+              borderRadius: "9999px",
+              border: `4px solid ${rank.color}`,
+              backgroundColor: "#0b0710",
+              boxShadow: `0 0 18px ${rank.color}, 0 0 46px ${rank.glow}`,
+              padding: "8px 32px",
+              fontSize: "34px",
+              fontWeight: 700,
+              color: rank.color,
+            }}>
+              LV {profile.level}
+            </div>
+          </div>
         </div>
 
         {/* Name + @login */}
-        <div style={{ display:"flex", marginTop:"28px", fontSize:"58px", fontWeight:700, textAlign:"center" }}>
+        <div style={{ display:"flex", marginTop:"52px", fontSize:"58px", fontWeight:700, textAlign:"center" }}>
           {profile.name ?? profile.login}
         </div>
         <div style={{ display:"flex", fontSize:"26px", color:"#8a8172" }}>
@@ -147,13 +185,21 @@ async function buildCard(
           ) : null}
         </div>
 
-        {/* Pixel art box — paper bg via img, sprite bottom-centre */}
+        {/*
+          Pixel art box — paper bg via img, sprite bottom-centre.
+          It absorbs the slack instead of a fixed height: a ranked medallion is
+          560px tall against Hollow's 336, and letting the box flex is what keeps
+          both cards full without hand-tuning every block above it. Clamped so
+          the sprite never crowds the frame nor floats in a sea of sky.
+        */}
         <div style={{
           display: "flex",
           position: "relative",
           marginTop: "32px",
           width: "920px",
-          height: "440px",
+          flexGrow: 1,
+          minHeight: "340px",
+          maxHeight: "470px",
           borderRadius: "20px",
           border: "2px solid rgba(212,175,55,0.18)",
           overflow: "hidden",
@@ -178,8 +224,8 @@ async function buildCard(
           )}
         </div>
 
-        {/* Stats — pushed to bottom with auto margin */}
-        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"auto", gap:"20px" }}>
+        {/* Stats */}
+        <div style={{ display:"flex", flexDirection:"column", width:"100%", marginTop:"32px", gap:"20px" }}>
           {STAT_KEYS.map((k) => (
             <div key={k} style={{ display:"flex", flexDirection:"column", width:"100%" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", width:"100%" }}>
@@ -196,8 +242,8 @@ async function buildCard(
           ))}
         </div>
 
-        {/* Footer */}
-        <div style={{ display:"flex", paddingTop:"24px", fontSize:"22px", letterSpacing:"2px", color:"#8a8172" }}>
+        {/* Footer — pinned to the bottom so any leftover slack sits above it */}
+        <div style={{ display:"flex", marginTop:"auto", paddingTop:"24px", fontSize:"22px", letterSpacing:"2px", color:"#8a8172" }}>
           gitsouls.com/{profile.login}
         </div>
       </div>

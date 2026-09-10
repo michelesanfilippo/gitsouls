@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { RANK_RING, type RankRing } from "./rank-ring";
+import type { RankName } from "./scoring/types";
 
 /**
  * Helpers shared by the image routes (`card.png`, `og.png`).
@@ -107,4 +109,18 @@ export async function readPublicImage(
   } catch {
     return null;
   }
+}
+
+/**
+ * The rank's portrait ring as a data URI, plus the hole ratio the caller needs
+ * to size the avatar. Null for Hollow (no art) and null on a read failure, so
+ * both fall back to the plain coloured border.
+ */
+export async function readRankRing(
+  rank: RankName,
+): Promise<(RankRing & { dataUri: string }) | null> {
+  const ring = RANK_RING[rank];
+  if (!ring) return null;
+  const dataUri = await readPublicImage(ring.src.replace(/^\//, ""));
+  return dataUri ? { ...ring, dataUri } : null;
 }
