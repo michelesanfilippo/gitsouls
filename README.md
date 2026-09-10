@@ -36,6 +36,10 @@
   <img src="public/sprites/readme/soulkeeper_f.gif"  width="80" title="Soulkeeper" alt="Soulkeeper" />
 </p>
 
+<p align="center">
+  <img src="https://www.gitsouls.com/michelesanfilippo/pixel.svg" alt="pixelego"/>
+</p>
+
 
 <h2 align="left">🔥 Summon your Soul</h2>
 Your GitSouls summoned at URL.</br>
